@@ -1,0 +1,67 @@
+# Tarkov Aim Lab Configuration
+# User-specific settings for sensitivity calculations
+
+player:
+  # In-game sensitivity setting
+  sensitivity: 0.192
+  
+  # ADS multiplier (sensitivity * this = ADS sens)
+  ads_multiplier: 1.42
+  
+  # Calculated ADS sensitivity: 0.192 * 1.42 = 0.27264
+  
+  # Field of View settings
+  fov:
+    hip: 69
+    ads: 53  # hip - 16
+  
+  # Mouse DPI (needed for cm/360 calculation)
+  dpi: 800
+  
+  # Monitor resolution
+  resolution:
+    width: 2560
+    height: 1440
+
+analysis:
+  # Crosshair velocity threshold for flick detection (pixels/frame)
+  # Values below this = "stationary", above = "moving"
+  flick_velocity_threshold: 15  # tune this empirically
+  
+  # Minimum frames crosshair must be stationary to count as "settled"
+  settle_frames: 3
+  
+  # Minimum flick duration (frames) to count as intentional
+  min_flick_frames: 2
+  
+  # ROI for crosshair detection (center of screen)
+  crosshair_roi:
+    # Percentage of screen width/height centered on screen
+    width_pct: 0.1   # 10% of screen width
+    height_pct: 0.1  # 10% of screen height
+
+detection:
+  # YOLO model to use
+  yolo_model: "yolov8n.pt"  # nano for speed, can upgrade to 's' or 'm'
+  
+  # Confidence threshold for enemy detection
+  confidence_threshold: 0.5
+  
+  # Only detect "person" class (class 0 in COCO)
+  target_classes: [0]
+
+video:
+  # Outplayed recordings root (will search subfolders)
+  recordings_path: "X:/Overwolf/Outplayed/Escape from Tarkov Arena"
+  
+  # Frame skip for initial pass (process every Nth frame)
+  # Set to 1 for full analysis, higher for quick scans
+  frame_skip: 1
+
+debug:
+  # Save annotated frames for debugging
+  save_debug_frames: true
+  debug_output_path: "./data/debug_frames"
+  
+  # Verbose logging
+  verbose: true
