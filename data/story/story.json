@@ -1,0 +1,229 @@
+{
+  "schemaVersion": 1,
+  "gameVersion": "1.0.6.0.46010",
+  "attribution": "Chapter/stage data derived from the Escape from Tarkov Fandom wiki (CC-BY-SA, https://escapefromtarkov.fandom.com) and the prior story-tracker artifact. Ending mappings are seed-confidence pending wiki re-verification (see decisions[].confidence).",
+  "chapters": [
+    {
+      "id": "tour", "name": "Tour", "wikiPage": "Tour", "order": 1,
+      "stages": [
+        { "id": "tour-01", "name": "Escape Ground Zero", "hint": "Complete tutorial raid behind SkySide building" },
+        { "id": "tour-02", "name": "Talk to Therapist", "hint": "Visit Therapist in Traders menu" },
+        { "id": "tour-03", "name": "Pay 250K roubles", "hint": "Hand over 250,000 Roubles for Streets access" },
+        { "id": "tour-04", "name": "Talk to Ragman", "hint": "Unlocks Interchange map" },
+        { "id": "tour-05", "name": "Extract Interchange", "hint": "Survive and extract with any status" },
+        { "id": "tour-06", "name": "Talk to Skier", "hint": "Unlocks Customs map" },
+        { "id": "tour-07", "name": "Extract Customs", "hint": "Survive and extract with any status" },
+        { "id": "tour-08", "name": "Give 5 materials", "hint": "Any Building Materials (Found in Raid)" },
+        { "id": "tour-09", "name": "Talk to Mechanic", "hint": "Unlocks Factory map" },
+        { "id": "tour-10", "name": "Extract Factory", "hint": "Survive and extract with any status" },
+        { "id": "tour-11", "name": "Give 2 weapons", "hint": "Any weapons found in raid" },
+        { "id": "tour-12", "name": "Kill 3 on Woods", "hint": "Any enemies - Scavs, PMCs, or bosses" },
+        { "id": "tour-13", "name": "Extract Woods", "hint": "Survive and extract with any status" },
+        { "id": "tour-14", "name": "Find Terminal entrance", "hint": "SE Shoreline near Road to Customs" },
+        { "id": "tour-15", "name": "Use intercom", "hint": "Tower base - stay away from walls" },
+        { "id": "tour-16", "name": "Extract Shoreline", "hint": "Survive and extract with any status" },
+        { "id": "tour-17", "name": "Pay $20K", "hint": "Buy dollars from Peacekeeper" },
+        { "id": "tour-18", "name": "Give 5 dogtags", "hint": "Loot from dead PMCs (any level)" },
+        { "id": "tour-19", "name": "Access Lab", "hint": "Transit from Factory basement or Streets" },
+        { "id": "tour-20", "name": "Search Lab offices", "hint": "Manager office O21, second level" },
+        { "id": "tour-21", "name": "Search server room", "hint": "Next to warehouse, first level" },
+        { "id": "tour-22", "name": "Find drainage escape", "hint": "Sewage Conduit extract underground" }
+      ]
+    },
+    {
+      "id": "falling-skies", "name": "Falling Skies", "wikiPage": "Falling_Skies", "order": 2,
+      "stages": [
+        { "id": "fs-01", "name": "Find crashed plane", "hint": "Woods near Jaeger camp area" },
+        { "id": "fs-02", "name": "Reach Prapor LL2", "hint": "Complete Prapor quests for loyalty" },
+        { "id": "fs-03", "name": "Ask about plane", "hint": "Talk to traders in menu" },
+        { "id": "fs-04", "name": "(Opt) Pay $2K", "hint": "Therapist hint for G-Wagon location", "optional": true },
+        { "id": "fs-05", "name": "Get flash drive", "hint": "Black G-Wagon near Tunnel, Shoreline" },
+        { "id": "fs-06", "name": "Give to Prapor", "hint": "Hand over the flash drive" },
+        { "id": "fs-07", "name": "Wait 1h", "hint": "Real-time wait" },
+        { "id": "fs-08", "name": "Get flight recorder", "hint": "Under plane, starboard/north side" },
+        { "id": "fs-09", "name": "Leave at Fisher Island", "hint": "Corner room in island house" },
+        { "id": "fs-10", "name": "Get transcript", "hint": "Chairman House, NW Shoreline swamp" },
+        { "id": "fs-11", "name": "Give transcript", "hint": "Hand over to Prapor" },
+        { "id": "fs-12", "name": "Wait 1h", "hint": "Real-time wait" },
+        { "id": "fs-13", "name": "Get armored case", "hint": "Plane cockpit on Woods" },
+        { "id": "fs-14", "name": "CASE CHOICE", "hint": "Major decision - branches Boreas requirements", "decision": "falling_skies_case" }
+      ]
+    },
+    {
+      "id": "batya", "name": "Batya", "wikiPage": "Batya", "order": 3,
+      "stages": [
+        { "id": "batya-01", "name": "Find BEAR outpost", "hint": "Stronghold, Resort tank, or USEC rock" },
+        { "id": "batya-02", "name": "Get Bogatyr Patch", "hint": "Power station trailer, south of Gas" },
+        { "id": "batya-03", "name": "Read patch", "hint": "Inspect in inventory" },
+        { "id": "batya-04", "name": "Visit Gnezdo", "hint": "BEAR outpost on Customs" },
+        { "id": "batya-05", "name": "Visit Ryabina", "hint": "Behind Sanatorium, Shoreline" },
+        { "id": "batya-06", "name": "Find grave", "hint": "Moreman grave on Woods" },
+        { "id": "batya-07", "name": "Craft tapes", "hint": "Workbench - RAM, batteries, wires" },
+        { "id": "batya-08", "name": "Listen tapes", "hint": "Play both in Handbook" },
+        { "id": "batya-09", "name": "Contact squad", "hint": "Requires Intel Center Level 3" },
+        { "id": "batya-10", "name": "Bring items to LK", "hint": "All Bogatyr items to Lightkeeper" },
+        { "id": "batya-11", "name": "Combat challenges", "hint": "15 kills no death, 4 PMC streak" },
+        { "id": "batya-12", "name": "Wait 24h", "hint": "Real-time wait for documents" },
+        { "id": "batya-13", "name": "Collect docs", "hint": "Red box at LK sliding door entrance" }
+      ]
+    },
+    {
+      "id": "accidental-witness", "name": "Accidental Witness", "wikiPage": "Accidental_Witness", "order": 4,
+      "stages": [
+        { "id": "aw-01", "name": "Find scribbled car", "hint": "Dorms courtyard parking, Customs" },
+        { "id": "aw-02", "name": "Find Kozlov location", "hint": "Two-story dorms building" },
+        { "id": "aw-03", "name": "Read door note", "hint": "Wall next to Room 110 door" },
+        { "id": "aw-04", "name": "(Opt) Enter room", "hint": "Need Dorm Room 110 key", "optional": true },
+        { "id": "aw-05", "name": "Ask about Anastasia", "hint": "Talk to Skier" },
+        { "id": "aw-06", "name": "Access apt", "hint": "Zmeisky Alley bldg 3, Streets" },
+        { "id": "aw-07", "name": "Read docs", "hint": "Documents inside apartment" }
+      ]
+    },
+    {
+      "id": "they-are-already-here", "name": "They Are Already Here", "wikiPage": "They_Are_Already_Here", "order": 5,
+      "stages": [
+        { "id": "taah-01", "name": "Find cult note", "hint": "Marked circles or kill Cultist" },
+        { "id": "taah-02", "name": "Find torture house", "hint": "Flooded village, Lighthouse" },
+        { "id": "taah-03", "name": "Get tape & key", "hint": "Tape on chair, key on table" },
+        { "id": "taah-04", "name": "Search apt", "hint": "Apt 69, north of Stylobate, Streets" },
+        { "id": "taah-05", "name": "Find Book", "hint": "Bookshelf in Igor office" },
+        { "id": "taah-06", "name": "Check village", "hint": "Two houses near church, Woods" },
+        { "id": "taah-07", "name": "Read newspaper", "hint": "Tarkov Lights on photo board" },
+        { "id": "taah-08", "name": "Find chalet note", "hint": "Lower chalet balcony, Lighthouse" },
+        { "id": "taah-09", "name": "Get KORD key", "hint": "On ATV outside two-story house" },
+        { "id": "taah-10", "name": "Reprogram card", "hint": "Workbench craft" },
+        { "id": "taah-11", "name": "Kill 2 Priests", "hint": "Cultist Priests on night raids" },
+        { "id": "taah-12", "name": "Get priest note", "hint": "Marked room 314 or RB-BK" },
+        { "id": "taah-13", "name": "Access ARRS", "hint": "Use reprogrammed card at 14-4" },
+        { "id": "taah-14", "name": "Give USB", "hint": "Hand to Mechanic" },
+        { "id": "taah-15", "name": "Read specs", "hint": "Check messages" }
+      ]
+    },
+    {
+      "id": "blue-fire", "name": "Blue Fire", "wikiPage": "Blue_Fire", "order": 6,
+      "stages": [
+        { "id": "bf-01", "name": "Find leaflet", "hint": "Green container, Woods Scav base" },
+        { "id": "bf-02", "name": "Get fragment", "hint": "Scav/Cultist areas, Streets/GZ" },
+        { "id": "bf-03", "name": "Check Post Office", "hint": "Primorsky Ave, Streets" },
+        { "id": "bf-04", "name": "Collect tapes", "hint": "3 tapes in Post Office" },
+        { "id": "bf-05", "name": "Get car key", "hint": "Under van rear wheel" },
+        { "id": "bf-06", "name": "Get blueprints", "hint": "Inside post van" },
+        { "id": "bf-07", "name": "Sell or keep", "hint": "Sell to Mechanic or keep" }
+      ]
+    },
+    {
+      "id": "the-ticket", "name": "The Ticket", "wikiPage": "The_Ticket", "order": 7,
+      "stages": [
+        { "id": "tt-01", "name": "Wait for Kerman", "hint": "Message notification" },
+        { "id": "tt-02", "name": "Contact Kerman", "hint": "Use Intel Center in Hideout" },
+        { "id": "tt-03", "name": "WORK WITH KERMAN?", "hint": "Opens Savior or locks Survivor", "decision": "ticket_kerman" },
+        { "id": "tt-04", "name": "Find Jammer", "hint": "Signal Jammer in Lab (3 spots)" },
+        { "id": "tt-05", "name": "Unlock case (55h)", "hint": "Workbench - uninterrupted power" },
+        { "id": "tt-06", "name": "GATHER EVIDENCE?", "hint": "YES=Savior path, NO=betray", "decision": "ticket_evidence" },
+        { "id": "tt-07", "name": "Wait for Elektronik", "hint": "Real-time wait after Mechanic" },
+        { "id": "tt-08", "name": "Pay 40 BTC", "hint": "40 Bitcoin to Mechanic at once" },
+        { "id": "tt-09", "name": "Get RFID device", "hint": "Apt 2, Klimova 14A, under table" },
+        { "id": "tt-10", "name": "Get Kruglov card", "hint": "Lab safe - needs Black keycard" },
+        { "id": "tt-11", "name": "Access hidden room", "hint": "Cardinal Apt 1, TerraGroup key" },
+        { "id": "tt-12", "name": "FINAL PATH?", "hint": "Prapor=Fallen, LK=Debtor", "decision": "ticket_final" }
+      ]
+    },
+    {
+      "id": "the-unheard", "name": "The Unheard", "wikiPage": "The_Unheard", "order": 8,
+      "stages": [
+        { "id": "tu-01", "name": "Find Purification note", "hint": "TerraGroup security post or GZ" },
+        { "id": "tu-02", "name": "Get Cargo Fax", "hint": "Dark office 022, Lab 2nd floor" },
+        { "id": "tu-03", "name": "Find doc", "hint": "Enterprise doc, Lab testing area" },
+        { "id": "tu-04", "name": "Get burnt doc", "hint": "TerraGroup storage, Factory" },
+        { "id": "tu-05", "name": "Get HDD", "hint": "Gray G-Wagon near LexOs, Streets" },
+        { "id": "tu-06", "name": "Get USB", "hint": "Resort East 305, Shoreline" },
+        { "id": "tu-07", "name": "Check whiteboard", "hint": "Announcement board in Lab" },
+        { "id": "tu-08", "name": "Wait 4h", "hint": "Real-time wait for Kerman" },
+        { "id": "tu-09", "name": "Access apt", "hint": "A.P. hidden room, Cardinal" },
+        { "id": "tu-10", "name": "Read notes", "hint": "All 4 notes in hidden room" }
+      ]
+    },
+    {
+      "id": "the-labyrinth", "name": "The Labyrinth", "wikiPage": "The_Labyrinth", "order": 9,
+      "stages": [
+        { "id": "lab-01", "name": "Find transit", "hint": "Resort west wing basement" },
+        { "id": "lab-02", "name": "Get Knossos key", "hint": "Admin Resort, 5 spawn spots" },
+        { "id": "lab-03", "name": "Ask traders", "hint": "Jaeger knows about BEAR squad" },
+        { "id": "lab-04", "name": "Wait for Jaeger", "hint": "24-48h for keycard barter" },
+        { "id": "lab-05", "name": "Get keycards", "hint": "2 free + barter from Jaeger" },
+        { "id": "lab-06", "name": "Enter Labyrinth", "hint": "Knossos + Labrys at transit" },
+        { "id": "lab-07", "name": "Solve puzzle", "hint": "Each spawn has unique trap" },
+        { "id": "lab-08", "name": "Find bodies", "hint": "Inspect all BEAR bodies" },
+        { "id": "lab-09", "name": "Get 5 notes", "hint": "Research Notes in Labyrinth" },
+        { "id": "lab-10", "name": "Find leader", "hint": "Squad leader body" },
+        { "id": "lab-11", "name": "Access locked room", "hint": "Key from assistant body" },
+        { "id": "lab-12", "name": "Get report", "hint": "Drainage near yacht club" },
+        { "id": "lab-13", "name": "Give tape", "hint": "To Jaeger - AXMC + 500K roubles" }
+      ]
+    },
+    {
+      "id": "boreas", "name": "Boreas", "wikiPage": "Boreas", "order": 10, "addedIn": "1.0.5.0",
+      "stages": [
+        { "id": "bor-01", "name": "Start chapter", "hint": "Paradigm Shipping poster OR Intel Center L3 distress signal" },
+        { "id": "bor-02", "name": "Ask traders about Paradigm/signal", "hint": "Mechanic for the distress signal origin" },
+        { "id": "bor-03", "name": "Locate cell-tower equipment", "hint": "Under cellular tower on Woods", "maps": ["Woods"] },
+        { "id": "bor-04", "name": "Repair equipment", "hint": "Needs Toolset; report back to Mechanic", "maps": ["Woods"] },
+        { "id": "bor-05", "name": "Obtain Paradigm Shipping directive", "hint": "Then tell Mechanic about Boreas" },
+        { "id": "bor-06", "name": "Arrange transport to icebreaker", "hint": "Branches on Falling Skies case decision" },
+        { "id": "bor-06a", "name": "Hand over AMG-10 fluid to Prapor", "hint": "Case-given branch", "condition": { "decision": "falling_skies_case", "option": "give_prapor" } },
+        { "id": "bor-06b", "name": "Hand 3 FIR Military power filters + AMG-10 to Prapor", "hint": "Case-kept branch", "condition": { "decision": "falling_skies_case", "option": "keep_case" } },
+        { "id": "bor-07", "name": "Find alternative transport", "hint": "Talk to the BTR Driver" },
+        { "id": "bor-08", "name": "Board smuggler hovercraft", "hint": "Shoreline; optional 400K roubles insertion / 2.5K euros evac", "maps": ["Shoreline"] },
+        { "id": "bor-09", "name": "Arrive at Icebreaker; check for survivors", "hint": "PvE-style ship raid, 1-3 players", "maps": ["Icebreaker"] },
+        { "id": "bor-10", "name": "Access engine room", "hint": "Optional engine room keycard", "maps": ["Icebreaker"] },
+        { "id": "bor-11", "name": "Breach superstructure", "hint": "SZ-1 charge on roof chain; ask Mechanic + Prapor about explosives", "maps": ["Icebreaker"] },
+        { "id": "bor-12", "name": "Reach upper decks; get level-6 door code", "hint": "Surviving scientist + Mechanic; plant hacking device in Lab server room", "maps": ["Icebreaker", "The Lab"] },
+        { "id": "bor-13", "name": "Open code-locked door; locate compartment C-1", "hint": "Decrypt The Unheard's data aboard Boreas", "maps": ["Icebreaker"] }
+      ]
+    }
+  ],
+  "decisions": [
+    {
+      "id": "falling_skies_case", "chapter": "falling-skies",
+      "question": "What did you do with the armored case?",
+      "confidence": "seed",
+      "options": [
+        { "id": "give_prapor", "label": "Gave it to Prapor", "effects": { "notes": "+1M roubles; Boreas transport branch: AMG-10 hand-in only" } },
+        { "id": "keep_case", "label": "Kept it", "effects": { "notes": "Faster unlock; Boreas transport branch adds 3x FIR Military power filter hand-in" } }
+      ]
+    },
+    {
+      "id": "ticket_kerman", "chapter": "the-ticket",
+      "question": "Work with Mr. Kerman?",
+      "confidence": "seed",
+      "options": [
+        { "id": "yes", "label": "Yes, work with him", "effects": { "locksEndings": [], "notes": "Opens Savior path; keeps Fallen/Debtor reachable" } },
+        { "id": "no", "label": "No, reject him", "effects": { "setsOnlyEnding": "survivor", "notes": "Locks into Survivor" } }
+      ]
+    },
+    {
+      "id": "ticket_evidence", "chapter": "the-ticket",
+      "question": "Gather evidence for Kerman?",
+      "confidence": "seed",
+      "options": [
+        { "id": "yes", "label": "Yes, gather it", "effects": { "setsOnlyEnding": "savior", "notes": "Requires completing Batya, Blue Fire, The Unheard evidence chains" } },
+        { "id": "no", "label": "No, refuse", "effects": { "locksEndings": ["savior"], "notes": "Betray Kerman; Fallen or Debtor remain" } }
+      ]
+    },
+    {
+      "id": "ticket_final", "chapter": "the-ticket",
+      "question": "Final escape route?",
+      "confidence": "seed",
+      "options": [
+        { "id": "prapor", "label": "Prapor (500M roubles)", "effects": { "setsOnlyEnding": "fallen" } },
+        { "id": "lightkeeper", "label": "Lightkeeper", "effects": { "setsOnlyEnding": "debtor" } }
+      ]
+    }
+  ],
+  "endings": [
+    { "id": "savior", "name": "Savior", "subtitle": "For Humanity", "description": "True ending. Expose TerraGroup, save others. Requires Kerman cooperation, full evidence chains, and Lightkeeper trust." },
+    { "id": "survivor", "name": "Survivor", "subtitle": "Selfish Escape", "description": "Escape alone after rejecting Kerman." },
+    { "id": "fallen", "name": "Fallen", "subtitle": "Betrayer", "description": "Betrayed Kerman; paid 500M roubles to Prapor for the way out." },
+    { "id": "debtor", "name": "Debtor", "subtitle": "Lightkeeper's Pawn", "description": "Escaped via Lightkeeper; the debt follows you out." }
+  ]
+}

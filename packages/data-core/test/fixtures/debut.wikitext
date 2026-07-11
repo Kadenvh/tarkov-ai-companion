@@ -1,0 +1,26 @@
+{{Infobox quest
+|icon         =
+|image        =DebutQuestPicture.png
+|location     =
+|given by     =[[Prapor]]
+|reward       =
+|reputation   =
+|quest number =
+|previous     =[[Shooting Cans]]
+|leads to     =[[Search Mission]]<br/>[[Luxurious Life]]
+|related      =
+|related2     =
+|reqkappa     =<font color="red">Yes</font>
+}}
+
+'''{{PAGENAME}}''' is a [[Quests|Quest]] in ''[[Escape from Tarkov]]''.
+
+==Objectives==
+* Eliminate 5 [[Scavs]] all over the Tarkov territory
+* Obtain and hand over 2 [[MP-133 12ga pump-action shotgun|MP-133 12ga shotguns]]
+
+==Rewards==
+* +1,700 [[EXP]]
+* [[Prapor]] Rep <font color="green">'''+0.02'''</font>
+* 15,000 Roubles
+** 15,750 Roubles with [[Hideout#Modules|Intelligence center]] Level 1

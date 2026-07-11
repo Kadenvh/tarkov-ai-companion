@@ -33,5 +33,17 @@ models/*.onnx
 .DS_Store
 Thumbs.db
 
-# Logs
+# Logs (but committed test fixtures are allowed)
 *.log
+!packages/**/test/fixtures/**/*.log
+!apps/**/test/fixtures/**/*.log
+
+# Node / TypeScript (tarkov-ai-companion)
+node_modules/
+*.tsbuildinfo
+.env
+.env.*
+# wiki fetch cache (re-fetchable; fixtures live in test/fixtures)
+data/cache/
+# per-profile SQLite state, config, tokens (local mutable data — never committed)
+data/local/
