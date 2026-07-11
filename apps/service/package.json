@@ -1,0 +1,31 @@
+{
+  "name": "@tac/service",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "dev": "tsx watch src/main.ts",
+    "start": "tsx src/main.ts"
+  },
+  "dependencies": {
+    "@fastify/static": "^8.0.0",
+    "@fastify/websocket": "^11.0.0",
+    "@tac/data-core": "workspace:*",
+    "@tac/environment": "workspace:*",
+    "@tac/insights": "workspace:*",
+    "@tac/planner": "workspace:*",
+    "@tac/shared": "workspace:*",
+    "@tac/state-engine": "workspace:*",
+    "fastify": "^5.0.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  }
+}
