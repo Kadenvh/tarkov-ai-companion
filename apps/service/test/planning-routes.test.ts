@@ -55,6 +55,12 @@ describe("planning routes (CONTRACTS §5.2)", () => {
     expect(raid).toHaveProperty("levelBefore");
     expect(raid).toHaveProperty("levelAfter");
     expect(raid.tasks.length).toBeGreaterThan(0);
+    // every raid map id resolves to a display name (consumers never show raw ids)
+    expect(body.mapNames).toBeDefined();
+    for (const r of body.plan.raids) {
+      expect(typeof body.mapNames[r.map]).toBe("string");
+      expect(body.mapNames[r.map]).not.toMatch(/^[0-9a-f]{24}$/);
+    }
   });
 
   it("GET /api/plan clamps a garbage horizon to the default", async () => {

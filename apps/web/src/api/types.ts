@@ -111,6 +111,8 @@ export interface PlanResponse extends Plan {
   /** plan hash (CONTRACTS §5.2) */
   hash?: string;
   generatedAt?: string;
+  /** map id → display name for every planned raid (CONTRACTS §5.2) */
+  mapNames?: Record<string, string>;
   /** alternative attachment point some services use: warnings beside the plan */
   warnings?: ForesightWarning[] | Record<string, ForesightWarning[]>;
 }

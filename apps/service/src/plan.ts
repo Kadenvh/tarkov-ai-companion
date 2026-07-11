@@ -59,6 +59,8 @@ export interface PlanBundle {
   plan: Plan;
   /** foresight warnings per planned raid (index-aligned with plan.raids) */
   foresight: RaidForesight[];
+  /** display names for every map id in plan.raids (+ "any") — consumers must never show raw ids */
+  mapNames: Record<string, string>;
 }
 
 export function goalsOf(store: ProfileStore): Goal[] {
@@ -96,6 +98,11 @@ export function buildPlanBundle(world: LoadedWorld, store: ProfileStore, horizon
     .digest("hex")
     .slice(0, 16);
 
+  const mapNames: Record<string, string> = { any: "Any map" };
+  for (const raid of plan.raids) {
+    if (raid.map !== "any") mapNames[raid.map] = world.mapName(raid.map);
+  }
+
   return {
     hash,
     builtAt: new Date().toISOString(),
@@ -105,6 +112,7 @@ export function buildPlanBundle(world: LoadedWorld, store: ProfileStore, horizon
     weights,
     plan,
     foresight,
+    mapNames,
   };
 }
 
@@ -172,15 +180,21 @@ export class PlanPipeline {
       // The broadcast path is the single owner of lastHash advancement: compare
       // against the last hash seen by a broadcast (or the boot baseline), then
       // record the rebuilt hash so the next cycle diffs against THIS plan.
-      const previous = this.lastHash;
-      const bundle = this.get(DEFAULT_HORIZON);
-      this.lastHash = bundle.hash;
-      if (bundle.hash !== previous) this.onUpdated?.(bundle);
+      try {
+        const previous = this.lastHash;
+        const bundle = this.get(DEFAULT_HORIZON);
+        this.lastHash = bundle.hash;
+        if (bundle.hash !== previous) this.onUpdated?.(bundle);
+      } catch (err) {
+        // a rebuild failure must not crash the process; the next read or
+        // state.changed retries with the same inputs surfaced to the caller
+        console.error("[plan] debounced rebuild failed:", err);
+      }
     }, this.debounceMs);
     this.timer.unref();
   }
 
-  /** Swap the underlying store/world (profile switch); rebinds and invalidates. */
+  /** Swap the underlying store/world (profile switch); rebinds, clears caches, and resets the broadcast baseline (the next read re-seeds it). */
   retarget(world: LoadedWorld, store: ProfileStore): void {
     this.unbindStore();
     this.world = world;

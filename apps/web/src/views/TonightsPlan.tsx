@@ -91,7 +91,7 @@ export function TonightsPlan(): ReactNode {
   const { plan, quartermaster, planFetchedAt, planStale, refreshPlan, horizon, setHorizon } =
     useApp();
   const [refreshing, setRefreshing] = useState(false);
-  const vm = buildPlanVM(plan, quartermaster, mapDisplayName);
+  const vm = buildPlanVM(plan, quartermaster, (key) => plan?.mapNames?.[key] ?? mapDisplayName(key));
 
   const doRefresh = async (): Promise<void> => {
     setRefreshing(true);

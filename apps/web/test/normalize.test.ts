@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   KAPPA_TOTAL_FALLBACK,
   LIGHTKEEPER_TOTAL_FALLBACK,
+  normalizePlanResponse,
+  normalizeStoryResponse,
   readGraphSummary,
   readInsightsEconomy,
   readInsightsRaids,
@@ -9,6 +11,101 @@ import {
   readPlayerState,
   readSettingsDiffs,
 } from "../src/lib/normalize";
+
+describe("normalizePlanResponse", () => {
+  const raid = {
+    index: 1,
+    map: "5704e3c2d2720bac5b8b4567",
+    tasks: [{ id: "t1", name: "Debut", anyMap: false, reasons: ["Kappa-required"] }],
+    levelBefore: 5,
+    levelAfter: 6,
+    score: 4.2,
+  };
+  const innerPlan = {
+    raids: [raid],
+    freeTasksCompleted: [{ id: "f1", name: "Shortage" }],
+    goalTaskCount: 257,
+    remainingGoalTasks: 200,
+    levelStalls: [],
+    reachedLevel: 12,
+  };
+
+  it("flattens the service PlanBundle (regression: live UI showed 'No plan yet' on a nested bundle)", () => {
+    const flat = normalizePlanResponse({
+      hash: "abc123",
+      builtAt: "2026-07-11T20:00:00.000Z",
+      buildMs: 5,
+      horizon: 10,
+      goals: [{ type: "kappa" }],
+      weights: { task: 1, xp: 0.15, criticality: 0.4, mapCost: {} },
+      plan: innerPlan,
+      foresight: [
+        {
+          raidIndex: 1,
+          warnings: [
+            {
+              kind: "task-exclusivity",
+              completing: { id: "t1", name: "Debut" },
+              fails: [{ id: "t9", name: "Other", kappaRequired: true, lightkeeperRequired: false }],
+              severity: "critical",
+            },
+          ],
+        },
+      ],
+      mapNames: { "5704e3c2d2720bac5b8b4567": "Woods", any: "Any map" },
+    });
+    expect(flat).not.toBeNull();
+    expect(flat!.raids).toHaveLength(1);
+    expect(flat!.hash).toBe("abc123");
+    expect(flat!.generatedAt).toBe("2026-07-11T20:00:00.000Z");
+    expect(flat!.mapNames?.["5704e3c2d2720bac5b8b4567"]).toBe("Woods");
+    expect((flat!.warnings as Record<string, unknown[]>)["1"]).toHaveLength(1);
+    expect(flat!.goalTaskCount).toBe(257);
+  });
+
+  it("passes an already-flat response through and rejects shapes without raids", () => {
+    const already = { ...innerPlan, hash: "dd" };
+    expect(normalizePlanResponse(already)).toBe(already);
+    expect(normalizePlanResponse({ hello: true })).toBeNull();
+    expect(normalizePlanResponse(null)).toBeNull();
+    expect(normalizePlanResponse("junk")).toBeNull();
+  });
+});
+
+describe("normalizeStoryResponse", () => {
+  const dataset = {
+    schemaVersion: 1,
+    gameVersion: "1.0.6.0.46010",
+    attribution: "wiki CC-BY-SA",
+    chapters: [{ id: "tour", name: "Tour", stages: [] }],
+    decisions: [{ id: "ticket_kerman", options: [] }],
+    endings: [{ id: "savior", name: "Savior" }],
+  };
+
+  it("flattens the service {dataset, player} envelope (regression: Goals view white-screened)", () => {
+    const flat = normalizeStoryResponse({
+      dataset,
+      player: {
+        chapters: [{ chapterId: "tour", status: "not-started" }],
+        stages: { "tour-01": true },
+        decisions: { ticket_kerman: "refuse" },
+        endings: { possible: ["savior"], locked: [], forced: null },
+      },
+    });
+    expect(flat).not.toBeNull();
+    expect(flat!.chapters).toHaveLength(1);
+    expect(flat!.decisions).toHaveLength(1);
+    expect(flat!.playerStatus?.stages?.["tour-01"]).toBe(true);
+    expect(flat!.playerStatus?.decisions?.["ticket_kerman"]).toBe("refuse");
+  });
+
+  it("passes flat responses through and rejects junk", () => {
+    const flat = { ...dataset };
+    expect(normalizeStoryResponse(flat)).toBe(flat);
+    expect(normalizeStoryResponse({ player: {} })).toBeNull();
+    expect(normalizeStoryResponse(undefined)).toBeNull();
+  });
+});
 
 describe("readPlayerState", () => {
   it("reads a flat state dump and counts record-shaped tasks", () => {

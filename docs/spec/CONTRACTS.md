@@ -102,7 +102,7 @@ All routes JSON; zod-validated; errors `{ error: string }` with proper status.
 
 ### 5.2 Planning
 - `GET /api/goals` / `POST /api/goals { goals: Goal[], weights?: PlannerWeights }`
-- `GET /api/plan?horizon=10` → `Plan` (planner) + foresight warnings attached per raid + plan hash
+- `GET /api/plan?horizon=10` → `Plan` (planner) + foresight warnings attached per raid + plan hash + `mapNames` (map id → display name for every planned raid; consumers never render raw ids)
 - `GET /api/quartermaster?raids=5` → `AcquisitionPlan` (§7)
 - `GET /api/foresight` → all pending irreversibility warnings for current goals
 
@@ -152,7 +152,7 @@ interface AcquisitionPlan {
 - `POST /chat { message, sessionId? }` → `{ reply, toolCalls[] }`; `POST /briefing { raidIndex }` → `{ briefing }` (<200 words).
 - Replan pipeline: subscribes to service `/ws`; on `raid.ended` → refetch plan → generate briefing for next raid → POST notification back to service (`POST /api/notify` broadcast as WS `notice`).
 - **Mock mode** (`TAC_AGENT_MOCK=1`): deterministic canned model layer so tests run without any Claude auth.
-- Learned weights (M4.5): pure function in agent from raid journal + plan-acceptance signals → proposed `PlannerWeights` delta, persisted to `meta.learnedWeights`, only applied when user confirms (UI/agent), always inspectable.
+- Learned weights (M4.5): pure, deterministic proposer in the agent (fingerprint + journal outcomes → proposed `PlannerWeights` delta with per-change rationale, `mapCost` clamped to [0.5, 3]), surfaced via `GET /propose-weights`. The agent persists nothing (it stays stateless; single-writer rule on the profile DB) — weights become active only when the user confirms, via `POST /api/goals` (optionally mirrored to `meta.learnedWeights` by the service). Always inspectable. *(Amended 2026-07-11 to match SPEC-3 — the original draft said the agent persists to `meta.learnedWeights`.)*
 
 ## 9. Environment package facts (from research/06)
 

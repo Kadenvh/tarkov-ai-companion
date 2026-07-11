@@ -11,12 +11,16 @@
 
 import type {
   FleaIncome,
+  ForesightWarning,
   NetWorthEstimate,
   PerfMapRow,
+  Plan,
+  PlanResponse,
   PositionPayload,
   QueueStat,
   SessionRhythm,
   SettingDiff,
+  StoryResponse,
   SurvivalByDurationRow,
   SurvivalByHourRow,
   SurvivalByMapRow,
@@ -108,6 +112,77 @@ function readPositions(raw: unknown): PositionPayload[] {
     const filename = str(r["filename"]);
     if (filename !== undefined) pos.filename = filename;
     out.push(pos);
+  }
+  return out;
+}
+
+// ---------- GET /api/plan ----------
+
+/**
+ * The service returns a nested PlanBundle ({hash, builtAt, plan:{raids…},
+ * foresight:[{raidIndex, warnings}], mapNames}) while the WS plan.updated
+ * frame carries a flattened summary. Accept both: flatten the bundle into the
+ * PlanResponse shape the views consume; pass an already-flat payload through.
+ * Anything without raids is null (the view shows its empty state).
+ */
+export function normalizePlanResponse(raw: unknown): PlanResponse | null {
+  const root = rec(raw);
+  if (!root) return null;
+
+  const inner = rec(root["plan"]);
+  if (!inner || !Array.isArray(inner["raids"])) {
+    return Array.isArray(root["raids"]) ? (raw as PlanResponse) : null;
+  }
+
+  const warnings: Record<string, ForesightWarning[]> = {};
+  for (const entry of arr(root["foresight"]) ?? []) {
+    const e = rec(entry);
+    if (!e) continue;
+    const idx = num(e["raidIndex"]);
+    const w = arr(e["warnings"]);
+    if (idx !== undefined && w) warnings[String(idx)] = w as ForesightWarning[];
+  }
+
+  const out: PlanResponse = { ...(inner as unknown as Plan), warnings };
+  const hash = str(root["hash"]);
+  if (hash !== undefined) out.hash = hash;
+  const builtAt = str(root["builtAt"]);
+  if (builtAt !== undefined) out.generatedAt = builtAt;
+  const mapNames = rec(root["mapNames"]);
+  if (mapNames) {
+    const names: Record<string, string> = {};
+    for (const [k, v] of Object.entries(mapNames)) {
+      const name = str(v);
+      if (name !== undefined) names[k] = name;
+    }
+    out.mapNames = names;
+  }
+  return out;
+}
+
+// ---------- GET /api/story ----------
+
+/**
+ * The service returns {dataset: {chapters, decisions, endings, …}, player:
+ * {stages, decisions, endings…}}; the views consume a flattened StoryResponse.
+ * Accept both (regression: the Goals view crashed on the nested envelope).
+ */
+export function normalizeStoryResponse(raw: unknown): StoryResponse | null {
+  const root = rec(raw);
+  if (!root) return null;
+  if (Array.isArray(root["chapters"])) return raw as StoryResponse;
+
+  const dataset = rec(root["dataset"]);
+  if (!dataset || !Array.isArray(dataset["chapters"])) return null;
+  const player = rec(root["player"]);
+  const out = { ...(dataset as unknown as StoryResponse) };
+  const stages = rec(player?.["stages"]);
+  const decisions = rec(player?.["decisions"]);
+  if (stages || decisions) {
+    out.playerStatus = {
+      ...(stages ? { stages: stages as Record<string, boolean> } : {}),
+      ...(decisions ? { decisions: decisions as Record<string, string> } : {}),
+    };
   }
   return out;
 }

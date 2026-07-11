@@ -144,14 +144,14 @@ Claude over ground truth. Grounded, never guessing.
 
 ## 3. Phase mapping (build order)
 
-| Phase | Modules | Exit criterion |
-|---|---|---|
-| **P0 Foundation** | M1 complete; M8.2 skeleton | Invariants green on 1.0.6 snapshot; story dataset v1; wiki pipeline parsing |
-| **P1 Planner MVP** | M3.1–M3.4; M5.1–M5.3 (seed state via M2.1 import/quiz) | **"Tonight's Plan" drives a real session** |
-| **P2 Auto-state** | M2.2–M2.8; M3.5; M5.4 | State freshness ≥ 90% automatic |
-| **P3 Copilot** | M4.1–M4.4 | Raid-end → replan → briefing loop live |
-| **P4 Environment** | M6, M7, M4.5, M5.5 | Settings/NVIDIA/perf + insights daily-driver |
-| **P5 Edge** | T3 experiments (spawn vision — only after ToS re-validation), squad, seasonal | Feature-flagged, individually approved |
+| Phase | Modules | Exit criterion | Status |
+|---|---|---|---|
+| **P0 Foundation** | M1 complete; M8.2 skeleton | Invariants green on 1.0.6 snapshot; story dataset v1; wiki pipeline parsing | ✅ 2026-07-11 |
+| **P1 Planner MVP** | M3.1–M3.4; M5.1–M5.3 (seed state via M2.1 import/quiz) | **"Tonight's Plan" drives a real session** | ✅ 2026-07-11 (built + verified live; first real session pending) |
+| **P2 Auto-state** | M2.2–M2.8; M3.5; M5.4 | State freshness ≥ 90% automatic | ✅ 2026-07-11 (58 real sessions backfilled: 118 raids / 115 quest events / 119 flea sales) |
+| **P3 Copilot** | M4.1–M4.4 | Raid-end → replan → briefing loop live | ✅ 2026-07-11 (live grounded briefing verified over agent-sdk) |
+| **P4 Environment** | M6, M7, M4.5, M5.5 | Settings/NVIDIA/perf + insights daily-driver | ✅ 2026-07-11 (M6.2 DRS *writes* deferred, recorded in SPEC-4) |
+| **P5 Edge** | T3 experiments (spawn vision — only after ToS re-validation), squad, seasonal, map route overlay, wiki⟷API drift automation (M1.4), snapshot `diff` CLI (M1.2) | Feature-flagged, individually approved | ⏳ open |
 
 ## 4. Open questions (tracked, non-blocking)
 

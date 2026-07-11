@@ -42,6 +42,7 @@ function briefingPrompt(raidIndex: number, strict: boolean): string {
     "",
     `Generate a pre-raid briefing for planned raid ${raidIndex}. Use get_plan, get_quartermaster, get_foresight, and get_story to gather ONLY current data.`,
     "Structure: the map; the task batch in execution order with a short why per task; the bring-list (keys/items with acquisition route); any irreversibility warnings.",
+    "Always call the map by its display name from get_plan's mapNames — never output a raw 24-hex id.",
     `Hard limit: fewer than ${BRIEFING_WORD_CAP} words. Plain text, no headings.`,
     strict ? `Your previous draft was too long. It MUST be under ${BRIEFING_WORD_CAP} words this time — cut detail, keep the structure.` : "",
   ]

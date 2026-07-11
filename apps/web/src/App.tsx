@@ -4,7 +4,7 @@
  * the view switch. Dark, high-contrast, second-monitor glanceable.
  */
 
-import { useEffect, useState, type ReactNode } from "react";
+import { Component, useEffect, useState, type ReactNode } from "react";
 import { useApp } from "./store";
 import { mapDisplayName } from "./lib/maps";
 import { TonightsPlan } from "./views/TonightsPlan";
@@ -16,6 +16,37 @@ import { MapView } from "./views/MapView";
 import { OnboardingModal } from "./views/Onboarding";
 
 type ViewId = "plan" | "goals" | "quartermaster" | "insights" | "environment" | "map";
+
+/** One broken view must never white-screen the shell — render the error in place. */
+class ViewBoundary extends Component<
+  { viewId: string; children: ReactNode },
+  { error: Error | null }
+> {
+  override state = { error: null as Error | null };
+
+  static getDerivedStateFromError(error: Error): { error: Error } {
+    return { error };
+  }
+
+  override componentDidUpdate(prev: { viewId: string }): void {
+    if (prev.viewId !== this.props.viewId && this.state.error) this.setState({ error: null });
+  }
+
+  override render(): ReactNode {
+    if (this.state.error) {
+      return (
+        <div className="card" style={{ margin: 24, padding: 20 }}>
+          <strong>This view hit an error.</strong>
+          <div className="task-reasons" style={{ marginTop: 8 }}>
+            {String(this.state.error)} — the rest of the app keeps running; switch views or
+            Refresh. Please report this.
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 const VIEWS: { id: ViewId; label: string }[] = [
   { id: "plan", label: "Tonight's Plan" },
@@ -118,12 +149,14 @@ export function App(): ReactNode {
         <StatusBar />
         <RaidBannerBar />
         <div className="content">
-          {view === "plan" ? <TonightsPlan /> : null}
-          {view === "goals" ? <GoalsView /> : null}
-          {view === "quartermaster" ? <QuartermasterView /> : null}
-          {view === "insights" ? <InsightsView /> : null}
-          {view === "environment" ? <EnvironmentView /> : null}
-          {view === "map" ? <MapView /> : null}
+          <ViewBoundary viewId={view}>
+            {view === "plan" ? <TonightsPlan /> : null}
+            {view === "goals" ? <GoalsView /> : null}
+            {view === "quartermaster" ? <QuartermasterView /> : null}
+            {view === "insights" ? <InsightsView /> : null}
+            {view === "environment" ? <EnvironmentView /> : null}
+            {view === "map" ? <MapView /> : null}
+          </ViewBoundary>
         </div>
       </div>
 

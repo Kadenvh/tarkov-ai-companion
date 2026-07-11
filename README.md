@@ -1,68 +1,41 @@
-# Tarkov Aim Lab
+# Tarkov AI Companion
 
-Research toolkit for analyzing aim mechanics in Escape from Tarkov Arena footage.
+**An agentic progression copilot for Escape from Tarkov** — it reconstructs your player state from the game's own logs, runs a real optimizer over the full 510-task graph, and puts a grounded Claude copilot on top that briefs, warns, and replans raid by raid.
 
-## Goal
+Nobody else answers *"what should I do next?"* — every existing tool answers "what exists" (tarkov.dev), "what have I done" (TarkovTracker), or "what is it worth" (RatScanner). This does: per-raid task **batching**, XP/level **simulation**, irreversibility **foresight** (fail-chains + story endings), plan-tied **acquisition**, and event-driven **replanning**.
 
-Extract three data points per flick:
-1. **Reaction Frame**: Last frame before crosshair starts moving
-2. **Termination Frame**: Frame where crosshair settles after flick
-3. **Enemy Centroid**: Y-center of enemy at termination
+> **Hard safety line (never crossed):** this suite never touches the game process, memory, network traffic, or input — it only reads files EFT itself writes (logs, screenshots, settings), the same T1 risk class as TarkovMonitor/RatScanner (multi-year, zero-ban track record). Full policy: [SPEC.md §1](SPEC.md). BattlEye sees a plain user-mode app that never interacts with the game window.
 
-Calculate sensitivity adjustment recommendations based on over/undershoot patterns.
-
-## Project Structure
-
-```
-tarkov-aim-lab/
-├── src/
-│   ├── detection/
-│   │   ├── crosshair.py     # Crosshair tracking via motion analysis
-│   │   ├── enemy.py         # YOLO-based enemy detection
-│   │   └── events.py        # Flick event detection (start/stop)
-│   ├── analysis/
-│   │   ├── flick.py         # Flick metrics calculation
-│   │   └── sensitivity.py   # Sensitivity recommendations
-│   └── utils/
-│       ├── video.py         # Video loading/frame extraction
-│       └── config.py        # Config loader
-├── notebooks/               # Jupyter notebooks for exploration
-├── data/                    # Sample clips, debug frames
-├── models/                  # YOLO weights
-├── config.yaml              # User settings
-└── analyze.py               # CLI entry point
-```
-
-## Setup
+## Quick start
 
 ```bash
-pip install opencv-python ultralytics numpy pyyaml
+pnpm install
+pnpm --filter @tac/web build      # build the UI once
+pnpm --filter @tac/service start  # daemon on http://localhost:3141 (REST + WS + UI)
+pnpm --filter @tac/agent start    # AI copilot on :3142 (rides Claude Code auth)
 ```
 
-## Usage (planned)
+Open `http://localhost:3141` → onboarding offers: quiz, TarkovTracker import, or **"backfill from logs"** (reconstructs raids/quests/flea history from every session on disk). Take an in-game screenshot any time to update the Map position (T1 channel).
 
-```bash
-# Analyze a single clip
-python analyze.py --clip "path/to/arena_match.mp4"
+## Monorepo
 
-# Batch analyze all clips in Outplayed folder
-python analyze.py --batch
-```
+| Workspace | What it is |
+|---|---|
+| [`packages/data-core`](packages/data-core) | world model: per-patch snapshots of json.tarkov.dev, task graph (510/257κ/102LK invariants), wiki parser, market loaders, curated + wiki-verified story dataset |
+| [`packages/planner`](packages/planner) | **the moat**: Raid Director (greedy+criticality batch solver), XP/level sim, Foresight Guard, Quartermaster (cheapest-route acquisition + craft scheduling) |
+| [`packages/state-engine`](packages/state-engine) | player model: SQLite store, log watcher/parsers (raids, quests, flea), historical backfill, screenshot positions, XP estimator, TarkovTracker mirror, raid journal |
+| [`packages/environment`](packages/environment) | EFT settings advisor (apply only game-closed, with backups), NVIDIA detection, PresentMon ingest + regression alerts, ammo tiers |
+| [`packages/insights`](packages/insights) | raid analytics, economy curves, playstyle fingerprint |
+| [`apps/service`](apps/service) | Fastify daemon: REST + WS ([CONTRACTS](docs/spec/CONTRACTS.md) §5), watcher host, patch sentinel, serves the UI |
+| [`apps/web`](apps/web) | React UI: Tonight's Plan, Goals + story/ending tracker, Quartermaster, Insights, Environment, Map |
+| [`apps/agent`](apps/agent) | Claude copilot: grounded tools (zero unsourced game facts), NL goal intake, <200-word briefings, raid-end→replan→notify pipeline, learned-weights proposer |
 
-## Current Phase: Exploration
+`pnpm -r test` — 350+ tests, many against sanitized excerpts of real session logs. Specs: [SPEC.md](SPEC.md) (contract) + [docs/spec/](docs/spec/) (per-phase) + [docs/research/](docs/research/) (verified evidence).
 
-Building and testing individual components:
-- [ ] Crosshair motion tracking
-- [ ] Flick start/end detection
-- [ ] YOLO enemy detection
-- [ ] Match window extraction via kill screen
-- [ ] Integration pipeline
+## Data & attribution
 
-## Settings
+Game data: [tarkov.dev](https://tarkov.dev) (json.tarkov.dev snapshots, committed per patch). Story/chapter data derived from the [EFT Fandom wiki](https://escapefromtarkov.fandom.com) (CC-BY-SA 3.0), machine-verified 2026-07-11. Local state stays in `data/local/` (gitignored, never leaves the machine).
 
-Edit `config.yaml` with your:
-- Sensitivity: 0.192
-- ADS multiplier: 1.42
-- FOV: 69 (hip) / 53 (ADS)
-- DPI: ???
-- Resolution: ???
+---
+
+*Legacy note: this repo previously hosted an aim-analysis prototype (`analyze.py`, `src/`, `notebooks/`, `config.yaml`, `requirements.txt` — Python). Those files are unrelated to the companion suite and kept only for reference; the repo is due a rename to `tarkov-ai-companion`.*

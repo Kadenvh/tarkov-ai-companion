@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "service",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@tac/service", "start"],
+      "port": 3141
+    },
+    {
+      "name": "agent",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@tac/agent", "start"],
+      "port": 3142
+    }
+  ]
+}

@@ -27,7 +27,12 @@ import type {
   StateResponse,
   StoryResponse,
 } from "./api/types";
-import { readPlayerState, type NormalizedPlayerState } from "./lib/normalize";
+import {
+  normalizePlanResponse,
+  normalizeStoryResponse,
+  readPlayerState,
+  type NormalizedPlayerState,
+} from "./lib/normalize";
 import type { DecisionsMade, StageProgress } from "./lib/story";
 
 // ---------- toasts ----------
@@ -188,10 +193,10 @@ export function AppProvider({ children }: { children: ReactNode }): ReactNode {
   const refreshPlan = useCallback(async () => {
     try {
       const [planRes, qmRes] = await Promise.all([
-        api.get<PlanResponse>("/api/plan", { horizon }),
+        api.get<unknown>("/api/plan", { horizon }),
         api.get<AcquisitionPlan>("/api/quartermaster", { raids: horizon }),
       ]);
-      setPlan(planRes);
+      setPlan(normalizePlanResponse(planRes));
       setQuartermaster(qmRes);
       setPlanFetchedAt(Date.now());
       setPlanStale(false);
@@ -202,7 +207,7 @@ export function AppProvider({ children }: { children: ReactNode }): ReactNode {
 
   const refreshStory = useCallback(async () => {
     try {
-      setStory(await api.get<StoryResponse>("/api/story"));
+      setStory(normalizeStoryResponse(await api.get<unknown>("/api/story")));
     } catch {
       /* story view shows its empty state */
     }
