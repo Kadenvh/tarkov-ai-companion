@@ -1,0 +1,334 @@
+/**
+ * Tolerant readers for service responses whose exact JSON shape is service-
+ * defined (CONTRACTS pins the semantics, not the field names, for /api/state,
+ * /api/graph/summary, /api/environment/settings, /api/insights/*).
+ *
+ * Every reader degrades to a well-formed empty result — shape drift between
+ * parallel-built apps must show an empty state, never a crash. The exact
+ * shapes assumed here are documented in docs/spec/SPEC-7.md for the
+ * integration wave.
+ */
+
+import type {
+  FleaIncome,
+  NetWorthEstimate,
+  PerfMapRow,
+  PositionPayload,
+  QueueStat,
+  SessionRhythm,
+  SettingDiff,
+  SurvivalByDurationRow,
+  SurvivalByHourRow,
+  SurvivalByMapRow,
+} from "../api/types";
+
+type Rec = Record<string, unknown>;
+
+function rec(v: unknown): Rec | null {
+  return v && typeof v === "object" && !Array.isArray(v) ? (v as Rec) : null;
+}
+
+function num(v: unknown): number | undefined {
+  return typeof v === "number" && Number.isFinite(v) ? v : undefined;
+}
+
+function str(v: unknown): string | undefined {
+  return typeof v === "string" ? v : undefined;
+}
+
+function arr(v: unknown): unknown[] | undefined {
+  return Array.isArray(v) ? v : undefined;
+}
+
+function pick(source: Rec, ...keys: string[]): unknown {
+  for (const key of keys) {
+    if (key in source && source[key] !== undefined && source[key] !== null) return source[key];
+  }
+  return undefined;
+}
+
+// ---------- /api/state ----------
+
+export interface NormalizedPlayerState {
+  level: number;
+  faction?: "USEC" | "BEAR";
+  prestige: number;
+  gameMode?: string;
+  progressEpoch?: number;
+  completedTasks: number;
+  failedTasks: number;
+  xp?: { value?: number; low?: number; high?: number };
+  positions: PositionPayload[];
+  /** true when the profile looks untouched (level<=1, nothing completed) — onboarding trigger */
+  empty: boolean;
+}
+
+function countTasks(tasks: unknown): { completed: number; failed: number } {
+  let completed = 0;
+  let failed = 0;
+  const list = arr(tasks);
+  if (list) {
+    // array of rows: { taskId, complete, failed }
+    for (const row of list) {
+      const r = rec(row);
+      if (!r) continue;
+      if (r["complete"] === true) completed++;
+      if (r["failed"] === true) failed++;
+    }
+    return { completed, failed };
+  }
+  const record = rec(tasks);
+  if (record) {
+    // record: taskId -> { complete, failed }
+    for (const value of Object.values(record)) {
+      const r = rec(value);
+      if (!r) continue;
+      if (r["complete"] === true) completed++;
+      if (r["failed"] === true) failed++;
+    }
+  }
+  return { completed, failed };
+}
+
+function readPositions(raw: unknown): PositionPayload[] {
+  const list = arr(raw);
+  if (!list) return [];
+  const out: PositionPayload[] = [];
+  for (const row of list) {
+    const r = rec(row);
+    if (!r) continue;
+    const x = num(r["x"]);
+    const y = num(r["y"]);
+    const z = num(r["z"]);
+    const ts = str(r["ts"]);
+    if (x === undefined || y === undefined || z === undefined || !ts) continue;
+    const pos: PositionPayload = { x, y, z, ts };
+    const map = str(r["map"]);
+    if (map !== undefined) pos.map = map;
+    const filename = str(r["filename"]);
+    if (filename !== undefined) pos.filename = filename;
+    out.push(pos);
+  }
+  return out;
+}
+
+export function readPlayerState(raw: unknown): NormalizedPlayerState {
+  const root = rec(raw) ?? {};
+
+  // level may live at top level or under an xp/estimate object
+  const xpObj = rec(pick(root, "xp", "xpEstimate", "estimate"));
+  const level = num(pick(root, "level")) ?? num(xpObj?.["level"]) ?? 1;
+
+  const factionRaw = str(pick(root, "faction", "pmcFaction"));
+  const faction = factionRaw === "USEC" || factionRaw === "BEAR" ? factionRaw : undefined;
+
+  // completed/failed: arrays of ids, task rows, or a record
+  const explicitCompleted = arr(pick(root, "completedTasks"));
+  const explicitFailed = arr(pick(root, "failedTasks"));
+  let completedTasks: number;
+  let failedTasks: number;
+  if (explicitCompleted || explicitFailed) {
+    completedTasks = explicitCompleted?.length ?? 0;
+    failedTasks = explicitFailed?.length ?? 0;
+  } else {
+    const counted = countTasks(pick(root, "tasks", "taskState"));
+    completedTasks = counted.completed;
+    failedTasks = counted.failed;
+  }
+
+  const confidence = rec(xpObj?.["confidence"]);
+  const xpValue = num(xpObj?.["xp"]) ?? num(pick(root, "xpValue"));
+  const low = num(confidence?.["low"]);
+  const high = num(confidence?.["high"]);
+  const xp =
+    xpValue !== undefined || low !== undefined || high !== undefined
+      ? {
+          ...(xpValue !== undefined ? { value: xpValue } : {}),
+          ...(low !== undefined ? { low } : {}),
+          ...(high !== undefined ? { high } : {}),
+        }
+      : undefined;
+
+  const out: NormalizedPlayerState = {
+    level,
+    prestige: num(pick(root, "prestige")) ?? 0,
+    completedTasks,
+    failedTasks,
+    positions: readPositions(pick(root, "positions", "positionHistory")),
+    empty: level <= 1 && completedTasks === 0,
+  };
+  if (faction) out.faction = faction;
+  const gameMode = str(pick(root, "gameMode", "mode"));
+  if (gameMode) out.gameMode = gameMode;
+  const epoch = num(pick(root, "progressEpoch", "epoch"));
+  if (epoch !== undefined) out.progressEpoch = epoch;
+  if (xp) out.xp = xp;
+  return out;
+}
+
+// ---------- /api/graph/summary ----------
+
+export interface GoalTrackSummary {
+  total: number | null;
+  remaining: number | null;
+  /** completed = total - remaining when both known */
+  done: number | null;
+  pct: number | null;
+}
+
+export interface NormalizedGraphSummary {
+  taskCount: number | null;
+  kappa: GoalTrackSummary;
+  lightkeeper: GoalTrackSummary;
+}
+
+/** SPEC.md M1.6 invariants — fallback totals when the summary omits them. */
+export const KAPPA_TOTAL_FALLBACK = 257;
+export const LIGHTKEEPER_TOTAL_FALLBACK = 102;
+
+function track(root: Rec, prefix: "kappa" | "lightkeeper", fallbackTotal: number): GoalTrackSummary {
+  const nested = rec(root[prefix]);
+  const total =
+    num(nested?.["total"]) ??
+    num(pick(root, `${prefix}Total`, `${prefix}Required`)) ??
+    fallbackTotal;
+  const remaining =
+    num(nested?.["remaining"]) ?? num(pick(root, `${prefix}Remaining`)) ?? null;
+  const doneExplicit = num(nested?.["done"]) ?? num(pick(root, `${prefix}Done`, `${prefix}Complete`));
+  const done = doneExplicit ?? (remaining !== null ? Math.max(0, total - remaining) : null);
+  const pct = done !== null && total > 0 ? done / total : null;
+  return { total, remaining, done, pct };
+}
+
+export function readGraphSummary(raw: unknown): NormalizedGraphSummary {
+  const root = rec(raw) ?? {};
+  return {
+    taskCount: num(pick(root, "taskCount", "tasks", "totalTasks")) ?? null,
+    kappa: track(root, "kappa", KAPPA_TOTAL_FALLBACK),
+    lightkeeper: track(root, "lightkeeper", LIGHTKEEPER_TOTAL_FALLBACK),
+  };
+}
+
+// ---------- /api/environment/settings ----------
+
+function isDiffArray(v: unknown): v is SettingDiff[] {
+  const list = arr(v);
+  if (!list) return false;
+  return list.every((item) => {
+    const r = rec(item);
+    return r !== null && typeof r["key"] === "string" && "recommended" in r;
+  });
+}
+
+/**
+ * Accepts either `{ profiles: { "max-fps": SettingDiff[] } }`, `{ diffs: ... }`
+ * or the bare `diffAllProfiles()` record `{ "max-fps": SettingDiff[], ... }`.
+ */
+export function readSettingsDiffs(raw: unknown): Record<string, SettingDiff[]> {
+  const root = rec(raw);
+  if (!root) return {};
+  for (const key of ["profiles", "diffs"]) {
+    const nested = rec(root[key]);
+    if (nested) {
+      const out: Record<string, SettingDiff[]> = {};
+      for (const [profile, diffs] of Object.entries(nested)) {
+        if (isDiffArray(diffs)) out[profile] = diffs;
+      }
+      if (Object.keys(out).length > 0) return out;
+    }
+  }
+  const out: Record<string, SettingDiff[]> = {};
+  for (const [key, value] of Object.entries(root)) {
+    if (isDiffArray(value)) out[key] = value;
+  }
+  return out;
+}
+
+// ---------- /api/environment/perf ----------
+
+export function readPerfRows(raw: unknown): PerfMapRow[] {
+  const list = arr(raw) ?? arr(rec(raw)?.["maps"]) ?? arr(rec(raw)?.["rows"]) ?? [];
+  const out: PerfMapRow[] = [];
+  for (const row of list) {
+    const r = rec(row);
+    if (!r) continue;
+    const entry: PerfMapRow = { map: str(r["map"]) ?? null };
+    const n = num(r["n"]) ?? num(r["samples"]);
+    if (n !== undefined) entry.n = n;
+    for (const key of ["fps_avg", "fps_p1", "frametime_p50", "frametime_p95", "frametime_p99"] as const) {
+      const v = num(r[key]);
+      if (v !== undefined) entry[key] = v;
+    }
+    const regression = rec(r["regression"]);
+    if (regression && typeof regression["regressed"] === "boolean") {
+      entry.regression = {
+        regressed: regression["regressed"],
+        reasons: (arr(regression["reasons"]) ?? []).filter((x): x is string => typeof x === "string"),
+      };
+      entry.regressed = regression["regressed"];
+    } else if (typeof r["regressed"] === "boolean") {
+      entry.regressed = r["regressed"];
+    }
+    out.push(entry);
+  }
+  return out;
+}
+
+// ---------- /api/insights/raids ----------
+
+export interface NormalizedInsightsRaids {
+  byMap: SurvivalByMapRow[];
+  byHour: { rows: SurvivalByHourRow[]; excluded: number };
+  byDuration: { rows: SurvivalByDurationRow[]; excluded: number };
+  queueByMap: ({ map: string } & QueueStat)[];
+  rhythm: SessionRhythm | null;
+}
+
+export function readInsightsRaids(raw: unknown): NormalizedInsightsRaids {
+  const root = rec(raw) ?? {};
+  const byMap = (arr(pick(root, "survivalByMap", "byMap")) ?? []) as SurvivalByMapRow[];
+
+  const hourRaw = pick(root, "survivalByHour", "byHour");
+  const hourRec = rec(hourRaw);
+  const byHour = {
+    rows: ((arr(hourRaw) ?? arr(hourRec?.["rows"])) ?? []) as SurvivalByHourRow[],
+    excluded: num(hourRec?.["excluded"]) ?? 0,
+  };
+
+  const durRaw = pick(root, "survivalByDuration", "byDuration");
+  const durRec = rec(durRaw);
+  const byDuration = {
+    rows: ((arr(durRaw) ?? arr(durRec?.["rows"])) ?? []) as SurvivalByDurationRow[],
+    excluded: num(durRec?.["excluded"]) ?? 0,
+  };
+
+  const queueRaw = pick(root, "queuePatterns", "queues", "queue");
+  const queueRec = rec(queueRaw);
+  const queueByMap = ((arr(queueRec?.["byMap"]) ?? arr(queueRaw)) ?? []) as ({ map: string } & QueueStat)[];
+
+  const rhythmRec = rec(pick(root, "sessionRhythm", "rhythm", "sessions"));
+  const rhythm =
+    rhythmRec && Array.isArray(rhythmRec["sessions"]) && rec(rhythmRec["summary"])
+      ? (rhythmRec as unknown as SessionRhythm)
+      : null;
+
+  return { byMap, byHour, byDuration, queueByMap, rhythm };
+}
+
+// ---------- /api/insights/economy ----------
+
+export interface NormalizedEconomy {
+  income: FleaIncome | null;
+  netWorth: NetWorthEstimate | null;
+}
+
+export function readInsightsEconomy(raw: unknown): NormalizedEconomy {
+  const root = rec(raw) ?? {};
+  const incomeRec = rec(pick(root, "income", "fleaIncome"));
+  const income =
+    incomeRec && Array.isArray(incomeRec["points"]) ? (incomeRec as unknown as FleaIncome) : null;
+  const netRec = rec(pick(root, "netWorth", "netWorthEstimate"));
+  const netWorth =
+    netRec && Array.isArray(netRec["points"]) ? (netRec as unknown as NetWorthEstimate) : null;
+  return { income, netWorth };
+}

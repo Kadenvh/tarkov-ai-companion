@@ -1,4 +1,13 @@
+import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { AppProvider } from "./store";
+import { App } from "./App";
+import "./styles.css";
 
-// Placeholder shell — replaced by the M5 build (see docs/spec/CONTRACTS.md §6).
-createRoot(document.getElementById("root")!).render(<h1>Tarkov AI Companion</h1>);
+createRoot(document.getElementById("root")!).render(
+  <StrictMode>
+    <AppProvider>
+      <App />
+    </AppProvider>
+  </StrictMode>,
+);
