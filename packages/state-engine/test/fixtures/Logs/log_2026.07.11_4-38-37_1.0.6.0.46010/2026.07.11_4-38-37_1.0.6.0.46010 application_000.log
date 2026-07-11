@@ -1,0 +1,517 @@
+2026-07-11 04:38:37.994|1.0.6.0.46010|Info|application|Application awaken, updateQueue:'Update'
+2026-07-11 04:38:37.994|1.0.6.0.46010|Info|application|Assert.raiseExceptions:'True'
+2026-07-11 04:38:38.078|1.0.6.0.46010|Info|application|driveType:SSD swapDriveType:SSD
+2026-07-11 04:38:40.450|1.0.6.0.46010|Info|application|NVIDIA Reflex is available on this machine, Status: NvReflex_OK.
+2026-07-11 04:38:43.580|1.0.6.0.46010|Info|application|Game settings:
+{
+  "Language": "en",
+  "SelectedMemberCategory": "UniqueId",
+  "QuickSlotsVisibility": "Autohide",
+  "StaminaVisibility": "Always",
+  "HealthVisibility": "Always",
+  "HealthColor": "WhiteToRed",
+  "NotificationTransportType": "Default",
+  "ConnectionType": "Default",
+  "HighlightScope": "All",
+  "FieldOfView": 67,
+  "HeadBobbing": 0.2,
+  "AutoEmptyWorkingSet": true,
+  "SetAffinityToLogicalCores": true,
+  "EnableHideoutPreload": false,
+  "StreamerModeEnabled": false,
+  "BlockGroupInvites": false,
+  "ItemQuickUseMode": "InRaidOnly",
+  "PriorityWindowMode": "Auto",
+  "AutoVaultingMode": "Hotkey",
+  "ContinuousHealMode": "Disabled",
+  "QuestItemNotificationMode": "Enabled",
+  "QuestItemSearchMode": "Enabled",
+  "WishlistNotificationsType": "All",
+  "AutoAddToWishlist": "Disabled",
+  "MalfunctionVisability": true,
+  "TradingIntermediateScreen": false,
+  "RagfairLinesCount": 15,
+  "EnvironmentUiType": "CyberEnvironmentUiType",
+  "TacticalInputMode": "Press"
+}
+2026-07-11 04:38:43.580|1.0.6.0.46010|Info|application|Sound settings:
+{
+  "OverallVolume": 10,
+  "InterfaceVolume": 5,
+  "ChatVolume": 6,
+  "MusicVolume": 4,
+  "HideoutVolume": 3,
+  "MusicOnRaidEnd": true,
+  "VoipEnabled": true,
+  "VoipDevice": "SteelSeries Sonar - Microphone (SteelSeries Sonar Virtual Audio Device)",
+  "VoiceChatVolume": 100,
+  "MicrophoneSensitivity": 4,
+  "DenoiseAmount": "Low"
+}
+2026-07-11 04:38:43.580|1.0.6.0.46010|Info|application|PostFx settings:
+{
+  "EnablePostFx": true,
+  "Brightness": 87,
+  "Saturation": 0,
+  "Clarity": -16,
+  "Colorfulness": 0,
+  "LumaSharpen": 82,
+  "AdaptiveSharpen": 62,
+  "ColorFilterType": "None",
+  "Intensity": 100,
+  "ColorBlindnessType": "None",
+  "ColorBlindnessIntensity": 24
+}
+2026-07-11 04:38:43.582|1.0.6.0.46010|Info|application|Graphics settings:
+{
+  "Stored": [
+    {
+      "Index": 0,
+      "FullScreenResolution": {
+        "Width": 2560,
+        "Height": 1440
+      },
+      "FullScreenAspectRatio": {
+        "X": 16,
+        "Y": 9
+      },
+      "WindowResolution": {
+        "Width": 2560,
+        "Height": 1440
+      },
+      "WindowAspectRatio": {
+        "X": 16,
+        "Y": 9
+      }
+    }
+  ],
+  "DisplaySettings": {
+    "Display": 0,
+    "FullScreenMode": 1,
+    "Resolution": {
+      "Width": 2560,
+      "Height": 1440
+    },
+    "AspectRatio": {
+      "X": 16,
+      "Y": 9
+    }
+  },
+  "GraphicsQuality": null,
+  "ShadowsQuality": 1,
+  "TextureQuality": 2,
+  "CloudsQuality": "Medium",
+  "SDMode": null,
+  "VSync": false,
+  "LobbyFramerate": 120,
+  "GameFramerate": 120,
+  "DisableGameFramerateLimit": false,
+  "SuperSampling": "Off",
+  "AnisotropicFiltering": "ForceEnable",
+  "OverallVisibility": 3000.0,
+  "LodBias": 4.0,
+  "MipStreamingBufferSize": 32,
+  "MipStreamingIOCount": 768,
+  "Ssao": "FastPerformance",
+  "Sharpen": 0.6,
+  "SSR": "Ultra",
+  "AntiAliasing": "TAA_High",
+  "NVidiaReflex": "On",
+  "HighQualityFog": false,
+  "GrassShadow": true,
+  "ChromaticAberrations": true,
+  "Noise": false,
+  "ZBlur": false,
+  "AreaLightsInstancing": false,
+  "HighQualityColor": false,
+  "SdTarkovStreets": false,
+  "VolumetricLight": "Off",
+  "DLSSMode": "Off",
+  "FSR2Mode": "Off",
+  "FSR3Mode": "Off",
+  "DLSSPreset": "Default",
+  "InApplyDisplaySettingsProcess": false,
+  "DLSSEnabled": false,
+  "FSR2Enabled": false,
+  "FSR3Enabled": false,
+  "ShadowDistance": 40.0,
+  "SuperSamplingFactor": 1.0
+}
+2026-07-11 04:38:43.585|1.0.6.0.46010|Info|application|Control settings:
+{"InvertedXAxis":false,"InvertedYAxis":false,"MouseSensitivity":0.192,"MouseAimingSensitivity":0.27,"DoubleClickTimeout":0.3,"OpticSensitivity":1.0,"axisBindings":[{"axisName":"MoveX","pairs":[{"positive":{"keyCode":["D"]},"negative":{"keyCode":["A"]}},{"positive":{"keyCode":[]},"negative":{"keyCode":[]}}]},{"axisName":"MoveY","pairs":[{"positive":{"keyCode":["W"]},"negative":{"keyCode":["S"]}},{"positive":{"keyCode":[]},"negative":{"keyCode":[]}}]},{"axisName":"TurnX","pairs":[{"positive":{"isAxis":true,"keyCode":[],"axisName":"Mouse X","positiveAxis":true,"sensitivity":5.0},"negative":{"isAxis":true,"keyCode":[],"axisName":"Mouse X","sensitivity":5.0}},{"positive":{"keyCode":[]},"negative":{"keyCode":[]}}]},{"axisName":"TurnY","pairs":[{"positive":{"isAxis":true,"keyCode":[],"axisName":"Mouse Y","sensitivity":5.0},"negative":{"isAxis":true,"keyCode":[],"axisName":"Mouse Y","positiveAxis":true,"sensitivity":5.0}},{"positive":{"keyCode":[]},"negative":{"keyCode":[]}}]},{"axisName":"LookX","pairs":[{"positive":{"isAxis":true,"keyCode":[],"axisName":"Mouse X","positiveAxis":true,"sensitivity":5.0},"negative":{"isAxis":true,"keyCode":[],"axisName":"Mouse X","sensitivity":5.0}},{"positive":{"keyCode":[]},"negative":{"keyCode":[]}}]},{"axisName":"LookY","pairs":[{"positive":{"isAxis":true,"keyCode":[],"axisName":"Mouse Y","sensitivity":5.0},"negative":{"isAxis":true,"keyCode":[],"axisName":"Mouse Y","positiveAxis":true,"sensitivity":5.0}},{"positive":{"keyCode":[]},"negative":{"keyCode":[]}}]},{"axisName":"LeanX","pairs":[{"positive":{"keyCode":["LeftAlt","Mouse4"]},"negative":{"keyCode":["LeftAlt","Mouse3"]}},{"positive":{"keyCode":[]},"negative":{"keyCode":[]}}]}],"keyBindings":[{"keyName":"LeanLockRight","variants":[{"keyCode":["Mouse4"]},{"keyCode":[]}],"pressType":"Continuous"},{"keyName":"LeanLockLeft","variants":[{"keyCode":["Mouse3"]},{"keyCode":[]}],"pressType":"Continuous"},{"keyName":"Walk","variants":[{"keyCode":[]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"Sprint","variants":[{"keyCode":["LeftShift"]},{"keyCode":[]}],"pressType":"Continuous"},{"keyName":"Jump","variants":[{"keyCode":["Space"]},{"keyCode":[]}],"pressType":"Release"},{"keyName":"Vaulting","variants":[{"keyCode":["V"]},{"keyCode":[]}],"pressType":"Continuous"},{"keyName":"Duck","variants":[{"keyCode":["LeftControl"]},{"keyCode":[]}],"pressType":"Continuous"},{"keyName":"Prone","variants":[{"keyCode":["C"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"StepRight","variants":[{"keyCode":[]},{"keyCode":[]}],"pressType":"Continuous"},{"keyName":"StepLeft","variants":[{"keyCode":[]},{"keyCode":[]}],"pressType":"Continuous"},{"keyName":"BlindShootAbove","variants":[{"keyCode":[]},{"keyCode":[]}],"pressType":"Continuous"},{"keyName":"BlindShootRight","variants":[{"keyCode":[]},{"keyCode":[]}],"pressType":"Continuous"},{"keyName":"NextWalkPose","variants":[{"isAxis":true,"keyCode":["LeftControl"],"axisName":"Mouse Scroll","positiveAxis":true},{"keyCode":[]}],"pressType":"Press"},{"keyName":"PreviousWalkPose","variants":[{"isAxis":true,"keyCode":["LeftControl"],"axisName":"Mouse Scroll"},{"keyCode":[]}],"pressType":"Press"},{"keyName":"LeftStance","variants":[{"keyCode":[]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"Next","variants":[{"isAxis":true,"keyCode":[],"axisName":"Mouse Scroll","positiveAxis":true},{"keyCode":[]}],"pressType":"Press"},{"keyName":"Previous","variants":[{"isAxis":true,"keyCode":[],"axisName":"Mouse Scroll"},{"keyCode":[]}],"pressType":"Press"},{"keyName":"WeaponMounting","variants":[{"keyCode":[]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"Shoot","variants":[{"keyCode":["Mouse0"]},{"keyCode":[]}],"pressType":"Continuous"},{"keyName":"Aim","variants":[{"keyCode":["Mouse1"]},{"keyCode":[]}],"pressType":"Continuous"},{"keyName":"ReloadWeapon","variants":[{"keyCode":["R"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"QuickReloadWeapon","variants":[{"keyCode":["P"]},{"keyCode":[]}],"pressType":"DoubleClick"},{"keyName":"ShootingMode","variants":[{"keyCode":["B"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"ForceAutoWeaponMode","variants":[{"keyCode":[]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"CheckFireMode","variants":[{"keyCode":[]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"NextMagazine","variants":[{"keyCode":[]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"PreviousMagazine","variants":[{"keyCode":[]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"UnloadMagazine","variants":[{"keyCode":[]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"CheckAmmo","variants":[{"keyCode":["T"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"CheckChamber","variants":[{"keyCode":["T","LeftShift"]},{"keyCode":[]}],"pressType":"Release"},{"keyName":"ChamberUnload","variants":[{"keyCode":[]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"ChangeAimScope","variants":[{"keyCode":["Q"]},{"keyCode":[]}],"pressType":"Continuous"},{"keyName":"ChangeAimScopeMagnification","variants":[{"keyCode":["Q"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"OpticCalibrationSwitchUp","variants":[{"keyCode":["Equals"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"OpticCalibrationSwitchDown","variants":[{"keyCode":["Minus"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"ScopeZoomIn","variants":[{"isAxis":true,"keyCode":["LeftAlt"],"axisName":"Mouse Scroll","positiveAxis":true},{"keyCode":[]}],"pressType":"Press"},{"keyName":"ScopeZoomOut","variants":[{"isAxis":true,"keyCode":["LeftAlt"],"axisName":"Mouse Scroll"},{"keyCode":[]}],"pressType":"Press"},{"keyName":"ExamineWeapon","variants":[{"keyCode":["T","LeftShift"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"FoldStock","variants":[{"keyCode":[]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"ToggleBipods","variants":[{"keyCode":[]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"PrimaryWeaponFirst","variants":[{"keyCode":["Alpha2"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"PrimaryWeaponSecond","variants":[{"keyCode":["Alpha3"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"Knife","variants":[{"keyCode":["U"]},{"keyCode":[]}],"pressType":"Continuous"},{"keyName":"SecondaryWeapon","variants":[{"keyCode":[]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"QuickSecondaryWeapon","variants":[{"keyCode":["Alpha1"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"QuickKnife","variants":[{"keyCode":["U"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"ThrowGrenade","variants":[{"keyCode":["G"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"ToggleGoggles","variants":[{"keyCode":["M"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"ToggleVoip","variants":[{"keyCode":[]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"PushToTalk","variants":[{"keyCode":["N"]},{"keyCode":[]}],"pressType":"Continuous"},{"keyName":"Tactical","variants":[{"keyCode":["E"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"NextTacticalDevice","variants":[{"keyCode":["E","LeftControl"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"ToggleHeadLight","variants":[{"keyCode":["H"]},{"keyCode":[]}],"pressType":"Release"},{"keyName":"SwitchHeadLight","variants":[{"keyCode":["H","LeftControl"]},{"keyCode":[]}],"pressType":"Release"},{"keyName":"ToggleTacticalInteraction","variants":[{"keyCode":["T","B"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"Nidnod","variants":[{"keyCode":["Mouse2"]},{"keyCode":[]}],"pressType":"Release"},{"keyName":"WatchTime","variants":[{"keyCode":[]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"Interact","variants":[{"keyCode":["F"]},{"keyCode":[]}],"pressType":"Continuous"},{"keyName":"ThrowItem","variants":[{"keyCode":["X"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"DropBackpack","variants":[{"keyCode":["Z"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"Breath","variants":[{"keyCode":["LeftAlt"]},{"keyCode":[]}],"pressType":"Continuous"},{"keyName":"Mumble","variants":[{"keyCode":["Y"]},{"keyCode":[]}],"pressType":"DoubleClick"},{"keyName":"MumbleDropdown","variants":[{"keyCode":["Y"]},{"keyCode":[]}],"pressType":"Continuous"},{"keyName":"MumbleQuick","variants":[{"keyCode":["Y"]},{"keyCode":[]}],"pressType":"Release"},{"keyName":"WatchTimerAndExits","variants":[{"keyCode":["O"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"Inventory","variants":[{"keyCode":["Tab"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"Slot4","variants":[{"keyCode":["Alpha4"]},{"keyCode":[]}],"pressType":"Release"},{"keyName":"Slot5","variants":[{"keyCode":["Alpha5"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"Slot6","variants":[{"keyCode":["Alpha5"]},{"keyCode":[]}],"pressType":"Release"},{"keyName":"Slot7","variants":[{"keyCode":["Alpha6"]},{"keyCode":[]}],"pressType":"Release"},{"keyName":"Slot8","variants":[{"keyCode":["Alpha7"]},{"keyCode":[]}],"pressType":"Release"},{"keyName":"Slot9","variants":[{"keyCode":["Alpha8"]},{"keyCode":[]}],"pressType":"Release"},{"keyName":"Slot0","variants":[{"keyCode":["Alpha9"]},{"keyCode":[]}],"pressType":"Release"},{"keyName":"Recorder","variants":[{"keyCode":[]},{"keyCode":[]}],"pressType":"Release"},{"keyName":"MakeScreenshot","variants":[{"keyCode":["SysReq"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"ToggleInfo","variants":[{"keyCode":["I"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"Console","variants":[{"keyCode":["BackQuote"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"ChangePointOfView","variants":[{"keyCode":["Home"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"TogglePinMode","variants":[{"keyCode":["P"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"ToggleLockMode","variants":[{"keyCode":["L"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"PressThrowGrenade","variants":[{"keyCode":["G"]},{"keyCode":[]}],"pressType":"Release"},{"keyName":"PressSlot4","variants":[{"keyCode":["Alpha4"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"PressSlot6","variants":[{"keyCode":["Alpha5"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"PressSlot7","variants":[{"keyCode":["Alpha6"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"PressSlot8","variants":[{"keyCode":["Alpha7"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"PressSlot9","variants":[{"keyCode":["Alpha8"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"PressSlot0","variants":[{"keyCode":["Alpha9"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"ReleaseTactical","variants":[{"keyCode":["E"]},{"keyCode":[]}],"pressType":"Release"}]}
+2026-07-11 04:38:46.379|1.0.6.0.46010|Info|application|Session mode: Regular
+2026-07-11 04:38:55.987|1.0.6.0.46010|Info|application|PrepareSelectedProfileLocally ProfileId:0123456789abcdef01234567 AccountId:1234567
+2026-07-11 04:38:55.987|1.0.6.0.46010|Info|application|CompleteSelectedProfile ProfileId:0123456789abcdef01234567 AccountId:1234567
+2026-07-11 04:39:08.767|1.0.6.0.46010|Debug|application|Start loading dll 'C:/Battlestate Games/Escape from Tarkov/EscapeFromTarkov_Data/../BattlEye/BEClient_x64.dll'
+2026-07-11 04:39:09.209|1.0.6.0.46010|Debug|application|SUCCESS: loading dll 'C:/Battlestate Games/Escape from Tarkov/EscapeFromTarkov_Data/../BattlEye/BEClient_x64.dll'
+2026-07-11 04:39:09.210|1.0.6.0.46010|Debug|application|Getting Proc Address for 'Init', dllPtr:'140718172798976'
+2026-07-11 04:39:09.210|1.0.6.0.46010|Debug|application|SUCCESS: getting proc address 'Init', dllPtr:'140718172798976'
+2026-07-11 04:39:09.210|1.0.6.0.46010|Debug|application|Getting Proc Address for 'GetVer', dllPtr:'140718172798976'
+2026-07-11 04:39:09.210|1.0.6.0.46010|Debug|application|SUCCESS: getting proc address 'GetVer', dllPtr:'140718172798976'
+2026-07-11 04:39:09.210|1.0.6.0.46010|Debug|application|Init: pstrGameVersion: Escape from Tarkov 1.0.6.0.46010, uiAddress: 0, usPort: 0
+2026-07-11 04:39:09.212|1.0.6.0.46010|Info|application|Initialized (v1.249)
+2026-07-11 04:39:09.212|1.0.6.0.46010|Info|application|BEClient inited successfully
+2026-07-11 04:39:09.212|1.0.6.0.46010|Debug|application|totalMemoryBeforeCleanUp 779.4453
+2026-07-11 04:39:09.212|1.0.6.0.46010|Debug|application|GC::Collect
+2026-07-11 04:39:09.447|1.0.6.0.46010|Debug|application|GC::Collect Aggressive
+2026-07-11 04:39:09.681|1.0.6.0.46010|Debug|application|collectedMemoryGB 19.96094
+2026-07-11 04:39:09.698|1.0.6.0.46010|Info|application|Config entry: GameID eft
+2026-07-11 04:39:09.698|1.0.6.0.46010|Info|application|Config entry: MasterPort 17000
+2026-07-11 04:39:09.766|1.0.6.0.46010|Info|application|Disposing BEClient
+2026-07-11 04:39:09.766|1.0.6.0.46010|Info|application|BEClient exit
+2026-07-11 04:39:09.867|1.0.6.0.46010|Info|application|BEClient exit successfully
+2026-07-11 04:39:09.867|1.0.6.0.46010|Debug|application|Releasing dll '140718172798976'
+2026-07-11 04:39:10.003|1.0.6.0.46010|Debug|application|SUCCESS: Dll released with code '1'
+2026-07-11 04:42:08.255|1.0.6.0.46010|Debug|application|Heap pre-allocation - disabled
+2026-07-11 04:42:08.255|1.0.6.0.46010|Debug|application|totalMemoryBeforeCleanUp 1455.559
+2026-07-11 04:42:08.255|1.0.6.0.46010|Debug|application|GC::Collect
+2026-07-11 04:42:09.111|1.0.6.0.46010|Debug|application|GC::Collect Aggressive
+2026-07-11 04:42:09.496|1.0.6.0.46010|Debug|application|collectedMemoryGB 203.2266
+2026-07-11 04:42:09.779|1.0.6.0.46010|Debug|application|GC mode switched to Disabled
+2026-07-11 04:45:51.897|1.0.6.0.46010|Debug|application|GC mode switched to Enabled
+2026-07-11 05:00:07.071|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.01013184s True
+2026-07-11 05:00:07.079|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:00:07.096|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:00:07.112|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006958008s True
+2026-07-11 05:00:07.176|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.03979492s False
+2026-07-11 05:00:07.206|1.0.6.0.46010|Debug|application|GC::CollectAsync time 0.1451416s 1454.258 - collected 18.90234
+2026-07-11 05:09:19.670|1.0.6.0.46010|Debug|application|Matching with group id: 
+2026-07-11 05:09:19.670|1.0.6.0.46010|Info|application|ClientMetricsEvents():1821.05
+2026-07-11 05:09:20.959|1.0.6.0.46010|Info|application|scene preset path:maps/factory_day_preset.bundle rcid:factory_day.scenespreset.asset
+2026-07-11 05:09:20.959|1.0.6.0.46010|Debug|application|TRACE-NetworkGameMatching G
+2026-07-11 05:09:22.315|1.0.6.0.46010|Debug|application|TRACE-NetworkGameMatching H
+2026-07-11 05:09:22.318|1.0.6.0.46010|Debug|application|TRACE-NetworkGameMatching I
+2026-07-11 05:09:32.235|1.0.6.0.46010|Info|application|LocationLoaded:7.08 real:12.56 diff:5.48
+2026-07-11 05:10:08.199|1.0.6.0.46010|Info|application|MatchingCompleted:43.08 real:48.52 diff:5.43
+2026-07-11 05:10:08.236|1.0.6.0.46010|Info|application|GamePrepared:43.11 real:48.56 diff:5.45
+2026-07-11 05:10:08.236|1.0.6.0.46010|Debug|application|TRACE-NetworkGameCreate 0
+2026-07-11 05:10:08.236|1.0.6.0.46010|Debug|application|TRACE-NetworkGameCreate 2
+2026-07-11 05:10:08.556|1.0.6.0.46010|Debug|application|TRACE-NetworkGameCreate 3
+2026-07-11 05:10:08.556|1.0.6.0.46010|Debug|application|TRACE-NetworkGameCreate profileStatus: 'Profileid: 0123456789abcdef01234567, Status: Busy, RaidMode: Online, Ip: 148.72.174.194, Port: 17010, Location: factory4_day, Sid: US-STL01G030_cafebabecafebabecafebabe_11.07.26_12-42-34, GameMode: deathmatch, shortId: 0JJW2J'
+2026-07-11 05:10:08.559|1.0.6.0.46010|Debug|application|TRACE-NetworkGameCreate 4
+2026-07-11 05:10:08.560|1.0.6.0.46010|Info|application|GameCreated:43.45(0.34) real:48.89(0.32) diff:5.43
+2026-07-11 05:10:08.560|1.0.6.0.46010|Debug|application|TRACE-NetworkGameCreate 5
+2026-07-11 05:10:20.142|1.0.6.0.46010|Info|application|GamePooled:54.62(11.16) real:60.47(11.58) diff:5.85
+2026-07-11 05:10:24.589|1.0.6.0.46010|Info|application|GameRunned:56.72(2.1) real:64.91(4.44) diff:8.19
+2026-07-11 05:10:24.680|1.0.6.0.46010|Info|application|GameSpawn:56.82(0.09) real:65.01(0.09) diff:8.19
+2026-07-11 05:10:25.003|1.0.6.0.46010|Info|application|PlayerSpawnEvent:57.14(0.31) real:65.33(0.31) diff:8.19
+2026-07-11 05:10:25.591|1.0.6.0.46010|Info|application|GameSpawned:57.54(0.4) real:65.92(0.58) diff:8.37
+2026-07-11 05:10:25.591|1.0.6.0.46010|Debug|application|Heap pre-allocation - disabled
+2026-07-11 05:10:25.625|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.03393555s True
+2026-07-11 05:10:25.637|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.01184082s True
+2026-07-11 05:10:25.651|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006958008s True
+2026-07-11 05:10:25.664|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006958008s True
+2026-07-11 05:10:25.677|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:25.690|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006958008s True
+2026-07-11 05:10:25.703|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:25.716|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:25.730|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:25.742|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:25.755|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:25.768|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:25.782|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:25.794|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:25.809|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007202148s True
+2026-07-11 05:10:25.822|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007202148s True
+2026-07-11 05:10:25.835|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:25.848|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:25.862|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:25.875|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:25.888|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:25.901|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:25.914|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:25.927|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006958008s True
+2026-07-11 05:10:25.939|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:25.953|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:25.966|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:25.978|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:25.990|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:26.003|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:26.016|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:26.029|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:26.042|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006958008s True
+2026-07-11 05:10:26.054|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:26.067|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006958008s True
+2026-07-11 05:10:26.080|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006958008s True
+2026-07-11 05:10:26.093|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:26.106|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:26.119|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006958008s True
+2026-07-11 05:10:26.133|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:26.145|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:26.158|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:26.171|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:26.184|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006958008s True
+2026-07-11 05:10:26.196|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:26.210|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:26.223|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:26.236|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006958008s True
+2026-07-11 05:10:26.248|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:26.261|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006958008s True
+2026-07-11 05:10:26.274|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:26.287|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:26.300|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006958008s True
+2026-07-11 05:10:26.313|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:26.325|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:26.338|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006958008s True
+2026-07-11 05:10:26.351|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006958008s True
+2026-07-11 05:10:26.363|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006958008s True
+2026-07-11 05:10:26.376|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006958008s True
+2026-07-11 05:10:26.387|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006958008s True
+2026-07-11 05:10:26.400|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:26.413|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006958008s True
+2026-07-11 05:10:26.426|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:26.438|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006958008s True
+2026-07-11 05:10:26.450|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:26.464|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:10:26.478|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.00793457s True
+2026-07-11 05:10:26.490|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006958008s True
+2026-07-11 05:10:26.586|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.07348633s False
+2026-07-11 05:10:26.593|1.0.6.0.46010|Debug|application|GC::CollectAsync time 1.002197s 1915.742 - collected 49.16406
+2026-07-11 05:10:27.201|1.0.6.0.46010|Debug|application|GC mode switched to Disabled
+2026-07-11 05:10:39.953|1.0.6.0.46010|Info|application|GameStarting:71.34(13.79) real:80.28(14.36) diff:8.94
+2026-07-11 05:10:51.990|1.0.6.0.46010|Info|application|GameStarted:82.7(11.36) real:92.31(12.02) diff:9.61
+2026-07-11 05:10:52.005|1.0.6.0.46010|Debug|application|TRACE-NetworkGameCreate 6
+2026-07-11 05:10:52.213|1.0.6.0.46010|Info|application|[Transit] `0123456789abcdef01234567` Count:0, EventPlayer:False
+2026-07-11 05:12:27.834|1.0.6.0.46010|Info|application|Reason:Speed, Position:(9.937, -0.227, -46.582), SpeedLimit:8.321667, CurrentState:Sprint, StrengthSummaryLevel:23, WalkSpeedLimit:1
+2026-07-11 05:12:56.418|1.0.6.0.46010|Info|application|Reason:Speed, Position:(45.713, 0.304, -35.882), SpeedLimit:8.321667, CurrentState:Sprint, StrengthSummaryLevel:23, WalkSpeedLimit:1
+2026-07-11 05:12:56.543|1.0.6.0.46010|Info|application|Reason:Speed, Position:(45.713, 0.304, -35.882), SpeedLimit:4.6, CurrentState:Run, StrengthSummaryLevel:23, WalkSpeedLimit:1
+2026-07-11 05:22:05.911|1.0.6.0.46010|Info|application|PrepareSelectedProfileLocally ProfileId:0123456789abcdef01234567 AccountId:1234567
+2026-07-11 05:22:20.770|1.0.6.0.46010|Debug|application|totalMemoryBeforeCleanUp 3200.547
+2026-07-11 05:22:20.770|1.0.6.0.46010|Debug|application|GC mode switched to Enabled
+2026-07-11 05:22:20.770|1.0.6.0.46010|Debug|application|GC::Collect
+2026-07-11 05:22:21.315|1.0.6.0.46010|Debug|application|GC::Collect Aggressive
+2026-07-11 05:22:21.943|1.0.6.0.46010|Debug|application|collectedMemoryGB 1612.438
+2026-07-11 05:22:21.943|1.0.6.0.46010|Debug|application|GC mode switched to Disabled
+2026-07-11 05:22:30.125|1.0.6.0.46010|Info|application|PrepareSelectedProfileLocally ProfileId:0123456789abcdef01234567 AccountId:1234567
+2026-07-11 05:22:30.126|1.0.6.0.46010|Info|application|CompleteSelectedProfile ProfileId:0123456789abcdef01234567 AccountId:1234567
+2026-07-11 05:22:58.192|1.0.6.0.46010|Info|application|PrepareSelectedProfileLocally ProfileId:0123456789abcdef01234567 AccountId:1234567
+2026-07-11 05:22:58.192|1.0.6.0.46010|Info|application|CompleteSelectedProfile ProfileId:0123456789abcdef01234567 AccountId:1234567
+2026-07-11 05:22:59.895|1.0.6.0.46010|Debug|application|Start loading dll 'C:/Battlestate Games/Escape from Tarkov/EscapeFromTarkov_Data/../BattlEye/BEClient_x64.dll'
+2026-07-11 05:23:00.383|1.0.6.0.46010|Debug|application|SUCCESS: loading dll 'C:/Battlestate Games/Escape from Tarkov/EscapeFromTarkov_Data/../BattlEye/BEClient_x64.dll'
+2026-07-11 05:23:00.383|1.0.6.0.46010|Debug|application|Getting Proc Address for 'Init', dllPtr:'140717445414912'
+2026-07-11 05:23:00.383|1.0.6.0.46010|Debug|application|SUCCESS: getting proc address 'Init', dllPtr:'140717445414912'
+2026-07-11 05:23:00.383|1.0.6.0.46010|Debug|application|Getting Proc Address for 'GetVer', dllPtr:'140717445414912'
+2026-07-11 05:23:00.383|1.0.6.0.46010|Debug|application|SUCCESS: getting proc address 'GetVer', dllPtr:'140717445414912'
+2026-07-11 05:23:00.383|1.0.6.0.46010|Debug|application|Init: pstrGameVersion: Escape from Tarkov 1.0.6.0.46010, uiAddress: 0, usPort: 0
+2026-07-11 05:23:00.384|1.0.6.0.46010|Info|application|Initialized (v1.249)
+2026-07-11 05:23:00.384|1.0.6.0.46010|Info|application|BEClient inited successfully
+2026-07-11 05:23:00.416|1.0.6.0.46010|Info|application|Config entry: GameID eft
+2026-07-11 05:23:00.416|1.0.6.0.46010|Info|application|Config entry: MasterPort 17000
+2026-07-11 05:23:01.130|1.0.6.0.46010|Debug|application|GC mode switched to Enabled
+2026-07-11 05:23:01.949|1.0.6.0.46010|Info|application|Disposing BEClient
+2026-07-11 05:23:01.949|1.0.6.0.46010|Info|application|BEClient exit
+2026-07-11 05:23:02.050|1.0.6.0.46010|Info|application|BEClient exit successfully
+2026-07-11 05:23:02.050|1.0.6.0.46010|Debug|application|Releasing dll '140717445414912'
+2026-07-11 05:23:02.202|1.0.6.0.46010|Debug|application|SUCCESS: Dll released with code '1'
+2026-07-11 05:37:19.392|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.01025391s True
+2026-07-11 05:37:19.399|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:37:19.412|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:37:19.423|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007324219s True
+2026-07-11 05:37:19.434|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:37:19.446|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:37:19.613|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.07543945s True
+2026-07-11 05:37:19.681|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.01220703s True
+2026-07-11 05:37:19.700|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:37:19.844|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.02124023s True
+2026-07-11 05:37:20.133|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.01074219s True
+2026-07-11 05:37:20.405|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.01123047s True
+2026-07-11 05:37:20.419|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:37:20.433|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006835938s True
+2026-07-11 05:37:20.447|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:37:20.466|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:37:20.478|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:37:20.587|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.06762695s False
+2026-07-11 05:37:20.594|1.0.6.0.46010|Debug|application|GC::CollectAsync time 1.213623s 1993.938 - collected 1.109375
+2026-07-11 05:37:24.977|1.0.6.0.46010|Debug|application|Matching with group id: 
+2026-07-11 05:37:24.977|1.0.6.0.46010|Info|application|ClientMetricsEvents():3474.313
+2026-07-11 05:37:26.137|1.0.6.0.46010|Info|application|scene preset path:maps/factory_day_preset.bundle rcid:factory_day.scenespreset.asset
+2026-07-11 05:37:26.137|1.0.6.0.46010|Debug|application|TRACE-NetworkGameMatching G
+2026-07-11 05:37:28.110|1.0.6.0.46010|Debug|application|TRACE-NetworkGameMatching H
+2026-07-11 05:37:28.112|1.0.6.0.46010|Debug|application|TRACE-NetworkGameMatching I
+2026-07-11 05:37:37.500|1.0.6.0.46010|Info|application|LocationLoaded:7.29 real:12.52 diff:5.23
+2026-07-11 05:37:47.708|1.0.6.0.46010|Info|application|MatchingCompleted:17.54 real:22.73 diff:5.18
+2026-07-11 05:37:47.750|1.0.6.0.46010|Info|application|GamePrepared:17.57 real:22.77 diff:5.2
+2026-07-11 05:37:47.750|1.0.6.0.46010|Debug|application|TRACE-NetworkGameCreate 0
+2026-07-11 05:37:47.750|1.0.6.0.46010|Debug|application|TRACE-NetworkGameCreate 2
+2026-07-11 05:37:48.061|1.0.6.0.46010|Debug|application|TRACE-NetworkGameCreate 3
+2026-07-11 05:37:48.061|1.0.6.0.46010|Debug|application|TRACE-NetworkGameCreate profileStatus: 'Profileid: 0123456789abcdef01234567, Status: Busy, RaidMode: Online, Ip: 84.17.45.161, Port: 17009, Location: factory4_day, Sid: US-LA04G032_cafebabecafebabecafebabe_11.07.26_13-36-34, GameMode: deathmatch, shortId: 0JCGJW'
+2026-07-11 05:37:48.061|1.0.6.0.46010|Debug|application|TRACE-NetworkGameCreate 4
+2026-07-11 05:37:48.062|1.0.6.0.46010|Info|application|GameCreated:17.89(0.31) real:23.08(0.3) diff:5.19
+2026-07-11 05:37:48.062|1.0.6.0.46010|Debug|application|TRACE-NetworkGameCreate 5
+2026-07-11 05:37:58.384|1.0.6.0.46010|Info|application|GamePooled:27.83(9.94) real:33.4(10.32) diff:5.57
+2026-07-11 05:38:02.900|1.0.6.0.46010|Info|application|GameRunned:29.93(2.1) real:37.92(4.51) diff:7.98
+2026-07-11 05:38:03.016|1.0.6.0.46010|Info|application|GameSpawn:30.05(0.11) real:38.03(0.11) diff:7.97
+2026-07-11 05:38:03.525|1.0.6.0.46010|Info|application|PlayerSpawnEvent:30.55(0.5) real:38.54(0.51) diff:7.99
+2026-07-11 05:38:03.824|1.0.6.0.46010|Info|application|GameSpawned:30.85(0.3) real:38.84(0.29) diff:7.99
+2026-07-11 05:38:03.824|1.0.6.0.46010|Debug|application|Heap pre-allocation - disabled
+2026-07-11 05:38:03.834|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.01025391s True
+2026-07-11 05:38:03.843|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006835938s True
+2026-07-11 05:38:03.856|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:38:03.869|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006835938s True
+2026-07-11 05:38:03.881|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:38:03.893|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:38:03.906|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:38:03.918|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006835938s True
+2026-07-11 05:38:03.930|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:38:03.944|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:38:03.957|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:38:03.971|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:38:03.982|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:38:03.996|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:38:04.009|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:38:04.022|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:38:04.034|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:38:04.046|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:38:04.059|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-07-11 05:38:04.227|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.05517578s False
+2026-07-11 05:38:04.234|1.0.6.0.46010|Debug|application|GC::CollectAsync time 0.409668s 2448.566 - collected 102.9648
+2026-07-11 05:38:04.834|1.0.6.0.46010|Debug|application|GC mode switched to Disabled
+2026-07-11 05:38:30.367|1.0.6.0.46010|Info|application|GameStarting:56.83(25.98) real:65.38(26.53) diff:8.54
+2026-07-11 05:38:42.402|1.0.6.0.46010|Info|application|GameStarted:68.23(11.4) real:77.42(12.04) diff:9.18
+2026-07-11 05:38:42.415|1.0.6.0.46010|Debug|application|TRACE-NetworkGameCreate 6
+2026-07-11 05:38:42.558|1.0.6.0.46010|Info|application|[Transit] `0123456789abcdef01234567` Count:0, EventPlayer:False
+2026-07-11 05:39:22.903|1.0.6.0.46010|Info|application|PrepareSelectedProfileLocally ProfileId:0123456789abcdef01234567 AccountId:1234567
+2026-07-11 05:39:36.210|1.0.6.0.46010|Debug|application|totalMemoryBeforeCleanUp 2469.402
+2026-07-11 05:39:36.210|1.0.6.0.46010|Debug|application|GC mode switched to Enabled
+2026-07-11 05:39:36.210|1.0.6.0.46010|Debug|application|GC::Collect
+2026-07-11 05:39:36.796|1.0.6.0.46010|Debug|application|GC::Collect Aggressive
+2026-07-11 05:39:37.393|1.0.6.0.46010|Debug|application|collectedMemoryGB 466.7539
+2026-07-11 05:39:37.393|1.0.6.0.46010|Debug|application|GC mode switched to Disabled
+2026-07-11 05:39:43.480|1.0.6.0.46010|Info|application|PrepareSelectedProfileLocally ProfileId:0123456789abcdef01234567 AccountId:1234567
+2026-07-11 05:39:43.481|1.0.6.0.46010|Info|application|CompleteSelectedProfile ProfileId:0123456789abcdef01234567 AccountId:1234567
+2026-07-11 05:40:21.105|1.0.6.0.46010|Info|application|PrepareSelectedProfileLocally ProfileId:0123456789abcdef01234567 AccountId:1234567
+2026-07-11 05:40:21.105|1.0.6.0.46010|Info|application|CompleteSelectedProfile ProfileId:0123456789abcdef01234567 AccountId:1234567
+2026-07-11 05:40:23.022|1.0.6.0.46010|Debug|application|Start loading dll 'C:/Battlestate Games/Escape from Tarkov/EscapeFromTarkov_Data/../BattlEye/BEClient_x64.dll'
+2026-07-11 05:40:23.502|1.0.6.0.46010|Debug|application|SUCCESS: loading dll 'C:/Battlestate Games/Escape from Tarkov/EscapeFromTarkov_Data/../BattlEye/BEClient_x64.dll'
+2026-07-11 05:40:23.502|1.0.6.0.46010|Debug|application|Getting Proc Address for 'Init', dllPtr:'140717441941504'
+2026-07-11 05:40:23.502|1.0.6.0.46010|Debug|application|SUCCESS: getting proc address 'Init', dllPtr:'140717441941504'
+2026-07-11 05:40:23.502|1.0.6.0.46010|Debug|application|Getting Proc Address for 'GetVer', dllPtr:'140717441941504'
+2026-07-11 05:40:23.502|1.0.6.0.46010|Debug|application|SUCCESS: getting proc address 'GetVer', dllPtr:'140717441941504'
+2026-07-11 05:40:23.502|1.0.6.0.46010|Debug|application|Init: pstrGameVersion: Escape from Tarkov 1.0.6.0.46010, uiAddress: 0, usPort: 0
+2026-07-11 05:40:23.504|1.0.6.0.46010|Info|application|Initialized (v1.249)
+2026-07-11 05:40:23.504|1.0.6.0.46010|Info|application|BEClient inited successfully
+2026-07-11 05:40:23.545|1.0.6.0.46010|Info|application|Config entry: GameID eft
+2026-07-11 05:40:23.545|1.0.6.0.46010|Info|application|Config entry: MasterPort 17000
+2026-07-11 05:40:24.325|1.0.6.0.46010|Debug|application|GC mode switched to Enabled
+2026-07-11 05:40:24.996|1.0.6.0.46010|Info|application|Disposing BEClient
+2026-07-11 05:40:24.996|1.0.6.0.46010|Info|application|BEClient exit
+2026-07-11 05:40:25.098|1.0.6.0.46010|Info|application|BEClient exit successfully
+2026-07-11 05:40:25.098|1.0.6.0.46010|Debug|application|Releasing dll '140717441941504'
+2026-07-11 05:40:25.259|1.0.6.0.46010|Debug|application|SUCCESS: Dll released with code '1'
+2026-07-11 05:46:29.069|1.0.6.0.46010|Debug|application|Matching with group id: 
+2026-07-11 05:46:29.069|1.0.6.0.46010|Info|application|ClientMetricsEvents():3987.693
+2026-07-11 05:46:30.219|1.0.6.0.46010|Info|application|scene preset path:maps/factory_day_preset.bundle rcid:factory_day.scenespreset.asset
+2026-07-11 05:46:30.219|1.0.6.0.46010|Debug|application|TRACE-NetworkGameMatching G
+2026-07-11 05:46:31.617|1.0.6.0.46010|Debug|application|TRACE-NetworkGameMatching H
+2026-07-11 05:46:31.618|1.0.6.0.46010|Debug|application|TRACE-NetworkGameMatching I
+2026-07-11 05:46:41.930|1.0.6.0.46010|Info|application|LocationLoaded:7.06 real:12.85 diff:5.79
+2026-07-11 05:47:02.189|1.0.6.0.46010|Info|application|MatchingCompleted:27.36 real:33.11 diff:5.75
+2026-07-11 05:47:02.232|1.0.6.0.46010|Info|application|GamePrepared:27.39 real:33.16 diff:5.77
+2026-07-11 05:47:02.232|1.0.6.0.46010|Debug|application|TRACE-NetworkGameCreate 0
+2026-07-11 05:47:02.232|1.0.6.0.46010|Debug|application|TRACE-NetworkGameCreate 2
+2026-07-11 05:47:02.577|1.0.6.0.46010|Debug|application|TRACE-NetworkGameCreate 3
+2026-07-11 05:47:02.577|1.0.6.0.46010|Debug|application|TRACE-NetworkGameCreate profileStatus: 'Profileid: 0123456789abcdef01234567, Status: Busy, RaidMode: Online, Ip: 84.17.63.45, Port: 17013, Location: factory4_day, Sid: US-DEN01G005_cafebabecafebabecafebabe_11.07.26_13-14-34, GameMode: deathmatch, shortId: 0JCT6M'
+2026-07-11 05:47:02.577|1.0.6.0.46010|Debug|application|TRACE-NetworkGameCreate 4
+2026-07-11 05:47:02.579|1.0.6.0.46010|Info|application|GameCreated:27.76(0.37) real:33.5(0.34) diff:5.74
+2026-07-11 05:47:02.579|1.0.6.0.46010|Debug|application|TRACE-NetworkGameCreate 5
+2026-07-11 05:47:13.010|1.0.6.0.46010|Info|application|GamePooled:37.86(10.1) real:43.94(10.43) diff:6.07
+2026-07-11 05:47:17.504|1.0.6.0.46010|Info|application|GameRunned:39.95(2.09) real:48.43(4.49) diff:8.47
+2026-07-11 05:47:17.703|1.0.6.0.46010|Info|application|GameSpawn:40.15(0.2) real:48.63(0.2) diff:8.47
+2026-07-11 05:47:18.019|1.0.6.0.46010|Info|application|PlayerSpawnEvent:40.47(0.31) real:48.94(0.3) diff:8.46
+2026-07-11 05:47:18.415|1.0.6.0.46010|Info|application|GameSpawned:40.88(0.4) real:49.34(0.4) diff:8.45
+2026-07-11 05:47:18.415|1.0.6.0.46010|Debug|application|Heap pre-allocation - disabled
+2026-07-11 05:47:18.425|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.01025391s True
+2026-07-11 05:47:18.433|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006835938s True
+2026-07-11 05:47:18.445|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006835938s True
+2026-07-11 05:47:18.459|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007324219s True
+2026-07-11 05:47:18.473|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007324219s True
+2026-07-11 05:47:18.486|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006835938s True
+2026-07-11 05:47:18.501|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007324219s True
+2026-07-11 05:47:18.513|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007324219s True
+2026-07-11 05:47:18.529|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007324219s True
+2026-07-11 05:47:18.542|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006835938s True
+2026-07-11 05:47:18.555|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006835938s True
+2026-07-11 05:47:18.567|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006835938s True
+2026-07-11 05:47:18.581|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006835938s True
+2026-07-11 05:47:18.595|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007324219s True
+2026-07-11 05:47:18.607|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007324219s True
+2026-07-11 05:47:18.619|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006835938s True
+2026-07-11 05:47:18.632|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007324219s True
+2026-07-11 05:47:18.646|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007324219s True
+2026-07-11 05:47:18.659|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007324219s True
+2026-07-11 05:47:18.672|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007324219s True
+2026-07-11 05:47:18.685|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006835938s True
+2026-07-11 05:47:18.699|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006835938s True
+2026-07-11 05:47:18.712|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006835938s True
+2026-07-11 05:47:18.824|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.078125s False
+2026-07-11 05:47:18.835|1.0.6.0.46010|Debug|application|GC::CollectAsync time 0.4199219s 2625.121 - collected 100.8633
+2026-07-11 05:47:19.447|1.0.6.0.46010|Debug|application|GC mode switched to Disabled
+2026-07-11 05:47:44.082|1.0.6.0.46010|Info|application|GameStarting:65.95(25.06) real:75.01(25.67) diff:9.06
+2026-07-11 05:47:56.109|1.0.6.0.46010|Info|application|GameStarted:77.41(11.46) real:87.03(12.01) diff:9.61
+2026-07-11 05:47:56.121|1.0.6.0.46010|Debug|application|TRACE-NetworkGameCreate 6
+2026-07-11 05:47:56.257|1.0.6.0.46010|Info|application|[Transit] `0123456789abcdef01234567` Count:0, EventPlayer:False
+2026-07-11 05:48:22.692|1.0.6.0.46010|Info|application|PrepareSelectedProfileLocally ProfileId:0123456789abcdef01234567 AccountId:1234567
+2026-07-11 05:48:36.251|1.0.6.0.46010|Debug|application|totalMemoryBeforeCleanUp 2632.934
+2026-07-11 05:48:36.251|1.0.6.0.46010|Debug|application|GC mode switched to Enabled
+2026-07-11 05:48:36.251|1.0.6.0.46010|Debug|application|GC::Collect
+2026-07-11 05:48:36.910|1.0.6.0.46010|Debug|application|GC::Collect Aggressive
+2026-07-11 05:48:37.664|1.0.6.0.46010|Debug|application|collectedMemoryGB 446.4883
+2026-07-11 05:48:37.664|1.0.6.0.46010|Debug|application|GC mode switched to Disabled
+2026-07-11 05:48:41.809|1.0.6.0.46010|Info|application|PrepareSelectedProfileLocally ProfileId:0123456789abcdef01234567 AccountId:1234567
+2026-07-11 05:48:41.809|1.0.6.0.46010|Info|application|CompleteSelectedProfile ProfileId:0123456789abcdef01234567 AccountId:1234567
+2026-07-11 05:48:57.487|1.0.6.0.46010|Info|application|PrepareSelectedProfileLocally ProfileId:0123456789abcdef01234567 AccountId:1234567
+2026-07-11 05:48:57.487|1.0.6.0.46010|Info|application|CompleteSelectedProfile ProfileId:0123456789abcdef01234567 AccountId:1234567
+2026-07-11 05:48:59.639|1.0.6.0.46010|Debug|application|Start loading dll 'C:/Battlestate Games/Escape from Tarkov/EscapeFromTarkov_Data/../BattlEye/BEClient_x64.dll'
+2026-07-11 05:49:00.047|1.0.6.0.46010|Debug|application|SUCCESS: loading dll 'C:/Battlestate Games/Escape from Tarkov/EscapeFromTarkov_Data/../BattlEye/BEClient_x64.dll'
+2026-07-11 05:49:00.047|1.0.6.0.46010|Debug|application|Getting Proc Address for 'Init', dllPtr:'140717445414912'
+2026-07-11 05:49:00.047|1.0.6.0.46010|Debug|application|SUCCESS: getting proc address 'Init', dllPtr:'140717445414912'
+2026-07-11 05:49:00.047|1.0.6.0.46010|Debug|application|Getting Proc Address for 'GetVer', dllPtr:'140717445414912'
+2026-07-11 05:49:00.047|1.0.6.0.46010|Debug|application|SUCCESS: getting proc address 'GetVer', dllPtr:'140717445414912'
+2026-07-11 05:49:00.047|1.0.6.0.46010|Debug|application|Init: pstrGameVersion: Escape from Tarkov 1.0.6.0.46010, uiAddress: 0, usPort: 0
+2026-07-11 05:49:00.048|1.0.6.0.46010|Info|application|Initialized (v1.249)
+2026-07-11 05:49:00.048|1.0.6.0.46010|Info|application|BEClient inited successfully
+2026-07-11 05:49:00.083|1.0.6.0.46010|Info|application|Config entry: GameID eft
+2026-07-11 05:49:00.083|1.0.6.0.46010|Info|application|Config entry: MasterPort 17000
+2026-07-11 05:49:00.920|1.0.6.0.46010|Debug|application|GC mode switched to Enabled
+2026-07-11 05:49:01.498|1.0.6.0.46010|Info|application|Disposing BEClient
+2026-07-11 05:49:01.498|1.0.6.0.46010|Info|application|BEClient exit
+2026-07-11 05:49:01.601|1.0.6.0.46010|Info|application|BEClient exit successfully
+2026-07-11 05:49:01.601|1.0.6.0.46010|Debug|application|Releasing dll '140717445414912'
+2026-07-11 05:49:01.759|1.0.6.0.46010|Debug|application|SUCCESS: Dll released with code '1'
+2026-07-11 06:21:04.427|1.0.6.0.46010|Debug|application|Heap pre-allocation - disabled
+2026-07-11 06:21:04.427|1.0.6.0.46010|Debug|application|totalMemoryBeforeCleanUp 2576.59
+2026-07-11 06:21:04.427|1.0.6.0.46010|Debug|application|GC::Collect
+2026-07-11 06:21:05.713|1.0.6.0.46010|Debug|application|GC::Collect Aggressive
+2026-07-11 06:21:06.448|1.0.6.0.46010|Debug|application|collectedMemoryGB 203.6992
+2026-07-11 06:21:06.838|1.0.6.0.46010|Debug|application|GC mode switched to Disabled
+2026-07-11 06:32:16.449|1.0.6.0.46010|Debug|application|GC mode switched to Enabled
+2026-07-11 06:32:16.459|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.01025391s True
+2026-07-11 06:32:16.467|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007324219s True
+2026-07-11 06:32:16.483|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006835938s True
+2026-07-11 06:32:16.500|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007324219s True
+2026-07-11 06:32:16.516|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006835938s True
+2026-07-11 06:32:16.531|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007324219s True
+2026-07-11 06:32:16.549|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007324219s True
+2026-07-11 06:32:16.567|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006835938s True
+2026-07-11 06:32:16.584|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007324219s True
+2026-07-11 06:32:16.599|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006835938s True
+2026-07-11 06:32:16.614|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007324219s True
+2026-07-11 06:32:16.629|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006835938s True
+2026-07-11 06:32:16.645|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007324219s True
+2026-07-11 06:32:16.662|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006835938s True
+2026-07-11 06:32:16.676|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007324219s True
+2026-07-11 06:32:16.691|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007324219s True
+2026-07-11 06:32:16.707|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007324219s True
+2026-07-11 06:32:16.723|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007324219s True
+2026-07-11 06:32:16.737|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006835938s True
+2026-07-11 06:32:16.754|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007324219s True
+2026-07-11 06:32:16.770|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006835938s True
+2026-07-11 06:32:16.785|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007324219s True
+2026-07-11 06:32:16.801|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007324219s True
+2026-07-11 06:32:16.815|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006835938s True
+2026-07-11 06:32:16.831|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006835938s True
+2026-07-11 06:32:16.847|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007324219s True
+2026-07-11 06:32:16.861|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.006835938s True
+2026-07-11 06:32:16.877|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.007324219s True
+2026-07-11 06:32:17.001|1.0.6.0.46010|Debug|application|GC::CollectAsync iteration: 0.08984375s False
+2026-07-11 06:32:17.020|1.0.6.0.46010|Debug|application|GC::CollectAsync time 0.5703125s 2662.598 - collected 284.2852

@@ -4,5 +4,6 @@ export * from "./snapshot.js";
 export * from "./tasks.js";
 export * from "./graph.js";
 export * from "./load.js";
+export * from "./market.js";
 export * from "./wiki/infobox.js";
 export * from "./story/schema.js";

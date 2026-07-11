@@ -1,0 +1,199 @@
+2026-07-11 04:38:59.355|1.0.6.0.46010|Info|push-notifications|NotificationManager: new params received url:  ws:wss://wsn-03.escapefromtarkov.com/push/notifier/getwebsocket/feedfacefeedfacefeedfacefeedfacefeedfacefeedfacefeedfacefeedface
+2026-07-11 04:41:15.897|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest result Count:53 MessageType:Text
+2026-07-11 04:41:15.897|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest received:53
+2026-07-11 04:41:15.899|1.0.6.0.46010|Info|push-notifications|NotificationManager.ProcessMessage | Received Service Notifications Ping
+2026-07-11 04:52:56.044|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest result Count:53 MessageType:Text
+2026-07-11 04:52:56.044|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest received:53
+2026-07-11 04:52:56.044|1.0.6.0.46010|Info|push-notifications|NotificationManager.ProcessMessage | Received Service Notifications Ping
+2026-07-11 05:04:09.926|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest result Count:328 MessageType:Text
+2026-07-11 05:04:09.926|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest received:328
+2026-07-11 05:04:09.929|1.0.6.0.46010|Info|push-notifications|Got notification | ChatMessageReceived
+{
+  "type": "new_message",
+  "eventId": "6a521519a2289ebde4222a34",
+  "dialogId": "58330581ace78e27b8b10cee",
+  "message": {
+    "_id": "6a5215193a490091ed0f4018",
+    "uid": "58330581ace78e27b8b10cee",
+    "type": 12,
+    "dt": 1783764249,
+    "text": "quest started",
+    "templateId": "68400926706e0a55e90b0007 successMessageText",
+    "hasRewards": false,
+    "maxStorageTime": 1209600
+  }
+}
+2026-07-11 05:04:09.929|1.0.6.0.46010|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: ChatMessageReceived, Time: 0, Duration: Default, ShowNotification: False
+2026-07-11 05:04:13.069|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest result Count:321 MessageType:Text
+2026-07-11 05:04:13.069|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest received:321
+2026-07-11 05:04:13.069|1.0.6.0.46010|Info|push-notifications|Got notification | ChatMessageReceived
+{
+  "type": "new_message",
+  "eventId": "6a52151cddf457f98216f069",
+  "dialogId": "58330581ace78e27b8b10cee",
+  "message": {
+    "_id": "6a52151c99687795a100c5db",
+    "uid": "58330581ace78e27b8b10cee",
+    "type": 10,
+    "dt": 1783764252,
+    "text": "quest started",
+    "templateId": "68400953506db3b4db0700e7 description",
+    "hasRewards": false,
+    "maxStorageTime": 1209600
+  }
+}
+2026-07-11 05:04:13.069|1.0.6.0.46010|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: ChatMessageReceived, Time: 0, Duration: Default, ShowNotification: False
+2026-07-11 05:04:35.962|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest result Count:53 MessageType:Text
+2026-07-11 05:04:35.962|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest received:53
+2026-07-11 05:04:35.962|1.0.6.0.46010|Info|push-notifications|NotificationManager.ProcessMessage | Received Service Notifications Ping
+2026-07-11 05:10:00.298|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest result Count:146 MessageType:Text
+2026-07-11 05:10:00.298|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest received:146
+2026-07-11 05:10:00.299|1.0.6.0.46010|Info|push-notifications|Got notification | UserMatchCreated
+{
+  "type": "userMatchCreated",
+  "eventId": "6a5216773e7d6b3830175caf",
+  "blockExitButton": true,
+  "blockExitButtonDuration": 0,
+  "showConfirmationPopup": false
+}
+2026-07-11 05:10:00.299|1.0.6.0.46010|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: UserMatchCreated, Time: 0, Duration: Default, ShowNotification: False
+2026-07-11 05:10:08.032|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest result Count:389 MessageType:Text
+2026-07-11 05:10:08.032|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest received:389
+2026-07-11 05:10:08.032|1.0.6.0.46010|Info|push-notifications|Got notification | UserConfirmed
+{
+  "type": "userConfirmed",
+  "eventId": "6a52167f8663b4a7e7173c97",
+  "profileid": "0123456789abcdef01234567",
+  "profileToken": "feedfacefeedfacefeedfacefeedface",
+  "status": "Busy",
+  "ip": "148.72.174.194",
+  "port": 17010,
+  "sid": "US-STL01G030_cafebabecafebabecafebabe_11.07.26_12-42-34",
+  "version": "live",
+  "location": "factory4_day",
+  "raidMode": "Online",
+  "mode": "deathmatch",
+  "shortId": "0JJW2J",
+  "additional_info": []
+}
+2026-07-11 05:10:08.032|1.0.6.0.46010|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: Ping, Time: 0, Duration: Default, ShowNotification: False
+2026-07-11 05:10:08.261|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest canceled
+2026-07-11 05:10:08.261|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest webSocket disposed
+2026-07-11 05:22:07.132|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest result Count:389 MessageType:Text
+2026-07-11 05:22:07.132|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest received:389
+2026-07-11 05:22:07.133|1.0.6.0.46010|Info|push-notifications|Got notification | UserMatchOver
+{
+  "type": "userMatchOver",
+  "eventId": "6a52194e3e7d6b3830176d2f",
+  "profileid": "0123456789abcdef01234567",
+  "profileToken": "feedfacefeedfacefeedfacefeedface",
+  "status": "Free",
+  "ip": "148.72.174.194",
+  "port": 17010,
+  "sid": "US-STL01G030_cafebabecafebabecafebabe_11.07.26_12-42-34",
+  "version": "live",
+  "location": "factory4_day",
+  "raidMode": "Online",
+  "mode": "deathmatch",
+  "shortId": "0JJW2J",
+  "additional_info": []
+}
+2026-07-11 05:22:07.133|1.0.6.0.46010|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: Ping, Time: 0, Duration: Default, ShowNotification: False
+2026-07-11 05:23:00.413|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest canceled
+2026-07-11 05:23:00.413|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest webSocket disposed
+2026-07-11 05:23:01.101|1.0.6.0.46010|Info|push-notifications|NotificationManager: new params received url:  ws:wss://wsn-03.escapefromtarkov.com/push/notifier/getwebsocket/feedfacefeedfacefeedfacefeedfacefeedfacefeedfacefeedfacefeedface
+2026-07-11 05:27:36.742|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest result Count:53 MessageType:Text
+2026-07-11 05:27:36.742|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest received:53
+2026-07-11 05:27:36.742|1.0.6.0.46010|Info|push-notifications|NotificationManager.ProcessMessage | Received Service Notifications Ping
+2026-07-11 05:37:42.838|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest result Count:146 MessageType:Text
+2026-07-11 05:37:42.838|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest received:146
+2026-07-11 05:37:42.839|1.0.6.0.46010|Info|push-notifications|Got notification | UserMatchCreated
+{
+  "type": "userMatchCreated",
+  "eventId": "6a521cf69c7361d540229648",
+  "blockExitButton": true,
+  "blockExitButtonDuration": 0,
+  "showConfirmationPopup": false
+}
+2026-07-11 05:37:42.839|1.0.6.0.46010|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: UserMatchCreated, Time: 0, Duration: Default, ShowNotification: False
+2026-07-11 05:37:47.658|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest result Count:386 MessageType:Text
+2026-07-11 05:37:47.658|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest received:386
+2026-07-11 05:37:47.658|1.0.6.0.46010|Info|push-notifications|Got notification | UserConfirmed
+{
+  "type": "userConfirmed",
+  "eventId": "6a521cfa728035dafb1b5091",
+  "profileid": "0123456789abcdef01234567",
+  "profileToken": "feedfacefeedfacefeedfacefeedface",
+  "status": "Busy",
+  "ip": "84.17.45.161",
+  "port": 17009,
+  "sid": "US-LA04G032_cafebabecafebabecafebabe_11.07.26_13-36-34",
+  "version": "live",
+  "location": "factory4_day",
+  "raidMode": "Online",
+  "mode": "deathmatch",
+  "shortId": "0JCGJW",
+  "additional_info": []
+}
+2026-07-11 05:37:47.658|1.0.6.0.46010|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: Ping, Time: 0, Duration: Default, ShowNotification: False
+2026-07-11 05:37:47.765|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest canceled
+2026-07-11 05:37:47.765|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest webSocket disposed
+2026-07-11 05:40:23.504|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest canceled
+2026-07-11 05:40:23.504|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest webSocket disposed
+2026-07-11 05:40:24.300|1.0.6.0.46010|Info|push-notifications|NotificationManager: new params received url:  ws:wss://wsn-01.escapefromtarkov.com/push/notifier/getwebsocket/feedfacefeedfacefeedfacefeedfacefeedfacefeedfacefeedfacefeedface
+2026-07-11 05:46:57.581|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest result Count:146 MessageType:Text
+2026-07-11 05:46:57.581|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest received:146
+2026-07-11 05:46:57.581|1.0.6.0.46010|Info|push-notifications|Got notification | UserMatchCreated
+{
+  "type": "userMatchCreated",
+  "eventId": "6a521f20b53d5a9f2521f4be",
+  "blockExitButton": true,
+  "blockExitButtonDuration": 0,
+  "showConfirmationPopup": false
+}
+2026-07-11 05:46:57.581|1.0.6.0.46010|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: UserMatchCreated, Time: 0, Duration: Default, ShowNotification: False
+2026-07-11 05:47:02.047|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest result Count:386 MessageType:Text
+2026-07-11 05:47:02.047|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest received:386
+2026-07-11 05:47:02.047|1.0.6.0.46010|Info|push-notifications|Got notification | UserConfirmed
+{
+  "type": "userConfirmed",
+  "eventId": "6a521f25885bf1aac71cd9c4",
+  "profileid": "0123456789abcdef01234567",
+  "profileToken": "feedfacefeedfacefeedfacefeedface",
+  "status": "Busy",
+  "ip": "84.17.63.45",
+  "port": 17013,
+  "sid": "US-DEN01G005_cafebabecafebabecafebabe_11.07.26_13-14-34",
+  "version": "live",
+  "location": "factory4_day",
+  "raidMode": "Online",
+  "mode": "deathmatch",
+  "shortId": "0JCT6M",
+  "additional_info": []
+}
+2026-07-11 05:47:02.047|1.0.6.0.46010|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: Ping, Time: 0, Duration: Default, ShowNotification: False
+2026-07-11 05:47:02.247|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest canceled
+2026-07-11 05:47:02.247|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest webSocket disposed
+2026-07-11 05:49:00.050|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest canceled
+2026-07-11 05:49:00.050|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest webSocket disposed
+2026-07-11 05:49:00.893|1.0.6.0.46010|Info|push-notifications|NotificationManager: new params received url:  ws:wss://wsn-02.escapefromtarkov.com/push/notifier/getwebsocket/feedfacefeedfacefeedfacefeedfacefeedfacefeedfacefeedfacefeedface
+2026-07-11 05:49:39.172|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest result Count:53 MessageType:Text
+2026-07-11 05:49:39.172|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest received:53
+2026-07-11 05:49:39.172|1.0.6.0.46010|Info|push-notifications|NotificationManager.ProcessMessage | Received Service Notifications Ping
+2026-07-11 06:00:18.681|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest result Count:53 MessageType:Text
+2026-07-11 06:00:18.681|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest received:53
+2026-07-11 06:00:18.681|1.0.6.0.46010|Info|push-notifications|NotificationManager.ProcessMessage | Received Service Notifications Ping
+2026-07-11 06:10:39.267|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest result Count:53 MessageType:Text
+2026-07-11 06:10:39.267|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest received:53
+2026-07-11 06:10:39.267|1.0.6.0.46010|Info|push-notifications|NotificationManager.ProcessMessage | Received Service Notifications Ping
+2026-07-11 06:21:18.435|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest result Count:53 MessageType:Text
+2026-07-11 06:21:18.436|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest received:53
+2026-07-11 06:21:18.436|1.0.6.0.46010|Info|push-notifications|NotificationManager.ProcessMessage | Received Service Notifications Ping
+2026-07-11 06:31:39.280|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest result Count:53 MessageType:Text
+2026-07-11 06:31:39.280|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest received:53
+2026-07-11 06:31:39.280|1.0.6.0.46010|Info|push-notifications|NotificationManager.ProcessMessage | Received Service Notifications Ping
+2026-07-11 06:32:19.530|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest result Count:74 MessageType:Text
+2026-07-11 06:32:19.531|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest received:74
+2026-07-11 06:32:19.531|1.0.6.0.46010|Info|push-notifications|NotificationManager.ProcessMessage | Received Service Notifications ChannelDeleted
+2026-07-11 06:32:19.539|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest result Count:0 MessageType:Close
+2026-07-11 06:32:19.548|1.0.6.0.46010|Info|push-notifications|LongPollingWebSocketRequest webSocket disposed

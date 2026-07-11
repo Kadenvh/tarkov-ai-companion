@@ -1,0 +1,30 @@
+{
+  "data": {
+    "tasksProgress": [
+      { "id": "5936d90786f7742b1420ba5b", "complete": true },
+      { "id": "5936da9e86f7742d65037edf", "complete": true },
+      { "id": "59674cd986f7744ab26e32f2", "complete": true, "failed": false },
+      { "id": "66058ccf06ef1d50a60c1f48", "complete": false, "failed": true },
+      { "id": "5967530a86f77462ba22226b", "complete": false }
+    ],
+    "taskObjectivesProgress": [
+      { "id": "59674cd986f7744ab26e32f2-0", "complete": true, "count": 1 },
+      { "id": "5967530a86f77462ba22226b-1", "complete": false, "count": 3 }
+    ],
+    "hideoutModulesProgress": [
+      { "id": "5d484fcd654e7668ec2ec322-1", "complete": true },
+      { "id": "5d484fcd654e7668ec2ec322-2", "complete": true },
+      { "id": "5d388e97081959000a123acf-1", "complete": true },
+      { "id": "5d494a0e5b56502f18c98a02-1", "complete": false }
+    ],
+    "hideoutPartsProgress": [
+      { "id": "5d484fcd654e7668ec2ec322-2-0", "complete": true, "count": 1 }
+    ],
+    "displayName": "TestPMC",
+    "userId": "0123456789abcdef01234567",
+    "playerLevel": 42,
+    "gameEdition": "edge_of_darkness",
+    "pmcFaction": "USEC"
+  },
+  "meta": { "self": "https://api.tarkovtracker.org/api/v2/progress" }
+}

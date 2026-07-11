@@ -1,0 +1,251 @@
+2026-05-25 20:57:56.785|1.0.5.0.45272|Info|application|Application awaken, updateQueue:'Update'
+2026-05-25 20:57:56.785|1.0.5.0.45272|Info|application|Assert.raiseExceptions:'True'
+2026-05-25 20:57:56.789|1.0.5.0.45272|Info|application|driveType:SSD swapDriveType:SSD
+2026-05-25 20:57:58.534|1.0.5.0.45272|Info|application|NVIDIA Reflex is available on this machine, Status: NvReflex_OK.
+2026-05-25 20:58:01.350|1.0.5.0.45272|Info|application|Game settings:
+{
+  "Language": "en",
+  "SelectedMemberCategory": "UniqueId",
+  "QuickSlotsVisibility": "Autohide",
+  "StaminaVisibility": "Always",
+  "HealthVisibility": "Always",
+  "HealthColor": "WhiteToRed",
+  "NotificationTransportType": "Default",
+  "ConnectionType": "Default",
+  "HighlightScope": "All",
+  "FieldOfView": 67,
+  "HeadBobbing": 0.2,
+  "AutoEmptyWorkingSet": true,
+  "SetAffinityToLogicalCores": true,
+  "EnableHideoutPreload": false,
+  "StreamerModeEnabled": false,
+  "BlockGroupInvites": false,
+  "ItemQuickUseMode": "InRaidOnly",
+  "PriorityWindowMode": "Auto",
+  "AutoVaultingMode": "Hotkey",
+  "ContinuousHealMode": "Disabled",
+  "QuestItemNotificationMode": "Enabled",
+  "QuestItemSearchMode": "Enabled",
+  "WishlistNotificationsType": "All",
+  "AutoAddToWishlist": "Disabled",
+  "MalfunctionVisability": true,
+  "TradingIntermediateScreen": false,
+  "RagfairLinesCount": 15,
+  "EnvironmentUiType": "CyberEnvironmentUiType",
+  "TacticalInputMode": "Press"
+}
+2026-05-25 20:58:01.350|1.0.5.0.45272|Info|application|Sound settings:
+{
+  "OverallVolume": 10,
+  "InterfaceVolume": 5,
+  "ChatVolume": 6,
+  "MusicVolume": 4,
+  "HideoutVolume": 3,
+  "MusicOnRaidEnd": true,
+  "VoipEnabled": true,
+  "VoipDevice": "SteelSeries Sonar - Microphone (SteelSeries Sonar Virtual Audio Device)",
+  "VoiceChatVolume": 100,
+  "MicrophoneSensitivity": 4,
+  "DenoiseAmount": "Low"
+}
+2026-05-25 20:58:01.350|1.0.5.0.45272|Info|application|PostFx settings:
+{
+  "EnablePostFx": true,
+  "Brightness": 87,
+  "Saturation": 0,
+  "Clarity": -16,
+  "Colorfulness": 0,
+  "LumaSharpen": 82,
+  "AdaptiveSharpen": 62,
+  "ColorFilterType": "None",
+  "Intensity": 100,
+  "ColorBlindnessType": "None",
+  "ColorBlindnessIntensity": 24
+}
+2026-05-25 20:58:01.353|1.0.5.0.45272|Info|application|Graphics settings:
+{
+  "Stored": [
+    {
+      "Index": 0,
+      "FullScreenResolution": {
+        "Width": 2560,
+        "Height": 1440
+      },
+      "FullScreenAspectRatio": {
+        "X": 16,
+        "Y": 9
+      },
+      "WindowResolution": {
+        "Width": 2560,
+        "Height": 1440
+      },
+      "WindowAspectRatio": {
+        "X": 16,
+        "Y": 9
+      }
+    }
+  ],
+  "DisplaySettings": {
+    "Display": 0,
+    "FullScreenMode": 1,
+    "Resolution": {
+      "Width": 2560,
+      "Height": 1440
+    },
+    "AspectRatio": {
+      "X": 16,
+      "Y": 9
+    }
+  },
+  "GraphicsQuality": null,
+  "ShadowsQuality": 1,
+  "TextureQuality": 2,
+  "CloudsQuality": "Medium",
+  "SDMode": null,
+  "VSync": false,
+  "LobbyFramerate": 120,
+  "GameFramerate": 120,
+  "DisableGameFramerateLimit": false,
+  "SuperSampling": "Off",
+  "AnisotropicFiltering": "ForceEnable",
+  "OverallVisibility": 3000.0,
+  "LodBias": 4.0,
+  "MipStreamingBufferSize": 32,
+  "MipStreamingIOCount": 768,
+  "Ssao": "FastPerformance",
+  "Sharpen": 0.6,
+  "SSR": "Ultra",
+  "AntiAliasing": "TAA_High",
+  "NVidiaReflex": "On",
+  "HighQualityFog": false,
+  "GrassShadow": true,
+  "ChromaticAberrations": true,
+  "Noise": false,
+  "ZBlur": false,
+  "AreaLightsInstancing": false,
+  "HighQualityColor": false,
+  "SdTarkovStreets": false,
+  "VolumetricLight": "Off",
+  "DLSSMode": "Off",
+  "FSR2Mode": "Off",
+  "FSR3Mode": "Off",
+  "DLSSPreset": "Default",
+  "InApplyDisplaySettingsProcess": false,
+  "DLSSEnabled": false,
+  "FSR2Enabled": false,
+  "FSR3Enabled": false,
+  "ShadowDistance": 40.0,
+  "SuperSamplingFactor": 1.0
+}
+2026-05-25 20:58:01.356|1.0.5.0.45272|Info|application|Control settings:
+{"InvertedXAxis":false,"InvertedYAxis":false,"MouseSensitivity":0.192,"MouseAimingSensitivity":0.27,"DoubleClickTimeout":0.3,"OpticSensitivity":1.0,"axisBindings":[{"axisName":"MoveX","pairs":[{"positive":{"keyCode":["D"]},"negative":{"keyCode":["A"]}},{"positive":{"keyCode":[]},"negative":{"keyCode":[]}}]},{"axisName":"MoveY","pairs":[{"positive":{"keyCode":["W"]},"negative":{"keyCode":["S"]}},{"positive":{"keyCode":[]},"negative":{"keyCode":[]}}]},{"axisName":"TurnX","pairs":[{"positive":{"isAxis":true,"keyCode":[],"axisName":"Mouse X","positiveAxis":true,"sensitivity":5.0},"negative":{"isAxis":true,"keyCode":[],"axisName":"Mouse X","sensitivity":5.0}},{"positive":{"keyCode":[]},"negative":{"keyCode":[]}}]},{"axisName":"TurnY","pairs":[{"positive":{"isAxis":true,"keyCode":[],"axisName":"Mouse Y","sensitivity":5.0},"negative":{"isAxis":true,"keyCode":[],"axisName":"Mouse Y","positiveAxis":true,"sensitivity":5.0}},{"positive":{"keyCode":[]},"negative":{"keyCode":[]}}]},{"axisName":"LookX","pairs":[{"positive":{"isAxis":true,"keyCode":[],"axisName":"Mouse X","positiveAxis":true,"sensitivity":5.0},"negative":{"isAxis":true,"keyCode":[],"axisName":"Mouse X","sensitivity":5.0}},{"positive":{"keyCode":[]},"negative":{"keyCode":[]}}]},{"axisName":"LookY","pairs":[{"positive":{"isAxis":true,"keyCode":[],"axisName":"Mouse Y","sensitivity":5.0},"negative":{"isAxis":true,"keyCode":[],"axisName":"Mouse Y","positiveAxis":true,"sensitivity":5.0}},{"positive":{"keyCode":[]},"negative":{"keyCode":[]}}]},{"axisName":"LeanX","pairs":[{"positive":{"keyCode":["LeftAlt","Mouse4"]},"negative":{"keyCode":["LeftAlt","Mouse3"]}},{"positive":{"keyCode":[]},"negative":{"keyCode":[]}}]}],"keyBindings":[{"keyName":"LeanLockRight","variants":[{"keyCode":["Mouse4"]},{"keyCode":[]}],"pressType":"Continuous"},{"keyName":"LeanLockLeft","variants":[{"keyCode":["Mouse3"]},{"keyCode":[]}],"pressType":"Continuous"},{"keyName":"Walk","variants":[{"keyCode":[]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"Sprint","variants":[{"keyCode":["LeftShift"]},{"keyCode":[]}],"pressType":"Continuous"},{"keyName":"Jump","variants":[{"keyCode":["Space"]},{"keyCode":[]}],"pressType":"Release"},{"keyName":"Vaulting","variants":[{"keyCode":["V"]},{"keyCode":[]}],"pressType":"Continuous"},{"keyName":"Duck","variants":[{"keyCode":["LeftControl"]},{"keyCode":[]}],"pressType":"Continuous"},{"keyName":"Prone","variants":[{"keyCode":["C"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"StepRight","variants":[{"keyCode":[]},{"keyCode":[]}],"pressType":"Continuous"},{"keyName":"StepLeft","variants":[{"keyCode":[]},{"keyCode":[]}],"pressType":"Continuous"},{"keyName":"BlindShootAbove","variants":[{"keyCode":[]},{"keyCode":[]}],"pressType":"Continuous"},{"keyName":"BlindShootRight","variants":[{"keyCode":[]},{"keyCode":[]}],"pressType":"Continuous"},{"keyName":"NextWalkPose","variants":[{"isAxis":true,"keyCode":["LeftControl"],"axisName":"Mouse Scroll","positiveAxis":true},{"keyCode":[]}],"pressType":"Press"},{"keyName":"PreviousWalkPose","variants":[{"isAxis":true,"keyCode":["LeftControl"],"axisName":"Mouse Scroll"},{"keyCode":[]}],"pressType":"Press"},{"keyName":"LeftStance","variants":[{"keyCode":[]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"Next","variants":[{"isAxis":true,"keyCode":[],"axisName":"Mouse Scroll","positiveAxis":true},{"keyCode":[]}],"pressType":"Press"},{"keyName":"Previous","variants":[{"isAxis":true,"keyCode":[],"axisName":"Mouse Scroll"},{"keyCode":[]}],"pressType":"Press"},{"keyName":"WeaponMounting","variants":[{"keyCode":[]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"Shoot","variants":[{"keyCode":["Mouse0"]},{"keyCode":[]}],"pressType":"Continuous"},{"keyName":"Aim","variants":[{"keyCode":["Mouse1"]},{"keyCode":[]}],"pressType":"Continuous"},{"keyName":"ReloadWeapon","variants":[{"keyCode":["R"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"QuickReloadWeapon","variants":[{"keyCode":["P"]},{"keyCode":[]}],"pressType":"DoubleClick"},{"keyName":"ShootingMode","variants":[{"keyCode":["B"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"ForceAutoWeaponMode","variants":[{"keyCode":[]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"CheckFireMode","variants":[{"keyCode":[]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"NextMagazine","variants":[{"keyCode":[]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"PreviousMagazine","variants":[{"keyCode":[]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"UnloadMagazine","variants":[{"keyCode":[]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"CheckAmmo","variants":[{"keyCode":["T"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"CheckChamber","variants":[{"keyCode":["T","LeftShift"]},{"keyCode":[]}],"pressType":"Release"},{"keyName":"ChamberUnload","variants":[{"keyCode":[]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"ChangeAimScope","variants":[{"keyCode":["Q"]},{"keyCode":[]}],"pressType":"Continuous"},{"keyName":"ChangeAimScopeMagnification","variants":[{"keyCode":["Q"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"OpticCalibrationSwitchUp","variants":[{"keyCode":["Equals"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"OpticCalibrationSwitchDown","variants":[{"keyCode":["Minus"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"ScopeZoomIn","variants":[{"isAxis":true,"keyCode":["LeftAlt"],"axisName":"Mouse Scroll","positiveAxis":true},{"keyCode":[]}],"pressType":"Press"},{"keyName":"ScopeZoomOut","variants":[{"isAxis":true,"keyCode":["LeftAlt"],"axisName":"Mouse Scroll"},{"keyCode":[]}],"pressType":"Press"},{"keyName":"ExamineWeapon","variants":[{"keyCode":["T","LeftShift"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"FoldStock","variants":[{"keyCode":[]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"ToggleBipods","variants":[{"keyCode":[]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"PrimaryWeaponFirst","variants":[{"keyCode":["Alpha2"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"PrimaryWeaponSecond","variants":[{"keyCode":["Alpha3"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"Knife","variants":[{"keyCode":["U"]},{"keyCode":[]}],"pressType":"Continuous"},{"keyName":"SecondaryWeapon","variants":[{"keyCode":[]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"QuickSecondaryWeapon","variants":[{"keyCode":["Alpha1"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"QuickKnife","variants":[{"keyCode":["U"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"ThrowGrenade","variants":[{"keyCode":["G"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"ToggleGoggles","variants":[{"keyCode":["M"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"ToggleVoip","variants":[{"keyCode":[]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"PushToTalk","variants":[{"keyCode":["N"]},{"keyCode":[]}],"pressType":"Continuous"},{"keyName":"Tactical","variants":[{"keyCode":["E"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"NextTacticalDevice","variants":[{"keyCode":["E","LeftControl"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"ToggleHeadLight","variants":[{"keyCode":["H"]},{"keyCode":[]}],"pressType":"Release"},{"keyName":"SwitchHeadLight","variants":[{"keyCode":["H","LeftControl"]},{"keyCode":[]}],"pressType":"Release"},{"keyName":"ToggleTacticalInteraction","variants":[{"keyCode":["T","B"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"Nidnod","variants":[{"keyCode":["Mouse2"]},{"keyCode":[]}],"pressType":"Release"},{"keyName":"WatchTime","variants":[{"keyCode":[]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"Interact","variants":[{"keyCode":["F"]},{"keyCode":[]}],"pressType":"Continuous"},{"keyName":"ThrowItem","variants":[{"keyCode":["X"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"DropBackpack","variants":[{"keyCode":["Z"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"Breath","variants":[{"keyCode":["LeftAlt"]},{"keyCode":[]}],"pressType":"Continuous"},{"keyName":"Mumble","variants":[{"keyCode":["Y"]},{"keyCode":[]}],"pressType":"DoubleClick"},{"keyName":"MumbleDropdown","variants":[{"keyCode":["Y"]},{"keyCode":[]}],"pressType":"Continuous"},{"keyName":"MumbleQuick","variants":[{"keyCode":["Y"]},{"keyCode":[]}],"pressType":"Release"},{"keyName":"WatchTimerAndExits","variants":[{"keyCode":["O"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"Inventory","variants":[{"keyCode":["Tab"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"Slot4","variants":[{"keyCode":["Alpha4"]},{"keyCode":[]}],"pressType":"Release"},{"keyName":"Slot5","variants":[{"keyCode":["Alpha5"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"Slot6","variants":[{"keyCode":["Alpha5"]},{"keyCode":[]}],"pressType":"Release"},{"keyName":"Slot7","variants":[{"keyCode":["Alpha6"]},{"keyCode":[]}],"pressType":"Release"},{"keyName":"Slot8","variants":[{"keyCode":["Alpha7"]},{"keyCode":[]}],"pressType":"Release"},{"keyName":"Slot9","variants":[{"keyCode":["Alpha8"]},{"keyCode":[]}],"pressType":"Release"},{"keyName":"Slot0","variants":[{"keyCode":["Alpha9"]},{"keyCode":[]}],"pressType":"Release"},{"keyName":"Recorder","variants":[{"keyCode":[]},{"keyCode":[]}],"pressType":"Release"},{"keyName":"MakeScreenshot","variants":[{"keyCode":["SysReq"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"ToggleInfo","variants":[{"keyCode":["I"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"Console","variants":[{"keyCode":["BackQuote"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"ChangePointOfView","variants":[{"keyCode":["Home"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"TogglePinMode","variants":[{"keyCode":["P"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"ToggleLockMode","variants":[{"keyCode":["L"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"PressThrowGrenade","variants":[{"keyCode":["G"]},{"keyCode":[]}],"pressType":"Release"},{"keyName":"PressSlot4","variants":[{"keyCode":["Alpha4"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"PressSlot6","variants":[{"keyCode":["Alpha5"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"PressSlot7","variants":[{"keyCode":["Alpha6"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"PressSlot8","variants":[{"keyCode":["Alpha7"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"PressSlot9","variants":[{"keyCode":["Alpha8"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"PressSlot0","variants":[{"keyCode":["Alpha9"]},{"keyCode":[]}],"pressType":"Press"},{"keyName":"ReleaseTactical","variants":[{"keyCode":["E"]},{"keyCode":[]}],"pressType":"Release"}]}
+2026-05-25 20:58:04.236|1.0.5.0.45272|Info|application|Session mode: Regular
+2026-05-25 20:58:12.555|1.0.5.0.45272|Info|application|PrepareSelectedProfileLocally ProfileId:0123456789abcdef01234567 AccountId:1234567
+2026-05-25 20:58:12.555|1.0.5.0.45272|Info|application|CompleteSelectedProfile ProfileId:0123456789abcdef01234567 AccountId:1234567
+2026-05-25 20:58:25.170|1.0.5.0.45272|Debug|application|Start loading dll 'C:/Battlestate Games/Escape from Tarkov/EscapeFromTarkov_Data/../BattlEye/BEClient_x64.dll'
+2026-05-25 20:58:25.537|1.0.5.0.45272|Debug|application|SUCCESS: loading dll 'C:/Battlestate Games/Escape from Tarkov/EscapeFromTarkov_Data/../BattlEye/BEClient_x64.dll'
+2026-05-25 20:58:25.537|1.0.5.0.45272|Debug|application|Getting Proc Address for 'Init', dllPtr:'140732932751360'
+2026-05-25 20:58:25.537|1.0.5.0.45272|Debug|application|SUCCESS: getting proc address 'Init', dllPtr:'140732932751360'
+2026-05-25 20:58:25.537|1.0.5.0.45272|Debug|application|Getting Proc Address for 'GetVer', dllPtr:'140732932751360'
+2026-05-25 20:58:25.537|1.0.5.0.45272|Debug|application|SUCCESS: getting proc address 'GetVer', dllPtr:'140732932751360'
+2026-05-25 20:58:25.538|1.0.5.0.45272|Debug|application|Init: pstrGameVersion: Escape from Tarkov 1.0.5.0.45272, uiAddress: 0, usPort: 0
+2026-05-25 20:58:25.540|1.0.5.0.45272|Info|application|Initialized (v1.249)
+2026-05-25 20:58:25.540|1.0.5.0.45272|Info|application|BEClient inited successfully
+2026-05-25 20:58:25.540|1.0.5.0.45272|Debug|application|totalMemoryBeforeCleanUp 777.4609
+2026-05-25 20:58:25.540|1.0.5.0.45272|Debug|application|GC::Collect
+2026-05-25 20:58:25.775|1.0.5.0.45272|Debug|application|GC::Collect Aggressive
+2026-05-25 20:58:26.006|1.0.5.0.45272|Debug|application|collectedMemoryGB 21.56641
+2026-05-25 20:58:26.018|1.0.5.0.45272|Info|application|Config entry: GameID eft
+2026-05-25 20:58:26.018|1.0.5.0.45272|Info|application|Config entry: MasterPort 17000
+2026-05-25 20:58:26.087|1.0.5.0.45272|Info|application|Disposing BEClient
+2026-05-25 20:58:26.087|1.0.5.0.45272|Info|application|BEClient exit
+2026-05-25 20:58:26.188|1.0.5.0.45272|Info|application|BEClient exit successfully
+2026-05-25 20:58:26.188|1.0.5.0.45272|Debug|application|Releasing dll '140732932751360'
+2026-05-25 20:58:26.310|1.0.5.0.45272|Debug|application|SUCCESS: Dll released with code '1'
+2026-05-25 20:59:46.039|1.0.5.0.45272|Debug|application|Heap pre-allocation - disabled
+2026-05-25 20:59:46.039|1.0.5.0.45272|Debug|application|totalMemoryBeforeCleanUp 1428.527
+2026-05-25 20:59:46.039|1.0.5.0.45272|Debug|application|GC::Collect
+2026-05-25 20:59:46.532|1.0.5.0.45272|Debug|application|GC::Collect Aggressive
+2026-05-25 20:59:46.885|1.0.5.0.45272|Debug|application|collectedMemoryGB 229.1758
+2026-05-25 20:59:47.139|1.0.5.0.45272|Debug|application|GC mode switched to Disabled
+2026-05-25 21:04:50.095|1.0.5.0.45272|Debug|application|GC mode switched to Enabled
+2026-05-25 21:04:56.236|1.0.5.0.45272|Debug|application|Matching with group id: 
+2026-05-25 21:04:56.237|1.0.5.0.45272|Info|application|ClientMetricsEvents():402.0833
+2026-05-25 21:04:57.127|1.0.5.0.45272|Info|application|scene preset path:maps/woods_preset.bundle rcid:woods.scenespreset.asset
+2026-05-25 21:04:57.127|1.0.5.0.45272|Debug|application|TRACE-NetworkGameMatching G
+2026-05-25 21:04:58.388|1.0.5.0.45272|Debug|application|TRACE-NetworkGameMatching H
+2026-05-25 21:04:58.391|1.0.5.0.45272|Debug|application|TRACE-NetworkGameMatching I
+2026-05-25 21:05:12.935|1.0.5.0.45272|Info|application|LocationLoaded:9.3 real:16.69 diff:7.39
+2026-05-25 21:05:24.005|1.0.5.0.45272|Info|application|MatchingCompleted:20.38 real:27.76 diff:7.38
+2026-05-25 21:05:24.052|1.0.5.0.45272|Info|application|GamePrepared:20.43 real:27.81 diff:7.37
+2026-05-25 21:05:24.053|1.0.5.0.45272|Debug|application|TRACE-NetworkGameCreate 0
+2026-05-25 21:05:24.053|1.0.5.0.45272|Debug|application|TRACE-NetworkGameCreate 2
+2026-05-25 21:05:24.785|1.0.5.0.45272|Debug|application|TRACE-NetworkGameCreate 3
+2026-05-25 21:05:24.785|1.0.5.0.45272|Debug|application|TRACE-NetworkGameCreate profileStatus: 'Profileid: 0123456789abcdef01234567, Status: Busy, RaidMode: Online, Ip: 152.233.27.67, Port: 17002, Location: Woods, Sid: CA-CAL01G001_cafebabecafebabecafebabe_26.05.26_05-03-09, GameMode: deathmatch, shortId: 5H5YBT'
+2026-05-25 21:05:24.788|1.0.5.0.45272|Debug|application|TRACE-NetworkGameCreate 4
+2026-05-25 21:05:24.790|1.0.5.0.45272|Info|application|GameCreated:21.16(0.72) real:28.55(0.73) diff:7.38
+2026-05-25 21:05:24.790|1.0.5.0.45272|Debug|application|TRACE-NetworkGameCreate 5
+2026-05-25 21:05:52.136|1.0.5.0.45272|Info|application|GamePooled:48.13(26.97) real:55.9(27.35) diff:7.77
+2026-05-25 21:05:58.266|1.0.5.0.45272|Info|application|GameRunned:50.63(2.5) real:62.03(6.12) diff:11.39
+2026-05-25 21:05:58.446|1.0.5.0.45272|Info|application|GameSpawn:50.87(0.23) real:62.21(0.18) diff:11.34
+2026-05-25 21:05:58.838|1.0.5.0.45272|Info|application|PlayerSpawnEvent:51.25(0.38) real:62.6(0.38) diff:11.34
+2026-05-25 21:05:59.690|1.0.5.0.45272|Info|application|GameSpawned:51.83(0.58) real:63.45(0.85) diff:11.61
+2026-05-25 21:05:59.690|1.0.5.0.45272|Debug|application|Heap pre-allocation - disabled
+2026-05-25 21:05:59.701|1.0.5.0.45272|Debug|application|GC::CollectAsync iteration: 0.01013184s True
+2026-05-25 21:05:59.709|1.0.5.0.45272|Debug|application|GC::CollectAsync iteration: 0.007019043s True
+2026-05-25 21:05:59.725|1.0.5.0.45272|Debug|application|GC::CollectAsync iteration: 0.007019043s True
+2026-05-25 21:05:59.740|1.0.5.0.45272|Debug|application|GC::CollectAsync iteration: 0.007049561s True
+2026-05-25 21:05:59.754|1.0.5.0.45272|Debug|application|GC::CollectAsync iteration: 0.007019043s True
+2026-05-25 21:05:59.768|1.0.5.0.45272|Debug|application|GC::CollectAsync iteration: 0.007049561s True
+2026-05-25 21:05:59.783|1.0.5.0.45272|Debug|application|GC::CollectAsync iteration: 0.007049561s True
+2026-05-25 21:05:59.798|1.0.5.0.45272|Debug|application|GC::CollectAsync iteration: 0.007049561s True
+2026-05-25 21:05:59.879|1.0.5.0.45272|Debug|application|GC::CollectAsync iteration: 0.04870605s False
+2026-05-25 21:05:59.890|1.0.5.0.45272|Debug|application|GC::CollectAsync time 0.2000122s 3216.973 - collected 55.19141
+2026-05-25 21:06:00.748|1.0.5.0.45272|Debug|application|GC mode switched to Disabled
+2026-05-25 21:06:11.681|1.0.5.0.45272|Info|application|GameStarting:63.01(11.17) real:75.44(11.99) diff:12.43
+2026-05-25 21:06:23.712|1.0.5.0.45272|Info|application|GameStarted:73.89(10.88) real:87.47(12.02) diff:13.58
+2026-05-25 21:06:23.728|1.0.5.0.45272|Debug|application|TRACE-NetworkGameCreate 6
+2026-05-25 21:06:23.909|1.0.5.0.45272|Info|application|[Transit] `0123456789abcdef01234567` Count:0, EventPlayer:False
+2026-05-25 21:07:08.738|1.0.5.0.45272|Info|application|Reason:PacketsQueue, Position:(475.442, -14.720, 197.440), SpeedLimit:8.321667, CurrentState:Sprint, StrengthSummaryLevel:23, WalkSpeedLimit:1
+2026-05-25 21:15:15.658|1.0.5.0.45272|Info|application|Reason:Lift, Position:(254.971, 22.079, -298.637), SpeedLimit:4.6, CurrentState:Run, StrengthSummaryLevel:23, WalkSpeedLimit:1
+2026-05-25 21:15:18.358|1.0.5.0.45272|Info|application|Reason:Lift, Position:(254.971, 22.079, -298.637), SpeedLimit:4.6, CurrentState:Run, StrengthSummaryLevel:23, WalkSpeedLimit:1
+2026-05-25 21:29:30.178|1.0.5.0.45272|Info|application|Reason:Speed, Position:(196.480, 24.477, -695.162), SpeedLimit:8.34, CurrentState:Sprint, StrengthSummaryLevel:24, WalkSpeedLimit:1
+2026-05-25 21:39:06.124|1.0.5.0.45272|Info|application|Reason:Lift, Position:(-487.553, 21.722, -234.751), SpeedLimit:0.7138389, CurrentState:Idle, StrengthSummaryLevel:23, WalkSpeedLimit:0.7867994
+2026-05-25 21:40:25.024|1.0.5.0.45272|Info|application|PrepareSelectedProfileLocally ProfileId:0123456789abcdef01234567 AccountId:1234567
+2026-05-25 21:40:40.031|1.0.5.0.45272|Debug|application|totalMemoryBeforeCleanUp 6944.004
+2026-05-25 21:40:40.031|1.0.5.0.45272|Debug|application|GC mode switched to Enabled
+2026-05-25 21:40:40.031|1.0.5.0.45272|Debug|application|GC::Collect
+2026-05-25 21:40:40.697|1.0.5.0.45272|Debug|application|GC::Collect Aggressive
+2026-05-25 21:40:41.348|1.0.5.0.45272|Debug|application|collectedMemoryGB 5113.367
+2026-05-25 21:40:41.348|1.0.5.0.45272|Debug|application|GC mode switched to Disabled
+2026-05-25 21:40:44.289|1.0.5.0.45272|Info|application|PrepareSelectedProfileLocally ProfileId:0123456789abcdef01234567 AccountId:1234567
+2026-05-25 21:40:44.291|1.0.5.0.45272|Info|application|CompleteSelectedProfile ProfileId:0123456789abcdef01234567 AccountId:1234567
+2026-05-25 21:41:51.562|1.0.5.0.45272|Info|application|PrepareSelectedProfileLocally ProfileId:0123456789abcdef01234567 AccountId:1234567
+2026-05-25 21:41:51.562|1.0.5.0.45272|Info|application|CompleteSelectedProfile ProfileId:0123456789abcdef01234567 AccountId:1234567
+2026-05-25 21:41:53.466|1.0.5.0.45272|Debug|application|Start loading dll 'C:/Battlestate Games/Escape from Tarkov/EscapeFromTarkov_Data/../BattlEye/BEClient_x64.dll'
+2026-05-25 21:41:53.911|1.0.5.0.45272|Debug|application|SUCCESS: loading dll 'C:/Battlestate Games/Escape from Tarkov/EscapeFromTarkov_Data/../BattlEye/BEClient_x64.dll'
+2026-05-25 21:41:53.911|1.0.5.0.45272|Debug|application|Getting Proc Address for 'Init', dllPtr:'140733878763520'
+2026-05-25 21:41:53.911|1.0.5.0.45272|Debug|application|SUCCESS: getting proc address 'Init', dllPtr:'140733878763520'
+2026-05-25 21:41:53.911|1.0.5.0.45272|Debug|application|Getting Proc Address for 'GetVer', dllPtr:'140733878763520'
+2026-05-25 21:41:53.911|1.0.5.0.45272|Debug|application|SUCCESS: getting proc address 'GetVer', dllPtr:'140733878763520'
+2026-05-25 21:41:53.911|1.0.5.0.45272|Debug|application|Init: pstrGameVersion: Escape from Tarkov 1.0.5.0.45272, uiAddress: 0, usPort: 0
+2026-05-25 21:41:53.918|1.0.5.0.45272|Info|application|Initialized (v1.249)
+2026-05-25 21:41:53.918|1.0.5.0.45272|Info|application|BEClient inited successfully
+2026-05-25 21:41:53.951|1.0.5.0.45272|Info|application|Config entry: GameID eft
+2026-05-25 21:41:53.951|1.0.5.0.45272|Info|application|Config entry: MasterPort 17000
+2026-05-25 21:41:54.626|1.0.5.0.45272|Debug|application|GC mode switched to Enabled
+2026-05-25 21:41:55.529|1.0.5.0.45272|Info|application|Disposing BEClient
+2026-05-25 21:41:55.529|1.0.5.0.45272|Info|application|BEClient exit
+2026-05-25 21:41:55.632|1.0.5.0.45272|Info|application|BEClient exit successfully
+2026-05-25 21:41:55.632|1.0.5.0.45272|Debug|application|Releasing dll '140733878763520'
+2026-05-25 21:41:55.762|1.0.5.0.45272|Debug|application|SUCCESS: Dll released with code '1'
+2026-05-25 22:00:49.121|1.0.5.0.45272|Debug|application|GC::CollectAsync iteration: 0.01000977s True
+2026-05-25 22:00:49.128|1.0.5.0.45272|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-05-25 22:00:49.141|1.0.5.0.45272|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-05-25 22:00:49.153|1.0.5.0.45272|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-05-25 22:00:49.164|1.0.5.0.45272|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-05-25 22:00:49.176|1.0.5.0.45272|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-05-25 22:00:49.188|1.0.5.0.45272|Debug|application|GC::CollectAsync iteration: 0.006835938s True
+2026-05-25 22:00:49.199|1.0.5.0.45272|Debug|application|GC::CollectAsync iteration: 0.007080078s True
+2026-05-25 22:00:49.299|1.0.5.0.45272|Debug|application|GC::CollectAsync iteration: 0.07397461s False
+2026-05-25 22:00:49.334|1.0.5.0.45272|Debug|application|GC::CollectAsync time 0.2229004s 2130.559 - collected 7.910156

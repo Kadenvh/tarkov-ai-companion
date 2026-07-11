@@ -1,2 +1,56 @@
-// @tac/insights — built in Wave 1 (see docs/spec/CONTRACTS.md §1, §4).
-export {};
+// @tac/insights — M7 personal insights: raid analytics, economy tracking,
+// playstyle fingerprint. Reads the per-profile SQLite (CONTRACTS.md §4)
+// through a caller-supplied node:sqlite DatabaseSync handle. @tier T0.
+export {
+  LOW_CONFIDENCE_N,
+  lowConfidence,
+  hourOf,
+  dayOf,
+  isoWeekMonday,
+} from "./util.js";
+export {
+  loadRaids,
+  raidTs,
+  raidEndTs,
+  survivalByMap,
+  survivalByHour,
+  survivalByDuration,
+  queuePatterns,
+  sessionRhythm,
+  DURATION_BUCKETS,
+  DEFAULT_SESSION_GAP_MIN,
+  type RaidRow,
+  type SurvivalStat,
+  type SurvivalByMapRow,
+  type SurvivalByHourRow,
+  type SurvivalByHourResult,
+  type DurationBucket,
+  type SurvivalByDurationRow,
+  type SurvivalByDurationResult,
+  type QueueStat,
+  type QueueByMapRow,
+  type QueueByHourRow,
+  type QueuePatterns,
+  type SessionOptions,
+  type RaidSession,
+  type SessionRhythm,
+} from "./raids.js";
+export {
+  loadFleaSales,
+  fleaIncome,
+  netWorthEstimate,
+  NetWorthConfig,
+  NET_WORTH_CAVEATS,
+  type FleaSaleRow,
+  type IncomeBucket,
+  type IncomePoint,
+  type FleaIncome,
+  type NetWorthPoint,
+  type NetWorthEstimate,
+} from "./economy.js";
+export {
+  playstyleFingerprint,
+  mapSlug,
+  type FingerprintOptions,
+  type PlaystyleFingerprint,
+} from "./fingerprint.js";

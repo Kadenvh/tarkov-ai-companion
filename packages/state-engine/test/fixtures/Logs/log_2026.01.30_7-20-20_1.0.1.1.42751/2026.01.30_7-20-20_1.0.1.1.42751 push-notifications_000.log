@@ -1,0 +1,1129 @@
+2026-01-30 07:20:51.913|1.0.1.1.42751|Info|push-notifications|NotificationManager: new params received url:  ws:wss://wsn-02.escapefromtarkov.com/push/notifier/getwebsocket/feedfacefeedfacefeedfacefeedfacefeedfacefeedfacefeedfacefeedface
+2026-01-30 07:23:02.411|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:1262 MessageType:Text
+2026-01-30 07:23:02.412|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:1262
+2026-01-30 07:23:02.416|1.0.1.1.42751|Info|push-notifications|Got notification | ChatMessageReceived
+{
+  "type": "new_message",
+  "eventId": "697cb0b5c28b2a72540b98ff",
+  "dialogId": "54cb50c76803fa8b248b4571",
+  "message": {
+    "_id": "697cb0b53f56d0eed50e8ba58",
+    "uid": "54cb50c76803fa8b248b4571",
+    "type": 13,
+    "dt": 1769779381,
+    "text": "",
+    "templateId": "672dd5b83804f9bc8e0a610e 0",
+    "items": {
+      "stash": "697cb0b53f56d0eed50e8ba6",
+      "data": [
+        {
+          "_id": "697cb0b53f56d0eed50e8ba8",
+          "_tpl": "5d1b33a686f7742523398398",
+          "upd": {
+            "SpawnedInSession": true,
+            "StackObjectsCount": 1
+          },
+          "parentId": "697cb0b53f56d0eed50e8ba6",
+          "slotId": "main"
+        },
+        {
+          "_id": "697cb0b53f56d0eed50e8baa",
+          "_tpl": "590a3c0a86f774385a33c450",
+          "upd": {
+            "SpawnedInSession": true,
+            "StackObjectsCount": 1
+          },
+          "parentId": "697cb0b53f56d0eed50e8ba6",
+          "slotId": "main"
+        },
+        {
+          "_id": "697cb0b53f56d0eed50e8bab",
+          "_tpl": "590a3c0a86f774385a33c450",
+          "upd": {
+            "SpawnedInSession": true,
+            "StackObjectsCount": 1
+          },
+          "parentId": "697cb0b53f56d0eed50e8ba6",
+          "slotId": "main"
+        },
+        {
+          "_id": "697cb0b53f56d0eed50e8bac",
+          "_tpl": "590a3c0a86f774385a33c450",
+          "upd": {
+            "SpawnedInSession": true,
+            "StackObjectsCount": 1
+          },
+          "parentId": "697cb0b53f56d0eed50e8ba6",
+          "slotId": "main"
+        },
+        {
+          "_id": "697cb0b53f56d0eed50e8bae",
+          "_tpl": "5d1b36a186f7742523398433",
+          "upd": {
+            "SpawnedInSession": true,
+            "StackObjectsCount": 1
+          },
+          "parentId": "697cb0b53f56d0eed50e8ba6",
+          "slotId": "main"
+        }
+      ]
+    },
+    "maxStorageTime": 2592000,
+    "profileChangeEvents": [],
+    "hasRewards": true
+  }
+}
+2026-01-30 07:23:02.416|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: ChatMessageReceived, Time: 0, Duration: Default, ShowNotification: False
+2026-01-30 07:25:57.662|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:53 MessageType:Text
+2026-01-30 07:25:57.662|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:53
+2026-01-30 07:25:57.662|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received Service Notifications Ping
+2026-01-30 07:41:03.891|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:53 MessageType:Text
+2026-01-30 07:41:03.891|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:53
+2026-01-30 07:41:03.891|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received Service Notifications Ping
+2026-01-30 07:46:16.652|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:53 MessageType:Text
+2026-01-30 07:46:16.652|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:53
+2026-01-30 07:46:16.652|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received Service Notifications Ping
+2026-01-30 07:49:59.056|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:635 MessageType:Text
+2026-01-30 07:49:59.056|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:635
+2026-01-30 07:49:59.057|1.0.1.1.42751|Info|push-notifications|Got notification | ChatMessageReceived
+{
+  "type": "new_message",
+  "eventId": "697cb7065f1e85c0b81165c3",
+  "dialogId": "5ac3b934156ae10c4430e83c",
+  "message": {
+    "_id": "697cb706251480c2b602f65125",
+    "uid": "5ac3b934156ae10c4430e83c",
+    "type": 4,
+    "dt": 1769780998,
+    "text": "",
+    "templateId": "5bdabfb886f7743e152e867e 0",
+    "systemData": {
+      "buyerNickname": "FleaBuyer",
+      "soldItem": "6389c8c5dbfd5e4b95197e6b",
+      "itemCount": 1
+    },
+    "items": {
+      "stash": "697cb706251480c2b602f652",
+      "data": [
+        {
+          "_id": "697cb706251480c2b602f64e",
+          "_tpl": "5449016a4bdc2d6f028b456f",
+          "upd": {
+            "StackObjectsCount": 397777
+          },
+          "parentId": "697cb706251480c2b602f652",
+          "slotId": "main"
+        }
+      ]
+    },
+    "maxStorageTime": 1209600,
+    "profileChangeEvents": [],
+    "hasRewards": true
+  }
+}
+2026-01-30 07:49:59.057|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: ChatMessageReceived, Time: 0, Duration: Default, ShowNotification: False
+2026-01-30 07:49:59.057|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:153 MessageType:Text
+2026-01-30 07:49:59.057|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:153
+2026-01-30 07:49:59.058|1.0.1.1.42751|Info|push-notifications|Got notification | RagfairOfferSold
+{
+  "type": "RagfairOfferSold",
+  "eventId": "697cb70661ab3e7a6517e211",
+  "offerId": "697cb445bf4686a7da034130c",
+  "handbookId": "6389c8c5dbfd5e4b95197e6b",
+  "count": 1
+}
+2026-01-30 07:49:59.058|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: RagfairOfferSold, Time: 0, Duration: Default, ShowNotification: True
+2026-01-30 07:50:06.711|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:102 MessageType:Text
+2026-01-30 07:50:06.711|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:102
+2026-01-30 07:50:06.713|1.0.1.1.42751|Info|push-notifications|Got notification | RagfairNewRating
+{
+  "type": "RagfairNewRating",
+  "eventId": "697cb70e9cbce0dd8011d4a1",
+  "rating": 4.64,
+  "isRatingGrowing": true
+}
+2026-01-30 07:50:06.713|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: RagfairNewRating, Time: 0, Duration: Default, ShowNotification: False
+2026-01-30 07:51:21.173|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:148 MessageType:Text
+2026-01-30 07:51:21.173|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:148
+2026-01-30 07:51:21.174|1.0.1.1.42751|Info|push-notifications|Got notification | UserMatchCreated
+{
+  "type": "userMatchCreated",
+  "eventId": "697cb759aa9b77620e189e1b",
+  "blockExitButton": true,
+  "blockExitButtonDuration": 120,
+  "showConfirmationPopup": false
+}
+2026-01-30 07:51:21.174|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: UserMatchCreated, Time: 0, Duration: Default, ShowNotification: False
+2026-01-30 07:51:21.189|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:145 MessageType:Text
+2026-01-30 07:51:21.189|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:145
+2026-01-30 07:51:21.190|1.0.1.1.42751|Info|push-notifications|Got notification | UserRoomStarted
+{
+  "type": "userRoomStarted",
+  "eventId": "697cb759d49d83b99c161189",
+  "blockExitButton": true,
+  "blockExitButtonDuration": 0,
+  "showConfirmationPopup": false
+}
+2026-01-30 07:51:21.190|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: UserRoomStarted, Time: 0, Duration: Default, ShowNotification: False
+2026-01-30 07:53:18.101|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:383 MessageType:Text
+2026-01-30 07:53:18.101|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:383
+2026-01-30 07:53:18.102|1.0.1.1.42751|Info|push-notifications|Got notification | UserConfirmed
+{
+  "type": "userConfirmed",
+  "eventId": "697cb7cd8bc9553f9912912c",
+  "profileid": "0123456789abcdef01234567",
+  "profileToken": "feedfacefeedfacefeedfacefeedface",
+  "status": "Busy",
+  "ip": "148.72.168.247",
+  "port": 17000,
+  "sid": "US-STL01G007_cafebabecafebabecafebabe_30.01.26_16-51-21",
+  "version": "live",
+  "location": "bigmap",
+  "raidMode": "Online",
+  "mode": "deathmatch",
+  "shortId": "MF7JZ0",
+  "additional_info": []
+}
+2026-01-30 07:53:18.102|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: Ping, Time: 0, Duration: Default, ShowNotification: False
+2026-01-30 07:53:18.464|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest canceled
+2026-01-30 07:53:18.464|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest webSocket disposed
+2026-01-30 08:29:43.849|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest canceled
+2026-01-30 08:29:43.849|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest webSocket disposed
+2026-01-30 08:29:44.217|1.0.1.1.42751|Info|push-notifications|NotificationManager: new params received url:  ws:wss://wsn-01.escapefromtarkov.com/push/notifier/getwebsocket/feedfacefeedfacefeedfacefeedfacefeedfacefeedfacefeedfacefeedface
+2026-01-30 08:33:12.409|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:714 MessageType:Text
+2026-01-30 08:33:12.409|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:714
+2026-01-30 08:33:12.410|1.0.1.1.42751|Info|push-notifications|Got notification | ChatMessageReceived
+{
+  "type": "new_message",
+  "eventId": "697cc128d49d83b99c167f4e",
+  "dialogId": "6617beeaa9cfa777ca915b7c",
+  "message": {
+    "_id": "697cc1263c3d3a4d7c07222027",
+    "uid": "6617beeaa9cfa777ca915b7c",
+    "type": 12,
+    "dt": 1769783590,
+    "text": "quest started",
+    "templateId": "66058cd19f59e625462acc90 successMessageText",
+    "items": {
+      "stash": "697cc1263c3d3a4d7c072221",
+      "data": [
+        {
+          "_id": "697cc1263c3d3a4d7c07221d",
+          "_tpl": "5d235b4d86f7742e017bc88a",
+          "upd": {
+            "StackObjectsCount": 85
+          },
+          "parentId": "697cc1263c3d3a4d7c072221",
+          "slotId": "main"
+        },
+        {
+          "_id": "697cc1263c3d3a4d7c07221f",
+          "_tpl": "664a55d84a90fc2c8a6305c9",
+          "upd": {
+            "StackObjectsCount": 1
+          },
+          "parentId": "697cc1263c3d3a4d7c072221",
+          "slotId": "main"
+        }
+      ]
+    },
+    "maxStorageTime": 172800,
+    "profileChangeEvents": [],
+    "hasRewards": true
+  }
+}
+2026-01-30 08:33:12.410|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: ChatMessageReceived, Time: 0, Duration: Default, ShowNotification: False
+2026-01-30 08:33:13.242|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:325 MessageType:Text
+2026-01-30 08:33:13.242|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:325
+2026-01-30 08:33:13.242|1.0.1.1.42751|Info|push-notifications|Got notification | ChatMessageReceived
+{
+  "type": "new_message",
+  "eventId": "697cc129afbdba22040d0be8",
+  "dialogId": "579dc571d53a0658a154fbec",
+  "message": {
+    "_id": "697cc1283c3d3a4d7c072222",
+    "uid": "579dc571d53a0658a154fbec",
+    "type": 11,
+    "dt": 1769783592,
+    "text": "quest started",
+    "templateId": "66058ccf06ef1d50a60c1f48 failMessageText",
+    "hasRewards": false,
+    "maxStorageTime": 1209600
+  }
+}
+2026-01-30 08:33:13.242|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: ChatMessageReceived, Time: 0, Duration: Default, ShowNotification: False
+2026-01-30 08:39:06.359|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:53 MessageType:Text
+2026-01-30 08:39:06.359|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:53
+2026-01-30 08:39:06.360|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received Service Notifications Ping
+2026-01-30 08:41:14.461|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:148 MessageType:Text
+2026-01-30 08:41:14.461|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:148
+2026-01-30 08:41:14.461|1.0.1.1.42751|Info|push-notifications|Got notification | UserMatchCreated
+{
+  "type": "userMatchCreated",
+  "eventId": "697cc30ac28b2a72540c6415",
+  "blockExitButton": true,
+  "blockExitButtonDuration": 120,
+  "showConfirmationPopup": false
+}
+2026-01-30 08:41:14.461|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: UserMatchCreated, Time: 0, Duration: Default, ShowNotification: False
+2026-01-30 08:41:14.477|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:145 MessageType:Text
+2026-01-30 08:41:14.477|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:145
+2026-01-30 08:41:14.477|1.0.1.1.42751|Info|push-notifications|Got notification | UserRoomStarted
+{
+  "type": "userRoomStarted",
+  "eventId": "697cc30a5f1e85c0b811ec39",
+  "blockExitButton": true,
+  "blockExitButtonDuration": 0,
+  "showConfirmationPopup": false
+}
+2026-01-30 08:41:14.477|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: UserRoomStarted, Time: 0, Duration: Default, ShowNotification: False
+2026-01-30 08:43:14.212|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:383 MessageType:Text
+2026-01-30 08:43:14.213|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:383
+2026-01-30 08:43:14.213|1.0.1.1.42751|Info|push-notifications|Got notification | UserConfirmed
+{
+  "type": "userConfirmed",
+  "eventId": "697cc382fdd8108d6d11ce0a",
+  "profileid": "0123456789abcdef01234567",
+  "profileToken": "feedfacefeedfacefeedfacefeedface",
+  "status": "Busy",
+  "ip": "148.72.174.197",
+  "port": 17001,
+  "sid": "US-STL01G033_cafebabecafebabecafebabe_30.01.26_17-41-14",
+  "version": "live",
+  "location": "bigmap",
+  "raidMode": "Online",
+  "mode": "deathmatch",
+  "shortId": "MFT94Q",
+  "additional_info": []
+}
+2026-01-30 08:43:14.213|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: Ping, Time: 0, Duration: Default, ShowNotification: False
+2026-01-30 08:43:14.487|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest canceled
+2026-01-30 08:43:14.487|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest webSocket disposed
+2026-01-30 09:16:27.189|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest canceled
+2026-01-30 09:16:27.189|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest webSocket disposed
+2026-01-30 09:16:27.581|1.0.1.1.42751|Info|push-notifications|NotificationManager: new params received url:  ws:wss://wsn-01.escapefromtarkov.com/push/notifier/getwebsocket/feedfacefeedfacefeedfacefeedfacefeedfacefeedfacefeedfacefeedface
+2026-01-30 09:16:48.007|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:1692 MessageType:Text
+2026-01-30 09:16:48.007|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:1692
+2026-01-30 09:16:48.009|1.0.1.1.42751|Info|push-notifications|Got notification | ChatMessageReceived
+{
+  "type": "new_message",
+  "eventId": "697ccb5fefb6a325f9136da3",
+  "dialogId": "54cb50c76803fa8b248b4571",
+  "message": {
+    "_id": "697ccb5fbd13870e2600dfed8",
+    "uid": "54cb50c76803fa8b248b4571",
+    "type": 12,
+    "dt": 1769786207,
+    "text": "quest started",
+    "templateId": "59c512ad86f7741f0d09de9b successMessageText",
+    "items": {
+      "stash": "697ccb5fbd13870e2600dfee",
+      "data": [
+        {
+          "_id": "697ccb5fbd13870e2600dfe5",
+          "_tpl": "5696686a4bdc2da3298b456a",
+          "upd": {
+            "StackObjectsCount": 2954
+          },
+          "parentId": "697ccb5fbd13870e2600dfee",
+          "slotId": "main"
+        },
+        {
+          "_id": "697ccb5fbd13870e2600dfe6",
+          "_tpl": "588892092459774ac91d4b11",
+          "upd": {
+            "SpawnedInSession": true
+          },
+          "parentId": "697ccb5fbd13870e2600dfee",
+          "slotId": "main"
+        },
+        {
+          "_id": "697ccb5fbd13870e2600dfe7",
+          "_tpl": "5888988e24597752fe43a6fa",
+          "parentId": "697ccb5fbd13870e2600dfe6",
+          "slotId": "mod_magazine",
+          "upd": {
+            "SpawnedInSession": true
+          }
+        },
+        {
+          "_id": "697ccb5fbd13870e2600dfe8",
+          "_tpl": "5888956924597752983e182d",
+          "parentId": "697ccb5fbd13870e2600dfe6",
+          "slotId": "mod_barrel",
+          "upd": {
+            "SpawnedInSession": true
+          }
+        },
+        {
+          "_id": "697ccb5fbd13870e2600dfe9",
+          "_tpl": "5888996c24597754281f9419",
+          "parentId": "697ccb5fbd13870e2600dfe8",
+          "slotId": "mod_muzzle",
+          "upd": {
+            "SpawnedInSession": true
+          }
+        },
+        {
+          "_id": "697ccb5fbd13870e2600dfea",
+          "_tpl": "5888976c24597754281f93f5",
+          "parentId": "697ccb5fbd13870e2600dfe8",
+          "slotId": "mod_handguard",
+          "upd": {
+            "SpawnedInSession": true
+          }
+        },
+        {
+          "_id": "697ccb5fbd13870e2600dfeb",
+          "_tpl": "57c55f172459772d27602381",
+          "parentId": "697ccb5fbd13870e2600dfe6",
+          "slotId": "mod_pistol_grip",
+          "upd": {
+            "SpawnedInSession": true
+          }
+        },
+        {
+          "_id": "697ccb5fbd13870e2600dfec",
+          "_tpl": "58889d0c2459775bc215d981",
+          "parentId": "697ccb5fbd13870e2600dfe6",
+          "slotId": "mod_stock",
+          "upd": {
+            "SpawnedInSession": true
+          }
+        }
+      ]
+    },
+    "maxStorageTime": 172800,
+    "profileChangeEvents": [],
+    "hasRewards": true
+  }
+}
+2026-01-30 09:16:48.009|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: ChatMessageReceived, Time: 0, Duration: Default, ShowNotification: False
+2026-01-30 09:16:52.488|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:321 MessageType:Text
+2026-01-30 09:16:52.488|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:321
+2026-01-30 09:16:52.488|1.0.1.1.42751|Info|push-notifications|Got notification | ChatMessageReceived
+{
+  "type": "new_message",
+  "eventId": "697ccb6443fc03cf26177a61",
+  "dialogId": "54cb50c76803fa8b248b4571",
+  "message": {
+    "_id": "697ccb64d2ff6bb99d04b9eb",
+    "uid": "54cb50c76803fa8b248b4571",
+    "type": 10,
+    "dt": 1769786212,
+    "text": "quest started",
+    "templateId": "59ca264786f77445a80ed044 description",
+    "hasRewards": false,
+    "maxStorageTime": 1209600
+  }
+}
+2026-01-30 09:16:52.488|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: ChatMessageReceived, Time: 0, Duration: Default, ShowNotification: False
+2026-01-30 09:17:27.299|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:626 MessageType:Text
+2026-01-30 09:17:27.299|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:626
+2026-01-30 09:17:27.300|1.0.1.1.42751|Info|push-notifications|Got notification | ChatMessageReceived
+{
+  "type": "new_message",
+  "eventId": "697ccb875cc032b7d80d22b1",
+  "dialogId": "5ac3b934156ae10c4430e83c",
+  "message": {
+    "_id": "697ccb86ea3a5b362a024b6c25",
+    "uid": "5ac3b934156ae10c4430e83c",
+    "type": 4,
+    "dt": 1769786246,
+    "text": "",
+    "templateId": "5bdabfb886f7743e152e867e 0",
+    "systemData": {
+      "buyerNickname": "FleaBuyer",
+      "soldItem": "61bf7c024770ee6f9c6b8b53",
+      "itemCount": 1
+    },
+    "items": {
+      "stash": "697ccb86ea3a5b362a024b6d",
+      "data": [
+        {
+          "_id": "697ccb86ea3a5b362a024b69",
+          "_tpl": "5449016a4bdc2d6f028b456f",
+          "upd": {
+            "StackObjectsCount": 88888
+          },
+          "parentId": "697ccb86ea3a5b362a024b6d",
+          "slotId": "main"
+        }
+      ]
+    },
+    "maxStorageTime": 1209600,
+    "profileChangeEvents": [],
+    "hasRewards": true
+  }
+}
+2026-01-30 09:17:27.300|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: ChatMessageReceived, Time: 0, Duration: Default, ShowNotification: False
+2026-01-30 09:17:27.316|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:153 MessageType:Text
+2026-01-30 09:17:27.316|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:153
+2026-01-30 09:17:27.316|1.0.1.1.42751|Info|push-notifications|Got notification | RagfairOfferSold
+{
+  "type": "RagfairOfferSold",
+  "eventId": "697ccb87f9a46dc35412bfec",
+  "offerId": "697cb47e0c2c8cdb6e030857c",
+  "handbookId": "61bf7c024770ee6f9c6b8b53",
+  "count": 1
+}
+2026-01-30 09:17:27.316|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: RagfairOfferSold, Time: 0, Duration: Default, ShowNotification: True
+2026-01-30 09:18:02.779|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:115 MessageType:Text
+2026-01-30 09:18:02.779|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:115
+2026-01-30 09:18:02.779|1.0.1.1.42751|Info|push-notifications|Got notification | RagfairNewRating
+{
+  "type": "RagfairNewRating",
+  "eventId": "697ccbaaa2626b485a18eedd",
+  "rating": 4.6999999999999993,
+  "isRatingGrowing": true
+}
+2026-01-30 09:18:02.779|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: RagfairNewRating, Time: 0, Duration: Default, ShowNotification: False
+2026-01-30 09:18:35.971|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:2048 MessageType:Text
+2026-01-30 09:18:35.971|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:1589 MessageType:Text
+2026-01-30 09:18:35.971|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:3637
+2026-01-30 09:18:35.975|1.0.1.1.42751|Info|push-notifications|Got notification | ChatMessageReceived
+{
+  "type": "new_message",
+  "eventId": "697ccbcbaa9b77620e198680",
+  "dialogId": "5c0647fdd443bc2504c2d371",
+  "message": {
+    "_id": "697ccbcb748e84e7ef07554e50",
+    "uid": "5c0647fdd443bc2504c2d371",
+    "type": 12,
+    "dt": 1769786315,
+    "text": "quest started",
+    "templateId": "68fa00bda5ef093c440fb0ba 0",
+    "items": {
+      "stash": "697ccbcb748e84e7ef07554f",
+      "data": [
+        {
+          "_id": "697ccbcb748e84e7ef075534",
+          "_tpl": "5449016a4bdc2d6f028b456f",
+          "upd": {
+            "StackObjectsCount": 590750
+          },
+          "parentId": "697ccbcb748e84e7ef07554f",
+          "slotId": "main"
+        },
+        {
+          "_id": "697ccbcb748e84e7ef075546",
+          "_tpl": "628120fd5631d45211793c9f",
+          "upd": {
+            "StackObjectsCount": 1
+          },
+          "parentId": "697ccbcb748e84e7ef07554f",
+          "slotId": "main"
+        },
+        {
+          "_id": "697ccbcb748e84e7ef075547",
+          "_tpl": "628120fd5631d45211793c9f",
+          "upd": {
+            "StackObjectsCount": 1
+          },
+          "parentId": "697ccbcb748e84e7ef07554f",
+          "slotId": "main"
+        },
+        {
+          "_id": "697ccbcb748e84e7ef07554a",
+          "_tpl": "657023ccbfc87b3a3409320a",
+          "upd": {
+            "StackObjectsCount": 1
+          },
+          "parentId": "697ccbcb748e84e7ef07554f",
+          "slotId": "main"
+        },
+        {
+          "_id": "697ccbcb748e84e7ef07554b",
+          "_tpl": "5fc275cf85fd526b824a571a",
+          "parentId": "697ccbcb748e84e7ef07554a",
+          "slotId": "cartridges",
+          "upd": {
+            "StackObjectsCount": 20
+          }
+        },
+        {
+          "_id": "697ccbcb748e84e7ef07554c",
+          "_tpl": "657023ccbfc87b3a3409320a",
+          "upd": {
+            "StackObjectsCount": 1
+          },
+          "parentId": "697ccbcb748e84e7ef07554f",
+          "slotId": "main"
+        },
+        {
+          "_id": "697ccbcb748e84e7ef07554d",
+          "_tpl": "5fc275cf85fd526b824a571a",
+          "parentId": "697ccbcb748e84e7ef07554c",
+          "slotId": "cartridges",
+          "upd": {
+            "StackObjectsCount": 20
+          }
+        },
+        {
+          "_id": "697ccbcb748e84e7ef075535",
+          "_tpl": "627e14b21713922ded6f2c15",
+          "upd": {
+            "FireMode": {
+              "FireMode": "single"
+            }
+          },
+          "parentId": "697ccbcb748e84e7ef07554f",
+          "slotId": "main"
+        },
+        {
+          "_id": "697ccbcb748e84e7ef075536",
+          "_tpl": "628120fd5631d45211793c9f",
+          "parentId": "697ccbcb748e84e7ef075535",
+          "slotId": "mod_magazine"
+        },
+        {
+          "_id": "697ccbcb748e84e7ef075537",
+          "_tpl": "62811e2510e26c1f344e6554",
+          "parentId": "697ccbcb748e84e7ef075535",
+          "slotId": "mod_pistol_grip",
+          "upd": {
+            "Foldable": {
+              "Folded": false
+            }
+          }
+        },
+        {
+          "_id": "697ccbcb748e84e7ef075538",
+          "_tpl": "62811f828193841aca4a45c3",
+          "parentId": "697ccbcb748e84e7ef075537",
+          "slotId": "mod_stock"
+        },
+        {
+          "_id": "697ccbcb748e84e7ef075539",
+          "_tpl": "6281204f308cb521f87a8f9b",
+          "parentId": "697ccbcb748e84e7ef075537",
+          "slotId": "mod_reciever"
+        },
+        {
+          "_id": "697ccbcb748e84e7ef07553a",
+          "_tpl": "6281209662cba23f6c4d7a19",
+          "parentId": "697ccbcb748e84e7ef075539",
+          "slotId": "mod_handguard"
+        },
+        {
+          "_id": "697ccbcb748e84e7ef07553b",
+          "_tpl": "628120c21d5df4475f46a337",
+          "parentId": "697ccbcb748e84e7ef07553a",
+          "slotId": "mod_mount_000"
+        },
+        {
+          "_id": "697ccbcb748e84e7ef07553c",
+          "_tpl": "628120d309427b40ab14e76d",
+          "parentId": "697ccbcb748e84e7ef07553a",
+          "slotId": "mod_mount_001"
+        },
+        {
+          "_id": "697ccbcb748e84e7ef07553d",
+          "_tpl": "628120d309427b40ab14e76d",
+          "parentId": "697ccbcb748e84e7ef07553a",
+          "slotId": "mod_mount_002"
+        },
+        {
+          "_id": "697ccbcb748e84e7ef07553e",
+          "_tpl": "628120dd308cb521f87a8fa1",
+          "parentId": "697ccbcb748e84e7ef07553a",
+          "slotId": "mod_mount_003"
+        },
+        {
+          "_id": "697ccbcb748e84e7ef07553f",
+          "_tpl": "6281212a09427b40ab14e770",
+          "parentId": "697ccbcb748e84e7ef075539",
+          "slotId": "mod_foregrip"
+        },
+        {
+          "_id": "697ccbcb748e84e7ef075540",
+          "_tpl": "62811fbf09427b40ab14e767",
+          "parentId": "697ccbcb748e84e7ef075539",
+          "slotId": "mod_reciever"
+        },
+        {
+          "_id": "697ccbcb748e84e7ef075541",
+          "_tpl": "628121434fa03b6b6c35dc6a",
+          "parentId": "697ccbcb748e84e7ef075540",
+          "slotId": "mod_barrel"
+        },
+        {
+          "_id": "697ccbcb748e84e7ef075542",
+          "_tpl": "62812081d23f207deb0ab216",
+          "parentId": "697ccbcb748e84e7ef075541",
+          "slotId": "mod_muzzle"
+        },
+        {
+          "_id": "697ccbcb748e84e7ef075543",
+          "_tpl": "628120621d5df4475f46a335",
+          "parentId": "697ccbcb748e84e7ef075542",
+          "slotId": "mod_muzzle"
+        },
+        {
+          "_id": "697ccbcb748e84e7ef075544",
+          "_tpl": "62811cd7308cb521f87a8f99",
+          "parentId": "697ccbcb748e84e7ef075535",
+          "slotId": "mod_charge"
+        }
+      ]
+    },
+    "maxStorageTime": 0,
+    "profileChangeEvents": [],
+    "hasRewards": true
+  }
+}
+2026-01-30 09:18:35.975|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: ChatMessageReceived, Time: 0, Duration: Default, ShowNotification: False
+2026-01-30 09:28:23.157|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:387 MessageType:Text
+2026-01-30 09:28:23.157|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:387
+2026-01-30 09:28:23.157|1.0.1.1.42751|Info|push-notifications|Got notification | UserConfirmed
+{
+  "type": "userConfirmed",
+  "eventId": "697cce16f44651bdf90c8b7c",
+  "profileid": "0123456789abcdef01234568",
+  "profileToken": "feedfacefeedfacefeedfacefeedface",
+  "status": "Busy",
+  "ip": "37.19.207.98",
+  "port": 17003,
+  "sid": "US-ASH02G015_cafebabecafebabecafebabe_30.01.26_18-19-10",
+  "version": "live",
+  "location": "factory4_day",
+  "raidMode": "Online",
+  "mode": "deathmatch",
+  "shortId": "MF4XYN",
+  "additional_info": []
+}
+2026-01-30 09:28:23.157|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: Ping, Time: 0, Duration: Default, ShowNotification: False
+2026-01-30 09:28:25.744|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest canceled
+2026-01-30 09:28:25.744|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest webSocket disposed
+2026-01-30 09:32:54.455|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest canceled
+2026-01-30 09:32:54.455|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest webSocket disposed
+2026-01-30 09:32:54.774|1.0.1.1.42751|Info|push-notifications|NotificationManager: new params received url:  ws:wss://wsn-01.escapefromtarkov.com/push/notifier/getwebsocket/feedfacefeedfacefeedfacefeedfacefeedfacefeedfacefeedfacefeedface
+2026-01-30 09:44:55.595|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:633 MessageType:Text
+2026-01-30 09:44:55.595|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:633
+2026-01-30 09:44:55.596|1.0.1.1.42751|Info|push-notifications|Got notification | ChatMessageReceived
+{
+  "type": "new_message",
+  "eventId": "697cd1f761ab3e7a6519157b",
+  "dialogId": "5ac3b934156ae10c4430e83c",
+  "message": {
+    "_id": "697cd1f7d2ff6bb99d04daa225",
+    "uid": "5ac3b934156ae10c4430e83c",
+    "type": 4,
+    "dt": 1769787895,
+    "text": "",
+    "templateId": "5bdabfb886f7743e152e867e 0",
+    "systemData": {
+      "buyerNickname": "FleaBuyer",
+      "soldItem": "5c0e534186f7747fa1419867",
+      "itemCount": 1
+    },
+    "items": {
+      "stash": "697cd1f7d2ff6bb99d04daa3",
+      "data": [
+        {
+          "_id": "697cd1f7d2ff6bb99d04da9f",
+          "_tpl": "5449016a4bdc2d6f028b456f",
+          "upd": {
+            "StackObjectsCount": 107999
+          },
+          "parentId": "697cd1f7d2ff6bb99d04daa3",
+          "slotId": "main"
+        }
+      ]
+    },
+    "maxStorageTime": 1209600,
+    "profileChangeEvents": [],
+    "hasRewards": true
+  }
+}
+2026-01-30 09:44:55.596|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: ChatMessageReceived, Time: 0, Duration: Default, ShowNotification: False
+2026-01-30 09:44:55.611|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:153 MessageType:Text
+2026-01-30 09:44:55.611|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:153
+2026-01-30 09:44:55.611|1.0.1.1.42751|Info|push-notifications|Got notification | RagfairOfferSold
+{
+  "type": "RagfairOfferSold",
+  "eventId": "697cd1f7d49d83b99c174166",
+  "offerId": "697cd170d3a90685fa0b5a5c4",
+  "handbookId": "5c0e534186f7747fa1419867",
+  "count": 1
+}
+2026-01-30 09:44:55.611|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: RagfairOfferSold, Time: 0, Duration: Default, ShowNotification: True
+2026-01-30 09:44:56.561|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:633 MessageType:Text
+2026-01-30 09:44:56.561|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:633
+2026-01-30 09:44:56.562|1.0.1.1.42751|Info|push-notifications|Got notification | ChatMessageReceived
+{
+  "type": "new_message",
+  "eventId": "697cd1f843fc03cf2617c6a3",
+  "dialogId": "5ac3b934156ae10c4430e83c",
+  "message": {
+    "_id": "697cd1f82020221bd6072e1925",
+    "uid": "5ac3b934156ae10c4430e83c",
+    "type": 4,
+    "dt": 1769787896,
+    "text": "",
+    "templateId": "5bdabfb886f7743e152e867e 0",
+    "systemData": {
+      "buyerNickname": "FleaBuyer",
+      "soldItem": "5c0e534186f7747fa1419867",
+      "itemCount": 1
+    },
+    "items": {
+      "stash": "697cd1f82020221bd6072e1a",
+      "data": [
+        {
+          "_id": "697cd1f82020221bd6072e16",
+          "_tpl": "5449016a4bdc2d6f028b456f",
+          "upd": {
+            "StackObjectsCount": 107999
+          },
+          "parentId": "697cd1f82020221bd6072e1a",
+          "slotId": "main"
+        }
+      ]
+    },
+    "maxStorageTime": 1209600,
+    "profileChangeEvents": [],
+    "hasRewards": true
+  }
+}
+2026-01-30 09:44:56.562|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: ChatMessageReceived, Time: 0, Duration: Default, ShowNotification: False
+2026-01-30 09:44:56.578|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:153 MessageType:Text
+2026-01-30 09:44:56.578|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:153
+2026-01-30 09:44:56.578|1.0.1.1.42751|Info|push-notifications|Got notification | RagfairOfferSold
+{
+  "type": "RagfairOfferSold",
+  "eventId": "697cd1f83cc52dfb721a0544",
+  "offerId": "697cd170d3a90685fa0b5a5c4",
+  "handbookId": "5c0e534186f7747fa1419867",
+  "count": 1
+}
+2026-01-30 09:44:56.578|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: RagfairOfferSold, Time: 0, Duration: Default, ShowNotification: True
+2026-01-30 09:44:58.128|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:633 MessageType:Text
+2026-01-30 09:44:58.128|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:633
+2026-01-30 09:44:58.129|1.0.1.1.42751|Info|push-notifications|Got notification | ChatMessageReceived
+{
+  "type": "new_message",
+  "eventId": "697cd1f9efb6a325f913ba2d",
+  "dialogId": "5ac3b934156ae10c4430e83c",
+  "message": {
+    "_id": "697cd1f94576b3766f02bb6525",
+    "uid": "5ac3b934156ae10c4430e83c",
+    "type": 4,
+    "dt": 1769787897,
+    "text": "",
+    "templateId": "5bdabfb886f7743e152e867e 0",
+    "systemData": {
+      "buyerNickname": "FleaBuyer",
+      "soldItem": "5c0e534186f7747fa1419867",
+      "itemCount": 1
+    },
+    "items": {
+      "stash": "697cd1f94576b3766f02bb66",
+      "data": [
+        {
+          "_id": "697cd1f94576b3766f02bb62",
+          "_tpl": "5449016a4bdc2d6f028b456f",
+          "upd": {
+            "StackObjectsCount": 107999
+          },
+          "parentId": "697cd1f94576b3766f02bb66",
+          "slotId": "main"
+        }
+      ]
+    },
+    "maxStorageTime": 1209600,
+    "profileChangeEvents": [],
+    "hasRewards": true
+  }
+}
+2026-01-30 09:44:58.129|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: ChatMessageReceived, Time: 0, Duration: Default, ShowNotification: False
+2026-01-30 09:44:58.145|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:153 MessageType:Text
+2026-01-30 09:44:58.145|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:153
+2026-01-30 09:44:58.145|1.0.1.1.42751|Info|push-notifications|Got notification | RagfairOfferSold
+{
+  "type": "RagfairOfferSold",
+  "eventId": "697cd1f9f44651bdf90cb897",
+  "offerId": "697cd170d3a90685fa0b5a5c4",
+  "handbookId": "5c0e534186f7747fa1419867",
+  "count": 1
+}
+2026-01-30 09:44:58.145|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: RagfairOfferSold, Time: 0, Duration: Default, ShowNotification: True
+2026-01-30 09:45:13.601|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:633 MessageType:Text
+2026-01-30 09:45:13.601|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:633
+2026-01-30 09:45:13.602|1.0.1.1.42751|Info|push-notifications|Got notification | ChatMessageReceived
+{
+  "type": "new_message",
+  "eventId": "697cd209d49d83b99c174260",
+  "dialogId": "5ac3b934156ae10c4430e83c",
+  "message": {
+    "_id": "697cd2096fb3a8e7e4015f3c25",
+    "uid": "5ac3b934156ae10c4430e83c",
+    "type": 4,
+    "dt": 1769787913,
+    "text": "",
+    "templateId": "5bdabfb886f7743e152e867e 0",
+    "systemData": {
+      "buyerNickname": "FleaBuyer",
+      "soldItem": "5c0e534186f7747fa1419867",
+      "itemCount": 1
+    },
+    "items": {
+      "stash": "697cd2096fb3a8e7e4015f3d",
+      "data": [
+        {
+          "_id": "697cd2096fb3a8e7e4015f39",
+          "_tpl": "5449016a4bdc2d6f028b456f",
+          "upd": {
+            "StackObjectsCount": 107999
+          },
+          "parentId": "697cd2096fb3a8e7e4015f3d",
+          "slotId": "main"
+        }
+      ]
+    },
+    "maxStorageTime": 1209600,
+    "profileChangeEvents": [],
+    "hasRewards": true
+  }
+}
+2026-01-30 09:45:13.602|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: ChatMessageReceived, Time: 0, Duration: Default, ShowNotification: False
+2026-01-30 09:45:13.618|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:153 MessageType:Text
+2026-01-30 09:45:13.618|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:153
+2026-01-30 09:45:13.619|1.0.1.1.42751|Info|push-notifications|Got notification | RagfairOfferSold
+{
+  "type": "RagfairOfferSold",
+  "eventId": "697cd209577813ae33111403",
+  "offerId": "697cd170d3a90685fa0b5a5c4",
+  "handbookId": "5c0e534186f7747fa1419867",
+  "count": 1
+}
+2026-01-30 09:45:13.619|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: RagfairOfferSold, Time: 0, Duration: Default, ShowNotification: True
+2026-01-30 09:45:22.917|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:641 MessageType:Text
+2026-01-30 09:45:22.917|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:641
+2026-01-30 09:45:22.919|1.0.1.1.42751|Info|push-notifications|Got notification | ChatMessageReceived
+{
+  "type": "new_message",
+  "eventId": "697cd21243fc03cf2617c802",
+  "dialogId": "5ac3b934156ae10c4430e83c",
+  "message": {
+    "_id": "697cd21203e070e31504f07925",
+    "uid": "5ac3b934156ae10c4430e83c",
+    "type": 4,
+    "dt": 1769787922,
+    "text": "",
+    "templateId": "5bdabfb886f7743e152e867e 0",
+    "systemData": {
+      "buyerNickname": "FleaBuyer",
+      "soldItem": "5c0e534186f7747fa1419867",
+      "itemCount": 1
+    },
+    "items": {
+      "stash": "697cd21203e070e31504f07a",
+      "data": [
+        {
+          "_id": "697cd21203e070e31504f076",
+          "_tpl": "5449016a4bdc2d6f028b456f",
+          "upd": {
+            "StackObjectsCount": 107999
+          },
+          "parentId": "697cd21203e070e31504f07a",
+          "slotId": "main"
+        }
+      ]
+    },
+    "maxStorageTime": 1209600,
+    "profileChangeEvents": [],
+    "hasRewards": true
+  }
+}
+2026-01-30 09:45:22.919|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: ChatMessageReceived, Time: 0, Duration: Default, ShowNotification: False
+2026-01-30 09:45:22.935|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:153 MessageType:Text
+2026-01-30 09:45:22.935|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:153
+2026-01-30 09:45:22.935|1.0.1.1.42751|Info|push-notifications|Got notification | RagfairOfferSold
+{
+  "type": "RagfairOfferSold",
+  "eventId": "697cd212009446831617d5dc",
+  "offerId": "697cd170d3a90685fa0b5a5c4",
+  "handbookId": "5c0e534186f7747fa1419867",
+  "count": 1
+}
+2026-01-30 09:45:22.935|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: RagfairOfferSold, Time: 0, Duration: Default, ShowNotification: True
+2026-01-30 09:46:04.496|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:102 MessageType:Text
+2026-01-30 09:46:04.496|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:102
+2026-01-30 09:46:04.496|1.0.1.1.42751|Info|push-notifications|Got notification | RagfairNewRating
+{
+  "type": "RagfairNewRating",
+  "eventId": "697cd23c9cbce0dd80130ae0",
+  "rating": 4.76,
+  "isRatingGrowing": true
+}
+2026-01-30 09:46:04.497|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: RagfairNewRating, Time: 0, Duration: Default, ShowNotification: False
+2026-01-30 09:46:27.365|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:148 MessageType:Text
+2026-01-30 09:46:27.365|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:148
+2026-01-30 09:46:27.365|1.0.1.1.42751|Info|push-notifications|Got notification | UserMatchCreated
+{
+  "type": "userMatchCreated",
+  "eventId": "697cd2538bc9553f9913c052",
+  "blockExitButton": true,
+  "blockExitButtonDuration": 120,
+  "showConfirmationPopup": false
+}
+2026-01-30 09:46:27.365|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: UserMatchCreated, Time: 0, Duration: Default, ShowNotification: False
+2026-01-30 09:46:27.381|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:145 MessageType:Text
+2026-01-30 09:46:27.381|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:145
+2026-01-30 09:46:27.382|1.0.1.1.42751|Info|push-notifications|Got notification | UserRoomStarted
+{
+  "type": "userRoomStarted",
+  "eventId": "697cd253fdd8108d6d127a02",
+  "blockExitButton": true,
+  "blockExitButtonDuration": 0,
+  "showConfirmationPopup": false
+}
+2026-01-30 09:46:27.382|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: UserRoomStarted, Time: 0, Duration: Default, ShowNotification: False
+2026-01-30 09:48:03.701|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:53 MessageType:Text
+2026-01-30 09:48:03.701|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:53
+2026-01-30 09:48:03.701|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received Service Notifications Ping
+2026-01-30 09:48:53.910|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:382 MessageType:Text
+2026-01-30 09:48:53.910|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:382
+2026-01-30 09:48:53.912|1.0.1.1.42751|Info|push-notifications|Got notification | UserConfirmed
+{
+  "type": "userConfirmed",
+  "eventId": "697cd2e59cbce0dd8013126e",
+  "profileid": "0123456789abcdef01234567",
+  "profileToken": "feedfacefeedfacefeedfacefeedface",
+  "status": "Busy",
+  "ip": "148.72.174.197",
+  "port": 17003,
+  "sid": "US-STL01G033_cafebabecafebabecafebabe_30.01.26_18-46-27",
+  "version": "live",
+  "location": "Woods",
+  "raidMode": "Online",
+  "mode": "deathmatch",
+  "shortId": "MFXK34",
+  "additional_info": []
+}
+2026-01-30 09:48:53.912|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: Ping, Time: 0, Duration: Default, ShowNotification: False
+2026-01-30 09:48:54.186|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest canceled
+2026-01-30 09:48:54.186|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest webSocket disposed
+2026-01-30 10:04:00.797|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest canceled
+2026-01-30 10:04:00.797|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest webSocket disposed
+2026-01-30 10:04:01.101|1.0.1.1.42751|Info|push-notifications|NotificationManager: new params received url:  ws:wss://wsn-01.escapefromtarkov.com/push/notifier/getwebsocket/feedfacefeedfacefeedfacefeedfacefeedfacefeedfacefeedfacefeedface
+2026-01-30 10:06:34.053|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:53 MessageType:Text
+2026-01-30 10:06:34.053|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:53
+2026-01-30 10:06:34.053|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received Service Notifications Ping
+2026-01-30 10:09:17.215|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:741 MessageType:Text
+2026-01-30 10:09:17.215|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:741
+2026-01-30 10:09:17.215|1.0.1.1.42751|Info|push-notifications|Got notification | ChatMessageReceived
+{
+  "type": "new_message",
+  "eventId": "697cd7acf9a46dc354134cad",
+  "dialogId": "5ac3b934156ae10c4430e83c",
+  "message": {
+    "_id": "697cd7acdfaa5d134903d95c25",
+    "uid": "5ac3b934156ae10c4430e83c",
+    "type": 12,
+    "dt": 1769789356,
+    "text": "quest started",
+    "templateId": "5c10f94386f774227172c572 successMessageText",
+    "items": {
+      "stash": "697cd7acdfaa5d134903d95d",
+      "data": [
+        {
+          "_id": "697cd7acdfaa5d134903d959",
+          "_tpl": "5449016a4bdc2d6f028b456f",
+          "upd": {
+            "StackObjectsCount": 88613
+          },
+          "parentId": "697cd7acdfaa5d134903d95d",
+          "slotId": "main"
+        },
+        {
+          "_id": "697cd7acdfaa5d134903d95b",
+          "_tpl": "5c0e774286f77468413cc5b2",
+          "upd": {
+            "SpawnedInSession": true,
+            "StackObjectsCount": 1
+          },
+          "parentId": "697cd7acdfaa5d134903d95d",
+          "slotId": "main"
+        }
+      ]
+    },
+    "maxStorageTime": 172800,
+    "profileChangeEvents": [],
+    "hasRewards": true
+  }
+}
+2026-01-30 10:09:17.215|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: ChatMessageReceived, Time: 0, Duration: Default, ShowNotification: False
+2026-01-30 10:09:20.929|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:321 MessageType:Text
+2026-01-30 10:09:20.929|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:321
+2026-01-30 10:09:20.929|1.0.1.1.42751|Info|push-notifications|Got notification | ChatMessageReceived
+{
+  "type": "new_message",
+  "eventId": "697cd7b0efb6a325f913fc6a",
+  "dialogId": "5ac3b934156ae10c4430e83c",
+  "message": {
+    "_id": "697cd7b07cffff2b430ce5a7",
+    "uid": "5ac3b934156ae10c4430e83c",
+    "type": 10,
+    "dt": 1769789360,
+    "text": "quest started",
+    "templateId": "66aa61663aa37705c5024277 description",
+    "hasRewards": false,
+    "maxStorageTime": 1209600
+  }
+}
+2026-01-30 10:09:20.929|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: ChatMessageReceived, Time: 0, Duration: Default, ShowNotification: False
+2026-01-30 10:18:46.693|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:53 MessageType:Text
+2026-01-30 10:18:46.693|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:53
+2026-01-30 10:18:46.693|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received Service Notifications Ping
+2026-01-30 10:29:47.415|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:53 MessageType:Text
+2026-01-30 10:29:47.417|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:53
+2026-01-30 10:29:47.417|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received Service Notifications Ping
+2026-01-30 10:41:11.787|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:53 MessageType:Text
+2026-01-30 10:41:11.787|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:53
+2026-01-30 10:41:11.787|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received Service Notifications Ping
+2026-01-30 10:45:21.519|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:148 MessageType:Text
+2026-01-30 10:45:21.519|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:148
+2026-01-30 10:45:21.519|1.0.1.1.42751|Info|push-notifications|Got notification | UserMatchCreated
+{
+  "type": "userMatchCreated",
+  "eventId": "697ce021a2626b485a19d91c",
+  "blockExitButton": true,
+  "blockExitButtonDuration": 120,
+  "showConfirmationPopup": false
+}
+2026-01-30 10:45:21.519|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: UserMatchCreated, Time: 0, Duration: Default, ShowNotification: False
+2026-01-30 10:45:21.521|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:145 MessageType:Text
+2026-01-30 10:45:21.521|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:145
+2026-01-30 10:45:21.521|1.0.1.1.42751|Info|push-notifications|Got notification | UserRoomStarted
+{
+  "type": "userRoomStarted",
+  "eventId": "697ce021577813ae3311b440",
+  "blockExitButton": true,
+  "blockExitButtonDuration": 0,
+  "showConfirmationPopup": false
+}
+2026-01-30 10:45:21.521|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: UserRoomStarted, Time: 0, Duration: Default, ShowNotification: False
+2026-01-30 10:47:49.299|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest result Count:380 MessageType:Text
+2026-01-30 10:47:49.299|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest received:380
+2026-01-30 10:47:49.299|1.0.1.1.42751|Info|push-notifications|Got notification | UserConfirmed
+{
+  "type": "userConfirmed",
+  "eventId": "697ce0b4aa9b77620e1a757d",
+  "profileid": "0123456789abcdef01234567",
+  "profileToken": "feedfacefeedfacefeedfacefeedface",
+  "status": "Busy",
+  "ip": "84.17.35.131",
+  "port": 17000,
+  "sid": "US-NYC02G009_cafebabecafebabecafebabe_30.01.26_19-45-21",
+  "version": "live",
+  "location": "Woods",
+  "raidMode": "Online",
+  "mode": "deathmatch",
+  "shortId": "MFRCVF",
+  "additional_info": []
+}
+2026-01-30 10:47:49.299|1.0.1.1.42751|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: Ping, Time: 0, Duration: Default, ShowNotification: False
+2026-01-30 10:47:49.444|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest canceled
+2026-01-30 10:47:49.444|1.0.1.1.42751|Info|push-notifications|LongPollingWebSocketRequest webSocket disposed

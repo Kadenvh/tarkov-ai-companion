@@ -1,0 +1,25 @@
+Application,ProcessID,SwapChainAddress,Runtime,SyncInterval,PresentFlags,Dropped,TimeInSeconds,msInPresentAPI,MsBetweenPresents,AllowsTearing,PresentMode,MsUntilRenderComplete,MsUntilDisplayed,MsBetweenDisplayChange
+EscapeFromTarkov.exe,18244,0x000001E5A2B4C6D0,DXGI,0,512,0,10.0080,0.102,8.000,1,Hardware: Independent Flip,7.912,9.104,8.001
+EscapeFromTarkov.exe,18244,0x000001E5A2B4C6D0,DXGI,0,512,0,10.0160,0.098,8.000,1,Hardware: Independent Flip,7.905,9.110,7.998
+dwm.exe,1492,0x000001F2B3C4D5E0,DXGI,1,0,0,10.0170,0.050,16.667,0,Composed: Flip,16.100,17.200,16.667
+EscapeFromTarkov.exe,18244,0x000001E5A2B4C6D0,DXGI,0,512,0,10.0240,0.101,8.000,1,Hardware: Independent Flip,7.920,9.100,8.002
+EscapeFromTarkov.exe,18244,0x000001E5A2B4C6D0,DXGI,0,512,0,10.0320,0.099,8.000,1,Hardware: Independent Flip,7.899,9.121,8.000
+EscapeFromTarkov.exe,18244,0x000001E5A2B4C6D0,DXGI,0,512,0,10.0400,0.100,8.000,1,Hardware: Independent Flip,7.910,9.108,7.999
+EscapeFromTarkov.exe,18244,0x000001E5A2B4C6D0,DXGI,0,512,0,10.0480,0.103,8.000,1,Hardware: Independent Flip,7.915,9.102,8.001
+EscapeFromTarkov.exe,18244,0x000001E5A2B4C6D0,DXGI,0,512,1,10.0560,0.097,999.000,1,Hardware: Independent Flip,7.900,9.115,8.000
+EscapeFromTarkov.exe,18244,0x000001E5A2B4C6D0,DXGI,0,512,0,10.0560,0.097,8.000,1,Hardware: Independent Flip,7.900,9.115,8.000
+EscapeFromTarkov.exe,18244,0x000001E5A2B4C6D0,DXGI,0,512,0,10.0640,0.104,8.000,1,Hardware: Independent Flip,7.908,9.107,8.002
+EscapeFromTarkov.exe,18244,0x000001E5A2B4C6D0,DXGI,0,512,0,10.0720,0.100,8.000,1,Hardware: Independent Flip,7.911,9.109,7.997
+EscapeFromTarkov.exe,18244,0x000001E5A2B4C6D0,DXGI,0,512,0,10.0800,0.099,8.000,1,Hardware: Independent Flip,7.906,9.111,8.000
+dwm.exe,1492,0x000001F2B3C4D5E0,DXGI,1,0,0,10.0840,0.051,16.667,0,Composed: Flip,16.150,17.210,16.666
+EscapeFromTarkov.exe,18244,0x000001E5A2B4C6D0,DXGI,0,512,0,10.0900,0.101,10.000,1,Hardware: Independent Flip,9.902,11.100,10.001
+EscapeFromTarkov.exe,18244,0x000001E5A2B4C6D0,DXGI,0,512,0,10.1000,0.098,10.000,1,Hardware: Independent Flip,9.910,11.105,9.999
+EscapeFromTarkov.exe,18244,0x000001E5A2B4C6D0,DXGI,0,512,0,10.1100,0.102,10.000,1,Hardware: Independent Flip,9.905,11.098,10.000
+EscapeFromTarkov.exe,18244,0x000001E5A2B4C6D0,DXGI,0,512,0,10.1200,0.100,10.000,1,Hardware: Independent Flip,9.899,11.110,10.002
+EscapeFromTarkov.exe,18244,0x000001E5A2B4C6D0,DXGI,0,512,0,10.1300,0.099,10.000,1,Hardware: Independent Flip,9.912,11.104,9.998
+EscapeFromTarkov.exe,18244,0x000001E5A2B4C6D0,DXGI,0,512,0,10.1420,0.105,12.000,1,Hardware: Independent Flip,11.900,13.102,12.001
+EscapeFromTarkov.exe,18244,0x000001E5A2B4C6D0,DXGI,0,512,0,10.1540,0.103,12.000,1,Hardware: Independent Flip,11.910,13.108,11.999
+EscapeFromTarkov.exe,18244,0x000001E5A2B4C6D0,DXGI,0,512,0,10.1680,0.108,14.000,1,Hardware: Independent Flip,13.905,15.100,14.000
+EscapeFromTarkov.exe,18244,0x000001E5A2B4C6D0,DXGI,0,512,0,10.1840,0.110,16.000,1,Hardware: Independent Flip,15.902,17.105,16.001
+EscapeFromTarkov.exe,18244,0x000001E5A2B4C6D0,DXGI,0,512,0,10.2040,0.115,20.000,1,Hardware: Independent Flip,19.908,21.110,19.999
+EscapeFromTarkov.exe,18244,0x000001E5A2B4C6D0,DXGI,0,512,0,10.2120,0.101,not-a-number,1,Hardware: Independent Flip,7.912,9.104,8.001

@@ -5,7 +5,8 @@ The moat (SPEC module **M3**). Turns the world model + player state into per-rai
 ## Try it
 
 ```bash
-pnpm --filter @tac/planner exec tsx src/cli/demo.ts 1     # Kappa plan from a fresh level-1 account
+pnpm --filter @tac/planner exec tsx src/cli/demo.ts 1                  # Kappa plan from a fresh level-1 account
+pnpm --filter @tac/planner exec tsx src/cli/quartermaster-demo.ts 15   # shopping list for the next 5 Kappa raids
 pnpm --filter @tac/planner test
 ```
 
@@ -17,6 +18,16 @@ pnpm --filter @tac/planner test
 - `goals.ts` — goal → target tasks → full prerequisite closure. Goals: `kappa`, `lightkeeper`, `level`, `tasks`.
 - `director.ts` — **Raid Director**: classifies tasks (free / any-map / pinned), batches by map, scores by value/cost where value = tasks + XP + **criticality** (downstream goal tasks a task unlocks), replans over a rolling horizon.
 - `foresight.ts` — **Foresight Guard**: task-exclusivity warnings (completing X fails Y — escalates to `critical` when Y is a goal/Kappa/LK task) + story `endingReachability`.
+- `quartermaster.ts` — **Quartermaster (M3.5)**: collects every item the planned raids hand in / plant (giveItem, plantItem, non-duplicate findItem), enumerates routes (flea / trader cash / barter / craft / find-in-raid), picks the cheapest route FEASIBLE at the current level + trader LLs, and schedules crafts so outputs are ready before the raid that needs them. Output is CONTRACTS §7 `AcquisitionPlan`; every item carries machine-readable `reasons` (M3.6).
+
+## Quartermaster rules (grounded in 1.0.6 data)
+
+- **FIR needs are never routed to flea/trader/barter** — purchases aren't found-in-raid. Crafts ARE offered as FIR alternatives (hideout outputs count as FIR). Find-in-raid routes point at a planned raid whose map matches a known find location (task map / objective zones), else the earliest raid.
+- **findItem/giveItem pairs count once** — 131 tasks say "find N FIR, hand over N"; the findItem is skipped when a same-task giveItem shares a candidate item.
+- **Any-of item lists** (e.g. "any 3 USEC dogtags") collapse to the cheapest candidate by reference price.
+- **Barter/craft costing** is one level deep: inputs are priced by direct purchase (flea at level, trader at LL), never by their own barters. Unbuyable inputs flag the route ("input must be found in raid") and block feasibility.
+- **Trader LL** derives from level+rep via the snapshot ladders (`requiredCommerce` ignored — not observable). Hideout station levels gate crafts when provided (`opts.hideoutLevels`); absent, stations are assumed built and the item carries `assumed:hideout-built`.
+- **Roubles handed in directly** (a few tasks) become a synthetic cash route at face value so `totalRubles` stays meaningful.
 
 ## Task classification (important)
 

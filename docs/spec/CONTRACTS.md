@@ -156,7 +156,7 @@ interface AcquisitionPlan {
 
 ## 9. Environment package facts (from research/06)
 
-Builder must read [docs/research/06-environment-paths.md](../research/06-environment-paths.md) for verified paths: EFT install (registry `HKCU\...EscapeFromTarkov` + BSG launcher config), `<install>\Logs\log_<date>_<version>\*` streams, EFT graphics/game settings files (plain JSON on disk), NVIDIA DRS store, screenshots folder `%USERPROFILE%\Documents\Escape From Tarkov\Screenshots` (filename encodes position+quaternion — may not exist until first screenshot; watcher must re-arm on folder creation). PresentMon: ingest CSV if the user runs it; never bundle binaries.
+Builder must read [docs/research/06-environment-paths.md](../research/06-environment-paths.md) for verified paths: EFT install (registry `HKLM\SOFTWARE\WOW6432Node\...\EscapeFromTarkov` `InstallLocation` — verified live; launcher-config fallback), `<install>\Logs\log_<date>_<version>\*` streams, EFT graphics/game settings files (plain JSON on disk), NVIDIA DRS store, screenshots folder `%USERPROFILE%\Documents\Escape From Tarkov\Screenshots` (filename encodes position+quaternion — may not exist until first screenshot; watcher must re-arm on folder creation). PresentMon: ingest CSV if the user runs it; never bundle binaries.
 
 ## 10. Definition of done (every wave)
 

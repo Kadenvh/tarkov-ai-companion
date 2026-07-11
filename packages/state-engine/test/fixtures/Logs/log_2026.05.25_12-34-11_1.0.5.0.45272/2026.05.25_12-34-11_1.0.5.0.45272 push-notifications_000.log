@@ -1,0 +1,45 @@
+2026-05-25 12:34:32.149|1.0.5.0.45272|Info|push-notifications|NotificationManager: new params received url:  ws:wss://wsn-03.escapefromtarkov.com/push/notifier/getwebsocket/feedfacefeedfacefeedfacefeedfacefeedfacefeedfacefeedfacefeedface
+2026-05-25 12:39:03.935|1.0.5.0.45272|Info|push-notifications|LongPollingWebSocketRequest result Count:146 MessageType:Text
+2026-05-25 12:39:03.936|1.0.5.0.45272|Info|push-notifications|LongPollingWebSocketRequest received:146
+2026-05-25 12:39:03.938|1.0.5.0.45272|Info|push-notifications|Got notification | UserMatchCreated
+{
+  "type": "userMatchCreated",
+  "eventId": "6a1489367199590ad1109f9b",
+  "blockExitButton": true,
+  "blockExitButtonDuration": 0,
+  "showConfirmationPopup": false
+}
+2026-05-25 12:39:03.938|1.0.5.0.45272|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: UserMatchCreated, Time: 0, Duration: Default, ShowNotification: False
+2026-05-25 12:39:10.878|1.0.5.0.45272|Info|push-notifications|LongPollingWebSocketRequest result Count:389 MessageType:Text
+2026-05-25 12:39:10.878|1.0.5.0.45272|Info|push-notifications|LongPollingWebSocketRequest received:389
+2026-05-25 12:39:10.879|1.0.5.0.45272|Info|push-notifications|Got notification | UserConfirmed
+{
+  "type": "userConfirmed",
+  "eventId": "6a14893d7199590ad110a006",
+  "profileid": "0123456789abcdef01234567",
+  "profileToken": "feedfacefeedfacefeedfacefeedface",
+  "status": "Busy",
+  "ip": "148.72.168.203",
+  "port": 17002,
+  "sid": "US-STL01G006_cafebabecafebabecafebabe_25.05.26_20-35-09",
+  "version": "live",
+  "location": "Sandbox_high",
+  "raidMode": "Online",
+  "mode": "deathmatch",
+  "shortId": "5X4540",
+  "additional_info": []
+}
+2026-05-25 12:39:10.879|1.0.5.0.45272|Info|push-notifications|NotificationManager.ProcessMessage | Received notification: Type: Ping, Time: 0, Duration: Default, ShowNotification: False
+2026-05-25 12:39:11.228|1.0.5.0.45272|Info|push-notifications|LongPollingWebSocketRequest canceled
+2026-05-25 12:39:11.228|1.0.5.0.45272|Info|push-notifications|LongPollingWebSocketRequest webSocket disposed
+2026-05-25 12:49:05.979|1.0.5.0.45272|Info|push-notifications|LongPollingWebSocketRequest canceled
+2026-05-25 12:49:05.979|1.0.5.0.45272|Info|push-notifications|LongPollingWebSocketRequest webSocket disposed
+2026-05-25 12:49:06.593|1.0.5.0.45272|Info|push-notifications|NotificationManager: new params received url:  ws:wss://wsn-01.escapefromtarkov.com/push/notifier/getwebsocket/feedfacefeedfacefeedfacefeedfacefeedfacefeedfacefeedfacefeedface
+2026-05-25 12:55:39.936|1.0.5.0.45272|Info|push-notifications|LongPollingWebSocketRequest result Count:53 MessageType:Text
+2026-05-25 12:55:39.936|1.0.5.0.45272|Info|push-notifications|LongPollingWebSocketRequest received:53
+2026-05-25 12:55:39.937|1.0.5.0.45272|Info|push-notifications|NotificationManager.ProcessMessage | Received Service Notifications Ping
+2026-05-25 12:59:24.875|1.0.5.0.45272|Info|push-notifications|LongPollingWebSocketRequest result Count:74 MessageType:Text
+2026-05-25 12:59:24.875|1.0.5.0.45272|Info|push-notifications|LongPollingWebSocketRequest received:74
+2026-05-25 12:59:24.877|1.0.5.0.45272|Info|push-notifications|NotificationManager.ProcessMessage | Received Service Notifications ChannelDeleted
+2026-05-25 12:59:24.883|1.0.5.0.45272|Info|push-notifications|LongPollingWebSocketRequest result Count:0 MessageType:Close
+2026-05-25 12:59:24.892|1.0.5.0.45272|Info|push-notifications|LongPollingWebSocketRequest webSocket disposed

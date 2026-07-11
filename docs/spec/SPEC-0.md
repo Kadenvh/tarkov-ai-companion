@@ -22,7 +22,7 @@ A typed, tested world model built from live data that survives every patch witho
 | 0.4 | Tasks zod schema (verified vs live shape) | ✅ (`experience` nullable in PvE) |
 | 0.5 | Task graph: unlocks, requires, fails, branch-only, exclusivity sets, acyclicity/dangling validation | ✅ |
 | 0.6 | Wiki infobox parser (trader, prev/leads-to, kappa) | ✅ Debut fixture |
-| 0.7 | Story dataset + schema (Boreas conditional branches encoded) | ✅ ending maps `confidence: seed` |
+| 0.7 | Story dataset + schema (Boreas conditional branches encoded) | ✅ ending maps wiki-verified 2026-07-11 (see [research/07](../research/07-story-verification.md)) |
 | 0.8 | `loadWorld()` convenience loader (names + map names + XP curve) | ✅ |
 
 ## Acceptance (all met)
@@ -30,6 +30,6 @@ A typed, tested world model built from live data that survives every patch witho
 - All three packages typecheck under strict + `noUncheckedIndexedAccess` + `exactOptionalPropertyTypes`.
 
 ## Known follow-ups (tracked, not blocking)
-- Story ending mappings need wiki re-verification (`seed` → `verified`).
+- ~~Story ending mappings need wiki re-verification~~ **Done 2026-07-11**: all 4 decisions `verified`, 20/20 ending claims confirmed ([research/07](../research/07-story-verification.md)).
 - Wiki batch-fetch + wiki⟷API cross-validation drift report (M1.4) not yet automated — infobox parser is ready for it.
 - Snapshot is committed as gzip; a `diff` CLI (M1.2) between two versions is the next data-core add, needed before 1.1.0.
