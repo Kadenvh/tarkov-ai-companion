@@ -1,33 +1,3 @@
-# Virtual environment
-.venv/
-venv/
-ENV/
-
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-*.egg-info/
-dist/
-build/
-
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
-
-# Project specific
-data/debug_frames/
-models/*.pt
-models/*.onnx
-!models/.gitkeep
-
-# Jupyter
-.ipynb_checkpoints/
-*.ipynb_checkpoints
 
 # OS
 .DS_Store
