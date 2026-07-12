@@ -59,7 +59,7 @@ Factory, Customs, Woods, Lighthouse, Shoreline, Reserve, Interchange, Streets, N
 
 | Source | Adds | Cost/terms |
 |---|---|---|
-| **EFT Fandom wiki (MediaWiki API)** | Only structured-ish source for **story chapters, stages, choices, endings**. Verified: `api.php?action=parse&page=Story_chapters&format=json&prop=wikitext` returns clean wikitext (10 chapters incl. Boreas; per-chapter pages with stage tables). CC-BY-SA — attribute if republishing. | Free |
+| **EFT Fandom wiki (MediaWiki API)** | Only structured-ish source for **story chapters, stages, choices, endings**. Verified: `api.php?action=parse&page=Story_chapters&format=json&prop=wikitext` returns clean wikitext (10 chapters incl. Boreas; per-chapter pages with stage tables). CC BY-NC-SA 3.0 — attribute if republishing; non-commercial only (corrected 2026-07-11). | Free |
 | **tarkov-market.com API** | Alt flea prices, item dumps, PvE. Requires paid "Pro status" (~$8/mo Patreon), personal use, mandatory credit, 5 req/min. Strictly worse than tarkov.dev except as cross-check. | Paid |
 | **tarkov-changes.com** | Raw game-file per-patch diffs; upstream source *for* tarkov.dev. Aggressive bot protection. Useful for patch-diff alerting only. | Free-ish |
 | **SPT (sp-tarkov)** | SPT 4.0.x targets EFT **0.16.9 (pre-1.0)**, no story content, ToS-gray. **Skip.** | Free |

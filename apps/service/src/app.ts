@@ -47,8 +47,15 @@ export async function buildApp(opts: BuildAppOptions = {}): Promise<FastifyInsta
   const app = fastify({ logger: opts.logger ?? false, forceCloseConnections: true });
   app.decorate("tac", rt);
 
-  // M5.6 request counter
-  app.addHook("onRequest", async (req) => {
+  // DNS-rebinding guard: the daemon is loopback-bound and unauthenticated, so
+  // reject any request whose Host header isn't a local name — a hostile page
+  // resolving its own domain to 127.0.0.1 must not reach side-effectful routes.
+  app.addHook("onRequest", async (req, reply) => {
+    const host = (req.headers.host ?? "").split(":")[0]?.toLowerCase() ?? "";
+    if (host !== "localhost" && host !== "127.0.0.1" && host !== "[::1]" && host !== "") {
+      return reply.code(403).send({ error: `Host "${host}" not allowed — this API is local-only.` });
+    }
+    // M5.6 request counter
     rt.metrics.countRequest(req.url);
   });
 

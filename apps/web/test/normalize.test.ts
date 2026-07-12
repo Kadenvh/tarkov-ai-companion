@@ -76,7 +76,7 @@ describe("normalizeStoryResponse", () => {
   const dataset = {
     schemaVersion: 1,
     gameVersion: "1.0.6.0.46010",
-    attribution: "wiki CC-BY-SA",
+    attribution: "wiki CC BY-NC-SA",
     chapters: [{ id: "tour", name: "Tour", stages: [] }],
     decisions: [{ id: "ticket_kerman", options: [] }],
     endings: [{ id: "savior", name: "Savior" }],

@@ -36,6 +36,17 @@ afterAll(async () => {
 });
 
 describe("agent HTTP surface (CONTRACTS §8)", () => {
+  it("rejects non-local Host headers (DNS-rebinding guard) — nobody spends tokens cross-origin", async () => {
+    const res = await app.inject({
+      method: "POST",
+      url: "/chat",
+      payload: { message: "hi" },
+      headers: { host: "evil.example.com:3142" },
+    });
+    expect(res.statusCode).toBe(403);
+    expect((res.json() as { error: string }).error).toMatch(/local-only/);
+  });
+
   it("POST /chat returns {reply, toolCalls} grounded in the service", async () => {
     const res = await app.inject({ method: "POST", url: "/chat", payload: { message: "what level am I?" } });
     expect(res.statusCode).toBe(200);

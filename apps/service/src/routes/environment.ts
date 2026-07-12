@@ -144,6 +144,11 @@ export function registerEnvironmentRoutes(app: FastifyInstance, rt: ServiceRunti
   app.post("/api/environment/perf/import", async (req, reply) => {
     const body = PerfImportBody.safeParse(req.body);
     if (!body.success) return reply.status(400).send({ error: body.error.issues[0]?.message ?? "invalid body" });
+    // Defense-in-depth on the {path} form: this is an unauthenticated local API,
+    // so never let it become an arbitrary-file-read primitive — only .csv files.
+    if (body.data.path !== undefined && !body.data.path.toLowerCase().endsWith(".csv")) {
+      return reply.status(400).send({ error: "path must point to a .csv file (PresentMon capture)" });
+    }
     let csv: string;
     try {
       csv = body.data.csv ?? readFileSync(body.data.path!, "utf8");

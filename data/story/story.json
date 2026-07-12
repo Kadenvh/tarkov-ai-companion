@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "gameVersion": "1.0.6.0.46010",
-  "attribution": "Chapter/stage data derived from the Escape from Tarkov Fandom wiki (CC-BY-SA 3.0, https://escapefromtarkov.fandom.com) and the prior story-tracker artifact. Ending mappings re-verified against the wiki's The Ticket and Endings pages on 2026-07-11 (see decisions[].confidence and top-level sources).",
+  "attribution": "Chapter/stage data derived from the Escape from Tarkov Fandom wiki (CC BY-NC-SA 3.0, https://escapefromtarkov.fandom.com) and the prior story-tracker artifact. Ending mappings re-verified against the wiki's The Ticket and Endings pages on 2026-07-11 (see decisions[].confidence and top-level sources).",
   "sources": {
     "story-chapters": "https://escapefromtarkov.fandom.com/wiki/Story_chapters",
     "endings": "https://escapefromtarkov.fandom.com/wiki/Endings",

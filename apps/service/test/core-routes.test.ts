@@ -13,6 +13,23 @@ const TWO_PROFILES: ServiceConfig = {
 describe("core routes (CONTRACTS §5.1)", () => {
   afterEach(closeApps);
 
+  it("rejects non-local Host headers (DNS-rebinding guard) but serves localhost", async () => {
+    const app = await testApp();
+    const evil = await app.inject({
+      method: "GET",
+      url: "/api/health",
+      headers: { host: "evil.example.com:3141" },
+    });
+    expect(evil.statusCode).toBe(403);
+    expect(evil.json().error).toMatch(/local-only/);
+    const local = await app.inject({
+      method: "GET",
+      url: "/api/health",
+      headers: { host: "127.0.0.1:3141" },
+    });
+    expect(local.statusCode).toBe(200);
+  });
+
   it("GET /api/health reports version, snapshot, profile, and patch sentinel", async () => {
     const app = await testApp();
     const res = await app.inject({ method: "GET", url: "/api/health" });

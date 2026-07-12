@@ -109,6 +109,17 @@ describe("environment routes (CONTRACTS §5.4)", () => {
     expect(res.statusCode).toBe(400);
   });
 
+  it("POST /api/environment/perf/import refuses non-.csv paths (no arbitrary-file-read)", async () => {
+    const app = await testApp();
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/environment/perf/import",
+      payload: { path: "C:\\Windows\\win.ini" },
+    });
+    expect(res.statusCode).toBe(400);
+    expect(res.json().error).toMatch(/\.csv/);
+  });
+
   it("GET /api/environment/ammo filters by caliber from the snapshot", async () => {
     const app = await testApp();
     const all = (await app.inject({ method: "GET", url: "/api/environment/ammo" })).json();

@@ -81,6 +81,15 @@ export function buildServer(deps: ServerDeps): FastifyInstance {
   const sessions = new SessionStore();
   const system = buildSystemPrompt();
 
+  // DNS-rebinding guard (mirrors apps/service): loopback-bound + unauthenticated,
+  // so a hostile page must not be able to spend model tokens via /chat.
+  app.addHook("onRequest", async (req, reply) => {
+    const host = (req.headers.host ?? "").split(":")[0]?.toLowerCase() ?? "";
+    if (host !== "localhost" && host !== "127.0.0.1" && host !== "[::1]" && host !== "") {
+      return reply.code(403).send({ error: `Host "${host}" not allowed — this API is local-only.` });
+    }
+  });
+
   app.post("/chat", async (req, reply) => {
     const parsed = ChatBody.safeParse(req.body);
     if (!parsed.success) return reply.code(400).send({ error: parsed.error.message });

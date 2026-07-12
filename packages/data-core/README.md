@@ -18,7 +18,7 @@ pnpm test                # invariants + parsers (requires a snapshot on disk)
 - `src/tasks.ts` — zod schemas for the tasks payload (verified against 1.0.6 live data).
 - `src/graph.ts` — task graph: progression edges, branch-only unlocks (`failed` prereqs), fail/exclusivity sets, structural validation.
 - `src/market.ts` — market loaders for the Quartermaster (M3.5): items with flea prices + per-item flea level gates + rouble-normalized trader offers, barters, crafts (tool inputs flagged), trader loyalty ladders, hideout stations. Lenient zod: bad rows are skipped into `Market.issues`, never fatal. `loyaltyLevelFor()` derives a player's LL from level+rep (ignores `requiredCommerce` — not log-observable, so it's an upper bound).
-- `src/wiki/infobox.ts` — `Infobox quest` wikitext parser (CC-BY-SA attribution required when republishing wiki content).
+- `src/wiki/infobox.ts` — `Infobox quest` wikitext parser (CC BY-NC-SA 3.0 — attribution required, non-commercial only when republishing wiki content).
 - `src/story/schema.ts` — schema for `data/story/story.json` (10 chapters, 4 decisions, 4 endings; tarkov.dev has zero story coverage — this dataset is ours).
 
 ## Data facts worth remembering (verified 2026-07-11, v1.0.6)

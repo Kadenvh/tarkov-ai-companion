@@ -34,7 +34,7 @@ Open `http://localhost:3141` → onboarding offers: quiz, TarkovTracker import, 
 
 ## Data & attribution
 
-Game data: [tarkov.dev](https://tarkov.dev) (json.tarkov.dev snapshots, committed per patch). Story/chapter data derived from the [EFT Fandom wiki](https://escapefromtarkov.fandom.com) (CC-BY-SA 3.0), machine-verified 2026-07-11. Local state stays in `data/local/` (gitignored, never leaves the machine).
+Game data: [tarkov.dev](https://tarkov.dev) (json.tarkov.dev snapshots, committed per patch). Story/chapter data derived from the [EFT Fandom wiki](https://escapefromtarkov.fandom.com) (CC BY-NC-SA 3.0 — non-commercial), machine-verified 2026-07-11. Local state stays in `data/local/` (gitignored, never leaves the machine).
 
 ---
 

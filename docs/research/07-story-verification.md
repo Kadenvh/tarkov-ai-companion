@@ -71,4 +71,4 @@ Every chapter, decision point and ending in the story dataset was re-checked aga
 
 ## Attribution
 
-Chapter, decision and ending content in `data/story/story.json` is derived from the [Escape from Tarkov Fandom wiki](https://escapefromtarkov.fandom.com), licensed under [CC-BY-SA 3.0](https://www.fandom.com/licensing). Text was paraphrased/condensed for the dataset; per-page source URLs are recorded in the dataset's top-level `sources` map and in the tables above. Downstream redistribution of the dataset must retain this attribution.
+Chapter, decision and ending content in `data/story/story.json` is derived from the [Escape from Tarkov Fandom wiki](https://escapefromtarkov.fandom.com), licensed under [CC BY-NC-SA 3.0](https://www.fandom.com/licensing) (non-commercial; ShareAlike applies to the derived dataset file). Text was paraphrased/condensed for the dataset; per-page source URLs are recorded in the dataset's top-level `sources` map and in the tables above. Downstream redistribution of the dataset must retain this attribution.

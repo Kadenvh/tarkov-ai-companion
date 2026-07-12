@@ -3,7 +3,7 @@ import { z } from "zod";
 /**
  * Curated story dataset schema (M1.5). tarkov.dev has zero story-chapter
  * coverage — this dataset is ours, seeded from the prior story-tracker
- * artifact + the EFT Fandom wiki (CC-BY-SA), enriched per patch.
+ * artifact + the EFT Fandom wiki (CC BY-NC-SA 3.0), enriched per patch.
  */
 
 export const StageCondition = z.object({

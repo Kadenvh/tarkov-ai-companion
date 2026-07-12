@@ -76,7 +76,7 @@ Sherpa = **a local-first companion service** that (a) passively reconstructs you
 | In-raid item scanner | RatScanner (reads our progress via TarkovTracker mirror) |
 | Progress-tracking UI basics + squad sync | TarkovTracker .org (mirror target) |
 | Log-parsing patterns | Port TarkovMonitor's proven regexes/architecture (GPL — reference the patterns, write our own code) |
-| Story wiki content | Fandom MediaWiki API (CC-BY-SA, attribute) + our tsx dataset as seed |
+| Story wiki content | Fandom MediaWiki API (CC BY-NC-SA 3.0, attribute, non-commercial) + our tsx dataset as seed |
 
 ## 5. The solver (core design sketch)
 

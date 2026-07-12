@@ -1,6 +1,6 @@
 /**
  * Parser for the EFT wiki's `Infobox quest` template (M1.3).
- * Wiki content is CC-BY-SA — attribute when republishing.
+ * Wiki content is CC BY-NC-SA 3.0 — attribute when republishing; non-commercial use only.
  */
 
 export interface QuestInfobox {
