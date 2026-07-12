@@ -339,6 +339,9 @@ export function GoalsView(): ReactNode {
         </div>
       </div>
 
+      <h3>TarkovTracker sync</h3>
+      <TrackerSyncCard />
+
       {foresight.length > 0 ? (
         <>
           <h3>Pending irreversibility warnings</h3>
@@ -363,6 +366,75 @@ export function GoalsView(): ReactNode {
       {draftGoals.length === 0 && foresight.length === 0 ? (
         <Empty>Pick a goal above to start planning.</Empty>
       ) : null}
+    </div>
+  );
+}
+
+/**
+ * M2.7 sync card — paste a tarkovtracker.org token (Settings → API token) to
+ * import progress once and enable the debounced background mirror. The token
+ * is stored server-side in data/local/config.json, never in the browser.
+ */
+function TrackerSyncCard(): ReactNode {
+  const { api, health, refreshAll, pushToast } = useApp();
+  const [token, setToken] = useState("");
+  const [busy, setBusy] = useState(false);
+  const sync = health?.trackerSync ?? null;
+
+  const importToken = async (): Promise<void> => {
+    if (!token.trim() || busy) return;
+    setBusy(true);
+    try {
+      const res = await api.post<{ ok: boolean; tasks: number; level: number | null }>(
+        "/api/state/import/tarkovtracker",
+        { token: token.trim() },
+      );
+      pushToast("info", `TarkovTracker imported (${res.tasks} tasks) — background sync is on.`);
+      setToken("");
+      await refreshAll();
+    } catch {
+      /* error toast pushed by the api client */
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="card">
+      {sync ? (
+        <div className="kv">
+          <span className="k">Status</span>
+          <span>
+            {sync.enabled
+              ? `syncing (queued: ${sync.queued})`
+              : `paused — ${sync.disabledReason ?? sync.lastError ?? "unknown"}`}
+          </span>
+          {sync.lastError && sync.enabled ? (
+            <>
+              <span className="k">Last error</span>
+              <span>{sync.lastError}</span>
+            </>
+          ) : null}
+        </div>
+      ) : (
+        <p className="sub" style={{ marginTop: 0 }}>
+          Not connected. Paste your token from tarkovtracker.org → Settings → API token (use the
+          one matching this profile&apos;s mode, PVP_/PVE_) to import progress and mirror local
+          completions back — this also lights up tarkov.dev and RatScanner interop for free.
+        </p>
+      )}
+      <div className="row" style={{ marginTop: 8 }}>
+        <input
+          type="password"
+          placeholder={sync ? "replace token…" : "PVP_…"}
+          value={token}
+          onChange={(e) => setToken(e.target.value)}
+          style={{ flex: 1 }}
+        />
+        <button onClick={() => void importToken()} disabled={busy || !token.trim()}>
+          {busy ? "Importing…" : sync ? "Replace & re-import" : "Import & enable sync"}
+        </button>
+      </div>
     </div>
   );
 }

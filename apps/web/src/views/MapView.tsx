@@ -8,7 +8,7 @@
 
 import type { ReactNode } from "react";
 import { useApp } from "../store";
-import { mapDeepLink, mapDisplayName } from "../lib/maps";
+import { MAP_REGISTRY, mapDeepLink, mapDisplayName, mapGenieLink } from "../lib/maps";
 import { timeAgo } from "../lib/format";
 import { Empty } from "../components/common";
 import type { PositionPayload } from "../api/types";
@@ -66,7 +66,15 @@ export function MapView(): ReactNode {
             <p style={{ marginTop: 12 }}>
               <a href={link} target="_blank" rel="noreferrer">
                 Open {mapDisplayName(latest.map ?? null)} on tarkov.dev ↗
-              </a>{" "}
+              </a>
+              {mapGenieLink(latest.map ?? null) ? (
+                <>
+                  {" · "}
+                  <a href={mapGenieLink(latest.map ?? null)!} target="_blank" rel="noreferrer">
+                    Map Genie ↗
+                  </a>
+                </>
+              ) : null}{" "}
               <span className="dim">— paste the coordinates into the map's position search.</span>
             </p>
           ) : null}
@@ -113,6 +121,38 @@ export function MapView(): ReactNode {
           </div>
         </div>
       ) : null}
+
+      <div className="card">
+        <h3 style={{ marginTop: 0 }}>Map directory</h3>
+        <p className="sub" style={{ marginTop: 0 }}>
+          tarkov.dev interactive maps · Map Genie (your Pro session stays in your browser).
+        </p>
+        <div className="table-scroll">
+          <table>
+            <tbody>
+              {MAP_REGISTRY.filter((m) => mapGenieLink(m.id) || mapDeepLink(m.id)).map((m) => (
+                <tr key={m.id}>
+                  <td>{m.name}</td>
+                  <td>
+                    <a href={mapDeepLink(m.id)!} target="_blank" rel="noreferrer">
+                      tarkov.dev ↗
+                    </a>
+                  </td>
+                  <td>
+                    {mapGenieLink(m.id) ? (
+                      <a href={mapGenieLink(m.id)!} target="_blank" rel="noreferrer">
+                        Map Genie ↗
+                      </a>
+                    ) : (
+                      <span className="dim">—</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 }

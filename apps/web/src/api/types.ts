@@ -16,6 +16,16 @@ export interface HealthResponse {
   snapshotVersion: string;
   profileKey: string;
   gameMode: string;
+  gameVersion?: string | null;
+  patchDetected?: boolean;
+  /** M2.7 TarkovTracker mirror status; null/absent = no token configured */
+  trackerSync?: {
+    enabled: boolean;
+    disabledReason: string | null;
+    queued: number;
+    backoffUntil: number | null;
+    lastError: string | null;
+  } | null;
 }
 
 export interface ProfilesResponse {

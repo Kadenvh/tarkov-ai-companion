@@ -32,9 +32,11 @@ Open `http://localhost:3141` → onboarding offers: quiz, TarkovTracker import, 
 
 `pnpm -r test` — 350+ tests, many against sanitized excerpts of real session logs. Specs: [SPEC.md](SPEC.md) (contract) + [docs/spec/](docs/spec/) (per-phase) + [docs/research/](docs/research/) (verified evidence).
 
-## Data & attribution
+## License, data & attribution
 
-Game data: [tarkov.dev](https://tarkov.dev) (json.tarkov.dev snapshots, committed per patch). Story/chapter data derived from the [EFT Fandom wiki](https://escapefromtarkov.fandom.com) (CC BY-NC-SA 3.0 — non-commercial), machine-verified 2026-07-11. Local state stays in `data/local/` (gitignored, never leaves the machine).
+Code is **[GPL-3.0](LICENSE)** (same license family as [tarkovtracker-org](https://github.com/tarkovtracker-org/TarkovTracker) and [TarkovMonitor](https://github.com/the-hideout/TarkovMonitor); all code here is original — patterns referenced, nothing copied). The AI copilot's model backends are pluggable; the optional `@anthropic-ai/claude-agent-sdk` dependency is proprietary to Anthropic — users bring their own Claude login or API key.
+
+Game data: [tarkov.dev](https://tarkov.dev) (json.tarkov.dev snapshots, committed per patch — their API is free with no usage terms; consider [supporting them](https://opencollective.com/tarkov-dev)). Story/chapter data (`data/story/story.json`) is derived from the [EFT Fandom wiki](https://escapefromtarkov.fandom.com) and is licensed **CC BY-NC-SA 3.0** (non-commercial, ShareAlike — separate from the code license; per-page sources inside the file). Local state stays in `data/local/` (gitignored, never leaves the machine).
 
 ---
 

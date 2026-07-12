@@ -15,9 +15,11 @@ import {
   openProfile,
   LogWatcher,
   ScreenshotWatcher,
+  TarkovTrackerMirror,
   findLogsDir,
   detectInstallDir,
   type ProfileStore,
+  type TrackerMirrorStatus,
 } from "@tac/state-engine";
 import { isEftRunning, type NvidiaSmiRunner } from "@tac/environment";
 import { loadConfig, saveConfig, resolveAgentUrl, type ProfileEntry, type ServiceConfig } from "./config.js";
@@ -87,6 +89,7 @@ export class ServiceRuntime {
   private logWatcher: LogWatcher | null = null;
   private screenshotWatcher: ScreenshotWatcher | null = null;
   private unbindPatch: (() => void) | null = null;
+  private mirror: TarkovTrackerMirror | null = null;
 
   constructor(opts: RuntimeOptions) {
     this.dataDir = opts.dataDir;
@@ -128,7 +131,27 @@ export class ServiceRuntime {
     });
     this.planner.bind();
     this.bindPatchSentinel();
+    this.restartMirror();
     if (this.watch) this.startWatchers();
+  }
+
+  /**
+   * (Re)start the TarkovTracker mirror (M2.7) from the configured token.
+   * Local quest completions/failures push to .org debounced+batched; no token
+   * → mirror stays off. Called at boot, after token import, on profile switch.
+   */
+  restartMirror(): void {
+    this.mirror?.stop();
+    this.mirror = null;
+    const token = this.config.tarkovTrackerToken;
+    if (!token) return;
+    this.mirror = new TarkovTrackerMirror(this.store, { token, fetchImpl: this.fetchImpl });
+    this.mirror.attach();
+  }
+
+  /** Mirror status for /api/health (null = no token configured). */
+  mirrorStatus(): TrackerMirrorStatus | null {
+    return this.mirror?.status ?? null;
   }
 
   private storeOpts(): { dir: string } | { memory: true } {
@@ -259,6 +282,7 @@ export class ServiceRuntime {
     previous.close();
     this.planner.retarget(this.world(entry.gameMode), this.store);
     this.bindPatchSentinel();
+    this.restartMirror();
     saveConfig(this.config, this.dataDir);
     if (wasWatching || this.watch) this.startWatchers();
     this.hub.broadcast("notice", { title: "Profile switched", body: `Active profile is now ${entry.label}` });
@@ -267,6 +291,9 @@ export class ServiceRuntime {
 
   async close(): Promise<void> {
     await this.stopWatchers();
+    await this.mirror?.flush(); // drain queued tracker writes before shutdown
+    this.mirror?.stop();
+    this.mirror = null;
     this.planner.stop();
     this.hub.unbindStore();
     this.unbindPatch?.();

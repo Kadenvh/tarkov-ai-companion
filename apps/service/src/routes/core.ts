@@ -104,6 +104,8 @@ export function registerCoreRoutes(app: FastifyInstance, rt: ServiceRuntime): vo
       // M8.2 patch sentinel: mismatch between the installed game and the data snapshot
       gameVersion,
       patchDetected: gameVersion !== null && gameVersion !== snapshotVersion,
+      // M2.7 mirror status (null = no TarkovTracker token configured)
+      trackerSync: rt.mirrorStatus(),
     };
   });
 
@@ -196,6 +198,7 @@ export function registerCoreRoutes(app: FastifyInstance, rt: ServiceRuntime): vo
     const progress = rt.store.importTarkovTracker(await res.json());
     rt.config.tarkovTrackerToken = body.data.token;
     saveConfig(rt.config, rt.dataDir);
+    rt.restartMirror(); // background push sync from now on (M2.7)
     return {
       ok: true,
       tasks: progress.tasksProgress.length,

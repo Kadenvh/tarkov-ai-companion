@@ -81,3 +81,27 @@ export function mapDeepLink(key: string | null | undefined): string | null {
   if (!info) return null;
   return `https://tarkov.dev/map/${info.normalizedName}`;
 }
+
+/**
+ * Map Genie slugs where they differ from tarkov.dev normalizedNames
+ * (every slug probed live 2026-07-11; maps without a Map Genie page → null).
+ */
+const MAPGENIE_SLUGS: Record<string, string | null> = {
+  "the-lab": "lab",
+  "streets-of-tarkov": "streets",
+  "the-labyrinth": "labyrinth",
+  "night-factory": "factory",
+  "ground-zero-21": "ground-zero",
+  "ground-zero-tutorial": "ground-zero",
+  terminal: null,
+  icebreaker: null,
+};
+
+/** Map Genie deep link (user's Pro session lives in their browser), or null. */
+export function mapGenieLink(key: string | null | undefined): string | null {
+  const info = resolveMap(key ?? null);
+  if (!info) return null;
+  const slug =
+    info.normalizedName in MAPGENIE_SLUGS ? MAPGENIE_SLUGS[info.normalizedName] : info.normalizedName;
+  return slug ? `https://mapgenie.io/tarkov/maps/${slug}` : null;
+}
