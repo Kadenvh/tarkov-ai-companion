@@ -12,6 +12,9 @@
   "scripts": {
     "snapshot": "pnpm --filter @tac/data-core snapshot",
     "test": "pnpm -r test",
-    "typecheck": "pnpm -r typecheck"
+    "typecheck": "pnpm -r typecheck",
+    "service": "pnpm --filter @tac/service start",
+    "agent": "pnpm --filter @tac/agent start",
+    "build:web": "pnpm --filter @tac/web build"
   }
 }
