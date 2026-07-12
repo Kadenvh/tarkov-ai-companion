@@ -17,3 +17,6 @@ node_modules/
 data/cache/
 # per-profile SQLite state, config, tokens (local mutable data — never committed)
 data/local/
+
+# build artifacts
+apps/web/dist/
