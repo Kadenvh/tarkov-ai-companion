@@ -13,6 +13,8 @@
 | `packages/state-engine` | `@tac/state-engine` | SQLite store, log watcher/parser, backfill, screenshot watcher, XP estimator, TarkovTracker mirror, raid journal, patch detection | shared, data-core |
 | `packages/environment` | `@tac/environment` | EFT settings advisor, NVIDIA advisor, PresentMon ingest, ammo/meta tiers | shared, data-core |
 | `packages/insights` | `@tac/insights` | raid analytics, economy tracking, playstyle fingerprint | shared (reads DB via SQL contract §4) |
+| `packages/connectors` | `@tac/connectors` | M9 capability-first adapter layer (EFT config, Wootility, manual-capture; registry + provenance envelope). **T0/T1 only — registration refuses > T1.** | shared, environment |
+| `packages/sources` | `@tac/sources` | M10 remote-source monitoring layer: registry + disciplined client (cache-first TTL, conditional 304s, quota budgeting, retry/backoff); tarkov.dev JSON (game-data/prices) + TarkovTracker (progress-read). **Read-only, network-only — no game contact, no writes.** | shared |
 | `apps/service` | `@tac/service` | Fastify daemon: REST+WS (§5), watcher host, serves web build, patch sentinel | all packages |
 | `apps/web` | `@tac/web` | React/Vite UI (§6) | service API only (HTTP) |
 | `apps/agent` | `@tac/agent` | Claude copilot: tools over service API, briefings, replan pipeline, learned weights | service API only (HTTP/WS) |
@@ -21,7 +23,8 @@
 
 - **SQLite driver: `node:sqlite` (`DatabaseSync`), NOT better-sqlite3.** Node 26 ships it built-in; zero native-compile risk on this machine; same synchronous embedded class. This supersedes SPEC.md §0 "better-sqlite3". No new native deps anywhere.
 - **Local mutable data lives in `data/local/`** (gitignored): `data/local/config.json` (profiles, active profile, tokens), `data/local/profiles/<profileKey>.sqlite` (one DB per profile). `profileKey = "<accountLabel>-<gameMode>"`, e.g. `main-regular`, `main-pve`, `alt-regular`.
-- **Ports:** service `3141` (env `TAC_PORT`), agent `3142` (env `TAC_AGENT_PORT`), vite dev `5173` (proxies `/api` + `/ws` → 3141).
+- **Ports:** service `3141` (env `TAC_PORT`), agent `3142` (env `TAC_AGENT_PORT`), monitor `3143` (env `TAC_MONITOR_PORT`), vite dev `5173` (proxies `/api` + `/ws` → 3141).
+- **Monitor (`@tac/monitor`, `pnpm monitor`):** a TarkovMonitor-style live companion that is a pure *consumer* of this service's `/ws` stream (§5.3) — it never reads logs or the game itself (@tier T0). It adds voice/chime alerts, in-raid timers (run-through, scav cooldown), session tallies, and opt-in crowdsourced submissions to tarkov.dev (queue times + goons sightings, both OFF by default). Its window is served at `http://localhost:3143`.
 - **Node WebSocket:** use the global `WebSocket` (Node ≥22) for clients; `@fastify/websocket` server-side.
 - **Committed fixtures never contain real profile ids / account ids** — replace with fake 24-hex ids when excerpting real logs.
 - **Nothing ever touches the EFT process/memory/input (T4)**; settings writes only game-closed with timestamped backups (T1-write).
@@ -42,6 +45,9 @@
 | `profile.detected` | `{ profileId, mode, ts }` |
 | `patch.detected` | `{ version, ts }` (log-folder version differs from snapshot) |
 | `state.changed` | `{ reason, ts }` (any store mutation — UI refresh signal) |
+| `connector.detected` | `{ connectorId, capability, installed, configPath?, ts }` (auto-detect sweep on service start) |
+| `connector.reading` | `{ connectorId, capability, settingsHash?, ts }` (a provenance-tagged read landed) |
+| `source.status` | `{ id, up, apiVersion?, lastFetch?, cacheAgeSec?, quota?: { readsRemaining?, writesRemaining?, resetsAt? }, lastError?, ts }` (a remote source's status changed) |
 
 ## 4. SQLite schema contract (DDL — the insights/state boundary)
 
@@ -83,6 +89,27 @@ CREATE TABLE IF NOT EXISTS perf_samples (
   id INTEGER PRIMARY KEY AUTOINCREMENT, raid_id INTEGER, map TEXT, ts TEXT NOT NULL,
   fps_avg REAL, fps_p1 REAL, frametime_p50 REAL, frametime_p95 REAL, frametime_p99 REAL,
   source TEXT NOT NULL DEFAULT 'presentmon');
+-- M9 connectors provenance store; the environment↔outcome join key for M6.3 attribution.
+CREATE TABLE IF NOT EXISTS connector_reading (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  connector_id TEXT NOT NULL,          -- "eft-config" | "wootility" | "manual-capture" | …
+  capability TEXT NOT NULL,            -- capability enum (see §5.6)
+  captured_at TEXT NOT NULL,           -- ISO-8601 (ConnectorReading.capturedAt)
+  game_version TEXT,                   -- nullable (ConnectorReading.gameVersion)
+  settings_hash TEXT,                  -- stable content hash; the environment↔outcome join key
+  raid_id INTEGER,                     -- optional FK to raids.id for per-raid attribution
+  data TEXT NOT NULL,                  -- JSON payload (ConnectorReading.data)
+  source TEXT NOT NULL DEFAULT 'connector');  -- connector|manual
+CREATE INDEX IF NOT EXISTS idx_connector_reading_cap ON connector_reading(capability, captured_at);
+CREATE INDEX IF NOT EXISTS idx_connector_reading_hash ON connector_reading(settings_hash);
+-- M10 sources quota ledger; persists the shared external-API budget across restarts
+-- (esp. TarkovTracker's 1000 reads / 100 writes per day, shared with the user's other tools).
+CREATE TABLE IF NOT EXISTS source_quota (
+  source_id TEXT PRIMARY KEY,           -- "tarkovtracker" | "tarkov-dev-json" | …
+  reads_remaining INTEGER,              -- nullable until first response teaches us the limit
+  writes_remaining INTEGER,
+  resets_at TEXT,                       -- ISO-8601 reset instant (from X-RateLimit-Reset)
+  updated_at TEXT NOT NULL);            -- ISO-8601 of last header fold
 ```
 
 Store API (state-engine exports): `openProfile(profileKey, opts?) → ProfileStore` with typed getters/setters over the above, `toPlayerState(): PlayerState` (the planner input, already defined in `@tac/planner` state.ts), `importTarkovTracker(progressJson)`, event emitter per §3.
@@ -120,6 +147,26 @@ All routes JSON; zod-validated; errors `{ error: string }` with proper status.
 
 ### 5.5 Agent proxy
 - Service does **not** embed the LLM. `apps/agent` runs on 3142; service proxies `POST /api/agent/chat`, `POST /api/agent/briefing { raidIndex }`, `GET /api/agent/health` to it (503 with helpful message if agent down).
+
+### 5.6 Connectors (`@tac/connectors` via `apps/service`)
+- `GET /api/connectors` → `[{ id, vendor, capabilities, riskTier, health }]` (registry.list + healthAll)
+- `GET /api/connectors/detect` → auto-detect sweep: `[{ id, installed, configPath?, version? }]`
+- `GET /api/connectors/capabilities` → the capability enum (below) + which connectors satisfy each
+- `GET /api/connectors/read?capability=<cap>&prefer=<id?>` → `ConnectorReading` (resolve-then-read; 404 if unsatisfiable, 409 if `prefer` mismatch)
+- `POST /api/connectors/manual { capability, payload }` → wraps a user-supplied payload as a `ConnectorReading` (manual-capture)
+- WS `/ws` pushes `connector.detected` / `connector.reading` (§3)
+- *Deferred to M9.5 (writes), reserved not live:* `POST /api/connectors/write { capability, patch, prefer? }` — opt-in, backs up first, returns `WriteResult` with revert.
+
+Capability enum (bind once — shared by DDL `capability`, the REST `capability` param, and the TS `Capability` union in `@tac/connectors`):
+`game-config | keyboard-actuation | audio-mix | gpu-3d-profile | display-config | perf-telemetry | tracker-sync | manual-capture`
+
+### 5.7 Sources (`@tac/sources` via `apps/service`)
+- `GET /api/sources` → `[{ id, kind, baseUrl, capabilities }]` (registry.list)
+- `GET /api/sources/status` → `[{ id, up, apiVersion?, lastFetch?, cacheAgeSec?, quota?, lastError? }]` (registry.status — the M10.3 status-view data)
+- `GET /api/sources/read?source=<id>&capability=<cap>` → `SourceReading` (cache-first, conditional, budget-aware; 404 unknown source, 400 if the source can't satisfy the capability, 429/503 surfaced as `{ error }` when quota-refused)
+- WS `/ws` pushes `source.status` (§3) on any source status change
+- Source capability enum (bind once — shared by the TS `SourceCapability` union in `@tac/sources`): `game-data | prices | progress-read | story | submit`
+- *Read-only in this slice: no submit/write route (M10.4 `submit` is opt-in, default-off).*
 
 ## 6. Web app (`apps/web`)
 

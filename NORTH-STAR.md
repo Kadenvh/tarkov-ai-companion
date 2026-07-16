@@ -28,8 +28,8 @@ When choosing what to build or how to build it, the first filter that discrimina
 ## Horizons
 
 - **H1 — Daily driver (now):** Kaden's second monitor, every session. Planner + auto-state + copilot. Success = the companion is *missed* when it's off.
-- **H2 — Whole-environment (next):** settings/NVIDIA/performance optimization, personal insights, learned weights, spawn-aware routing. Success = measurably better raids, not just better plans.
-- **H3 — Beyond us (optional, unforced):** squad features, community release, Kord Breach seasonal racing. Only if H1/H2 stay healthy.
+- **H2 — The Coach (next):** the companion stops being a passive tracker and becomes a *coach* — deepest **account-safe** capture (logs + end-of-raid results OCR + config/perf telemetry + net-worth), structured into a personal model, driving proactive pre-raid plans, post-raid debriefs, and settings/economy/route/ending feedback. The app wraps agentic loops; occasional *assisted-capture* prompts are acceptable, used only to fill gaps the passive pipeline can't reach. Success = measurably better raids and decisions, not just better plans.
+- **H3 — Community surface (real track, no SaaS):** shareable plugin + OBS browser-source overlay + published guide/dataset (story-foresight under CC BY-NC-SA, settings-vs-meta audit). Local-first only — **no hosting, no multi-user auth, no cloud state-of-record.** Promoted from "optional" to a real horizon; ships the novel parts without the SaaS tail. (Squad features / Kord Breach racing remain unforced, behind H1/H2 health.)
 
 ## Never list (hard non-goals)
 
@@ -50,3 +50,6 @@ When choosing what to build or how to build it, the first filter that discrimina
 | State architecture | **Local-first SQLite; TarkovTracker .org as optional mirror** | 2026-07-11 |
 | Data sources | **json.tarkov.dev primary + EFT wiki (MediaWiki API) first-class + curated story dataset** | 2026-07-11 |
 | Dev method | **Spec-driven** (SPEC.md is the contract; recon precedes build) | 2026-07-11 |
+| Product posture | **"The Coach"** — proactive agentic companion, not passive tracker; agentic loops + occasional assisted-capture prompts | 2026-07-16 |
+| Community strategy | **Plugin + OBS overlay + guide/dataset (local-first, no SaaS/cloud state)** — H3 promoted to a real track | 2026-07-16 |
+| Data-capture depth | **Maximal account-safe:** logs + end-of-raid results OCR + config↔outcome/perf attribution + net-worth/goal ETA | 2026-07-16 |

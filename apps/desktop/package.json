@@ -1,0 +1,26 @@
+{
+  "name": "@tac/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "license": "GPL-3.0-only",
+  "description": "Electron app shell (M11) — supervises the @tac/service + @tac/agent sidecars and renders the web UI as a single installable Windows app.",
+  "type": "module",
+  "main": "dist-electron/main.js",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "build": "node scripts/build-electron.mjs",
+    "icon": "node scripts/make-icon.mjs",
+    "start": "electron dist-electron/main.js",
+    "dev": "node scripts/build-electron.mjs && electron dist-electron/main.js",
+    "dist": "node scripts/build-electron.mjs && electron-builder --config electron-builder.yml"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "electron": "^43.1.1",
+    "electron-builder": "^26.15.3",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  }
+}

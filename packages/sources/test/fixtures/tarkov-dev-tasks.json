@@ -1,0 +1,22 @@
+[
+  {
+    "id": "5936d90786f7742b1420ba5b",
+    "name": "Debut",
+    "normalizedName": "debut",
+    "minPlayerLevel": 1,
+    "trader": { "id": "54cb50c76803fa8b248b4571", "name": "Prapor" },
+    "objectives": [
+      { "id": "5968526e86f774576b581c78", "type": "shoot", "count": 5 }
+    ]
+  },
+  {
+    "id": "5936da9e86f7742d65037edf",
+    "name": "Checking",
+    "normalizedName": "checking",
+    "minPlayerLevel": 1,
+    "trader": { "id": "54cb50c76803fa8b248b4571", "name": "Prapor" },
+    "objectives": [
+      { "id": "5968542e86f7741949328db5", "type": "giveItem", "count": 1 }
+    ]
+  }
+]

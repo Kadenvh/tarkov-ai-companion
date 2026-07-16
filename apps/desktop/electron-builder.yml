@@ -1,0 +1,82 @@
+# electron-builder config for @tac/desktop (SPEC-9 M11.2).
+#
+# Emits an NSIS installer (.exe) AND an MSI under apps/desktop/dist/. appId +
+# productName are fixed here; the version is taken from apps/desktop/package.json
+# (kept in lockstep with the root package.json — both 0.1.0). Code-signing is
+# deferred (personal/unsigned first); Windows SmartScreen will warn on first run
+# of an unsigned build (see README).
+#
+# PACKAGING GAP: `extraResources` below wires a bundled Node 26 runtime + the
+# service/agent sources into the installed app, but the shell does not yet point
+# its sidecar spawner at that bundled runtime (it uses `node --import tsx` from
+# PATH, which is correct for `app:dev`). Finishing the standalone `.exe`/`.msi`
+# requires (a) dropping a real node.exe under resources/runtime/, and (b) an
+# `nodeCommand` override in main.ts for the packaged case. See README "Standalone
+# packaging — what remains".
+
+appId: me.vhtech.tarkovaicompanion
+productName: Tarkov AI Companion
+copyright: Copyright © 2026 vhtech — GPL-3.0-only
+
+directories:
+  buildResources: resources
+  output: dist
+
+# The Electron app payload: just the compiled shell. Everything the sidecars
+# need is delivered via extraResources (below) so it lands outside the asar.
+files:
+  - dist-electron/**/*
+  - package.json
+
+asar: true
+
+# Bundled sidecar payload + Node runtime, copied verbatim into
+# <install>/resources/. These are the pieces the standalone build needs; the
+# `runtime/` node.exe is NOT committed — see README for how to populate it.
+extraResources:
+  - from: ../../apps/service
+    to: sidecars/service
+    filter:
+      - "src/**/*"
+      - "package.json"
+  - from: ../../apps/agent
+    to: sidecars/agent
+    filter:
+      - "src/**/*"
+      - "package.json"
+  - from: ../../apps/web/dist
+    to: sidecars/web/dist
+    filter:
+      - "**/*"
+  - from: resources/runtime
+    to: runtime
+    filter:
+      - "**/*"
+
+icon: resources/icon.png
+
+win:
+  icon: resources/icon.png
+  target:
+    - target: nsis
+      arch:
+        - x64
+    - target: msi
+      arch:
+        - x64
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Tarkov AI Companion
+
+msi:
+  oneClick: false
+  perMachine: false
+
+# M11.3 auto-update is DEFERRED. Artifacts are still versioned so a future
+# electron-updater feed can be added without restructuring.
+artifactName: ${productName}-${version}-${arch}.${ext}
