@@ -5,6 +5,7 @@ import {
   isCapability,
   createManualCaptureConnector,
   type Capability,
+  type ConnectorReading,
 } from "@tac/connectors";
 import {
   isSourceCapability,
@@ -12,6 +13,7 @@ import {
   HttpError,
   type SourceCapability,
   type SourceStatus,
+  type QuotaState,
 } from "@tac/sources";
 import type { ServiceRuntime } from "../runtime.js";
 
@@ -24,8 +26,10 @@ import type { ServiceRuntime } from "../runtime.js";
  * (§3): `connector.detected` on the detect sweep, `connector.reading` on a
  * landed read, `source.status` whenever a source's status row changes.
  *
- * Persistence of `connector_reading` / `source_quota` to SQLite is out of scope
- * for this pass (the registries are in-memory) — see the TODO(M10) markers.
+ * M10 persistence (CONTRACTS §4): connector reads land in `connector_reading`,
+ * source-read quota folds into `source_quota` (restored on the next startup).
+ * All persistence is BEST-EFFORT — a store failure is logged and swallowed so it
+ * never fails the underlying read.
  */
 
 /** Query/body validators. Capabilities are validated against the enums at the boundary. */
@@ -70,6 +74,39 @@ function defaultSourcePath(
 const nowIso = (): string => new Date().toISOString();
 
 export function registerIntegrationRoutes(app: FastifyInstance, rt: ServiceRuntime): void {
+  // Best-effort persistence (CONTRACTS §4). A store failure must never fail the
+  // read the caller asked for, so both helpers log-and-swallow.
+
+  /** Persist a landed connector/manual reading to `connector_reading`. */
+  const persistReading = (reading: ConnectorReading, source: "connector" | "manual"): void => {
+    try {
+      rt.store.insertConnectorReading({
+        connectorId: reading.connectorId,
+        capability: reading.capability,
+        capturedAt: reading.capturedAt,
+        ...(reading.gameVersion !== undefined ? { gameVersion: reading.gameVersion } : {}),
+        ...(reading.settingsHash !== undefined ? { settingsHash: reading.settingsHash } : {}),
+        data: reading.data,
+        source,
+      });
+    } catch (err) {
+      app.log.warn({ err }, "failed to persist connector_reading (best-effort)");
+    }
+  };
+
+  /** Fold a source's current `QuotaState` into `source_quota` for restore-on-restart. */
+  const persistSourceQuota = (sourceId: string, quota: QuotaState): void => {
+    try {
+      rt.store.upsertSourceQuota(sourceId, {
+        ...(quota.readsRemaining !== undefined ? { readsRemaining: quota.readsRemaining } : {}),
+        ...(quota.writesRemaining !== undefined ? { writesRemaining: quota.writesRemaining } : {}),
+        ...(quota.resetsAt !== undefined ? { resetsAt: quota.resetsAt } : {}),
+      });
+    } catch (err) {
+      app.log.warn({ err }, "failed to persist source_quota (best-effort)");
+    }
+  };
+
   // ---- §5.6 Connectors ------------------------------------------------------
 
   app.get("/api/connectors", async () => {
@@ -138,7 +175,7 @@ export function registerIntegrationRoutes(app: FastifyInstance, rt: ServiceRunti
     } catch (err) {
       return reply.status(500).send({ error: (err as Error).message });
     }
-    // TODO(M10): persist connector_reading per CONTRACTS §4 (in-memory only this pass).
+    persistReading(reading, "connector");
     rt.hub.broadcast("connector.reading", {
       connectorId: reading.connectorId,
       capability: reading.capability,
@@ -158,7 +195,7 @@ export function registerIntegrationRoutes(app: FastifyInstance, rt: ServiceRunti
       targetCapability: body.data.capability,
     });
     const reading = await connector.read("manual-capture");
-    // TODO(M10): persist connector_reading (source: "manual") per CONTRACTS §4.
+    persistReading(reading, "manual");
     rt.hub.broadcast("connector.reading", {
       connectorId: reading.connectorId,
       capability: reading.capability,
@@ -221,7 +258,9 @@ export function registerIntegrationRoutes(app: FastifyInstance, rt: ServiceRunti
 
     try {
       const reading = await source.fetch({ capability: query.data.capability, path });
-      // TODO(M10): persist source_quota (X-RateLimit fold) per CONTRACTS §4.
+      // Fold the source's freshly-learned budget into source_quota (best-effort).
+      const quota = source.quota?.();
+      if (quota !== undefined) persistSourceQuota(source.id, quota);
       broadcastStatusChanges(await rt.sources.status());
       return reading;
     } catch (err) {

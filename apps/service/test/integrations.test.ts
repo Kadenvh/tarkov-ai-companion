@@ -8,7 +8,8 @@ import {
   type FetchLike,
   type HttpResponse,
 } from "@tac/sources";
-import { buildSourceRegistry } from "../src/registries.js";
+import { openProfile } from "@tac/state-engine";
+import { buildSourceRegistry, type SourceQuotaSeed } from "../src/registries.js";
 import { closeApps, testApp } from "./helpers.js";
 
 /**
@@ -244,6 +245,89 @@ describe("sources routes (CONTRACTS §5.7)", () => {
     const body = res.json();
     expect(body.sourceId).toBe("tarkovtracker");
     expect(body.data.playerLevel).toBe(42);
+  });
+});
+
+describe("M10 persistence (CONTRACTS §4)", () => {
+  afterEach(closeApps);
+
+  it("GET /api/connectors/read persists a connector_reading row", async () => {
+    const app = await testApp();
+    const res = await app.inject({ method: "GET", url: "/api/connectors/read?capability=manual-capture" });
+    expect(res.statusCode).toBe(200);
+    const rows = app.tac.store.listConnectorReadings();
+    expect(rows).toHaveLength(1);
+    expect(rows[0]!.connectorId).toBe("manual-capture");
+    expect(rows[0]!.capability).toBe("manual-capture");
+    expect(rows[0]!.source).toBe("connector");
+  });
+
+  it("POST /api/connectors/manual persists a connector_reading row tagged manual", async () => {
+    const app = await testApp();
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/connectors/manual",
+      payload: { capability: "tracker-sync", payload: { level: 42 } },
+    });
+    expect(res.statusCode).toBe(200);
+    const rows = app.tac.store.listConnectorReadings();
+    expect(rows).toHaveLength(1);
+    expect(rows[0]!.source).toBe("manual");
+    expect(rows[0]!.data).toMatchObject({ kind: "payload", payload: { level: 42 } });
+  });
+
+  it("GET /api/sources/read folds the source's quota into source_quota", async () => {
+    const sources = buildSourceRegistry({ token: "tkn", fetchImpl: fixtureFetch });
+    const app = await testApp({ sources });
+    const res = await app.inject({
+      method: "GET",
+      url: "/api/sources/read?source=tarkovtracker&capability=progress-read",
+    });
+    expect(res.statusCode).toBe(200);
+    // fixture responds with X-RateLimit-Remaining: 998
+    const quota = app.tac.store.getSourceQuota("tarkovtracker");
+    expect(quota?.readsRemaining).toBe(998);
+  });
+
+  it("a connector_reading persistence failure does NOT 500 the read", async () => {
+    const app = await testApp();
+    app.tac.store.insertConnectorReading = () => {
+      throw new Error("db down");
+    };
+    const res = await app.inject({ method: "GET", url: "/api/connectors/read?capability=manual-capture" });
+    expect(res.statusCode).toBe(200);
+  });
+
+  it("a source_quota persistence failure does NOT 500 the read", async () => {
+    const sources = buildSourceRegistry({ token: "tkn", fetchImpl: fixtureFetch });
+    const app = await testApp({ sources });
+    app.tac.store.upsertSourceQuota = () => {
+      throw new Error("db down");
+    };
+    const res = await app.inject({
+      method: "GET",
+      url: "/api/sources/read?source=tarkovtracker&capability=progress-read",
+    });
+    expect(res.statusCode).toBe(200);
+  });
+
+  it("startup restore: a persisted TT quota surfaces in /api/sources/status without a fresh read", async () => {
+    // A prior run persisted the shared read budget…
+    const seedStore = openProfile("seed-regular", { memory: true });
+    seedStore.upsertSourceQuota("tarkovtracker", { readsRemaining: 250 });
+    const quotaSeeds: Record<string, SourceQuotaSeed> = {};
+    for (const row of seedStore.getAllSourceQuota()) {
+      if (row.readsRemaining !== null) quotaSeeds[row.sourceId] = { readsRemaining: row.readsRemaining };
+    }
+    seedStore.close();
+
+    // …a new registry restores it on build (seed() into the TT QuotaLedger).
+    const sources = buildSourceRegistry({ token: "tkn", fetchImpl: fixtureFetch, quotaSeeds });
+    const app = await testApp({ sources });
+    const body = (await app.inject({ method: "GET", url: "/api/sources/status" })).json();
+    const tt = body.find((s: { id: string }) => s.id === "tarkovtracker");
+    expect(tt.up).toBe(true); // token present + budget positive → connected
+    expect(tt.quota.readsRemaining).toBe(250);
   });
 });
 

@@ -28,7 +28,24 @@ import { loadConfig, saveConfig, resolveAgentUrl, type ProfileEntry, type Servic
 import { Metrics } from "./metrics.js";
 import { WsHub } from "./ws.js";
 import { PlanPipeline } from "./plan.js";
-import { buildConnectorRegistry, buildSourceRegistry } from "./registries.js";
+import { buildConnectorRegistry, buildSourceRegistry, type SourceQuotaSeed } from "./registries.js";
+
+/**
+ * Fold the persisted `source_quota` rows into the `quotaSeeds` record
+ * `buildSourceRegistry` consumes on startup (nulls dropped so absent columns
+ * stay unknown rather than seeding `null`).
+ */
+function sourceQuotaSeeds(store: ProfileStore): Record<string, SourceQuotaSeed> {
+  const seeds: Record<string, SourceQuotaSeed> = {};
+  for (const row of store.getAllSourceQuota()) {
+    const seed: SourceQuotaSeed = {};
+    if (row.readsRemaining !== null) seed.readsRemaining = row.readsRemaining;
+    if (row.writesRemaining !== null) seed.writesRemaining = row.writesRemaining;
+    if (row.resetsAt !== null) seed.resetsAt = row.resetsAt;
+    seeds[row.sourceId] = seed;
+  }
+  return seeds;
+}
 
 /**
  * ServiceRuntime — everything the routes share: config, the active
@@ -120,11 +137,15 @@ export class ServiceRuntime {
     this.screenshotsDir = opts.screenshotsDir;
     this.version = opts.version ?? "0.1.0";
     this.watch = opts.watch ?? false;
+    // Open the profile store before building the source registry: the M10
+    // quota restore seeds each source's ledger from the persisted `source_quota`.
+    this.store = openProfile(this.config.activeProfile, this.storeOpts());
     this.connectors = opts.connectors ?? buildConnectorRegistry();
     this.sources =
       opts.sources ??
       buildSourceRegistry({
         fetchImpl: this.fetchImpl,
+        quotaSeeds: sourceQuotaSeeds(this.store),
         ...(this.config.tarkovTrackerToken !== undefined
           ? { token: this.config.tarkovTrackerToken }
           : {}),
@@ -134,7 +155,6 @@ export class ServiceRuntime {
     if (opts.world) this.worlds.set(opts.world.mode, opts.world);
     if (opts.market) this.markets.set(opts.market.mode, opts.market);
 
-    this.store = openProfile(this.config.activeProfile, this.storeOpts());
     this.hub = new WsHub(this.config.activeProfile, this.metrics);
     this.hub.bindStore(this.store);
     this.metrics.attachStore(this.store);

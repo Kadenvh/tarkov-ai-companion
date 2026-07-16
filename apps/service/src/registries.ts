@@ -8,6 +8,7 @@ import {
 } from "@tac/connectors";
 import {
   SourceRegistry,
+  QuotaLedger,
   createTarkovDevJsonSource,
   createTarkovTrackerSource,
   createEftWikiSource,
@@ -49,11 +50,25 @@ export function buildConnectorRegistry(): ConnectorRegistry {
   return registry;
 }
 
+/** A persisted per-source budget to restore across restarts (M10, CONTRACTS §4). */
+export interface SourceQuotaSeed {
+  readsRemaining?: number;
+  writesRemaining?: number;
+  resetsAt?: string;
+}
+
 export interface SourceRegistryOptions {
   /** TarkovTracker API token (from data/local/config.json). Absent → TT registered but `missing`. */
   token?: string;
   /** Injectable transport (fixtures in tests); defaults to the global fetch inside each source. */
   fetchImpl?: FetchLike;
+  /**
+   * Persisted `source_quota` rows (keyed by source id) restored on startup so the
+   * shared external-API budget (esp. TarkovTracker's 1000/100-per-day, shared with
+   * the user's other tools) survives a service restart. Only quota-metered sources
+   * (TarkovTracker) consume this; injectable for tests.
+   */
+  quotaSeeds?: Record<string, SourceQuotaSeed>;
 }
 
 export function buildSourceRegistry(opts: SourceRegistryOptions = {}): SourceRegistry {
@@ -61,10 +76,24 @@ export function buildSourceRegistry(opts: SourceRegistryOptions = {}): SourceReg
   registry.register(
     createTarkovDevJsonSource(opts.fetchImpl !== undefined ? { fetchImpl: opts.fetchImpl } : {}),
   );
+
+  // Restore TarkovTracker's shared read/write budget from the persisted ledger,
+  // so a restart doesn't optimistically re-open a budget the user already spent
+  // via this tool or TarkovMonitor.
+  const ttSeed = opts.quotaSeeds?.["tarkovtracker"];
+  let ttQuota: QuotaLedger | undefined;
+  if (ttSeed && (ttSeed.readsRemaining !== undefined || ttSeed.writesRemaining !== undefined)) {
+    ttQuota = new QuotaLedger();
+    ttQuota.seed({
+      ...(ttSeed.readsRemaining !== undefined ? { readsRemaining: ttSeed.readsRemaining } : {}),
+      ...(ttSeed.writesRemaining !== undefined ? { writesRemaining: ttSeed.writesRemaining } : {}),
+    });
+  }
   registry.register(
     createTarkovTrackerSource({
       token: opts.token ?? "",
       ...(opts.fetchImpl !== undefined ? { fetchImpl: opts.fetchImpl } : {}),
+      ...(ttQuota !== undefined ? { quota: ttQuota } : {}),
     }),
   );
   registry.register(
