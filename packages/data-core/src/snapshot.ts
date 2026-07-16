@@ -2,7 +2,7 @@ import { gunzipSync } from "node:zlib";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import type { GameMode } from "@tac/shared";
-import { SNAPSHOT_DIR } from "./paths.js";
+import { snapshotDir } from "./paths.js";
 import type { EndpointName } from "./api.js";
 
 export interface SnapshotRef {
@@ -12,13 +12,14 @@ export interface SnapshotRef {
 
 /** Newest snapshot on disk (versions sort lexicographically well enough within a major line). */
 export function latestSnapshot(): SnapshotRef {
-  const versions = readdirSync(SNAPSHOT_DIR, { withFileTypes: true })
+  const root = snapshotDir();
+  const versions = readdirSync(root, { withFileTypes: true })
     .filter((d) => d.isDirectory())
     .map((d) => d.name)
     .sort();
   const version = versions.at(-1);
-  if (!version) throw new Error(`No snapshots in ${SNAPSHOT_DIR} — run \`pnpm snapshot\` first`);
-  return { version, dir: join(SNAPSHOT_DIR, version) };
+  if (!version) throw new Error(`No snapshots in ${root} — run \`pnpm snapshot\` first`);
+  return { version, dir: join(root, version) };
 }
 
 export function loadRaw(ref: SnapshotRef, mode: GameMode, name: string): unknown {

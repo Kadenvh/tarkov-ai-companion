@@ -25,3 +25,6 @@ apps/web/dist/
 # never vendored — our code is reimplemented in our own idiom + attributed.
 /TarkovMonitor/
 /TarkovTracker/
+
+# Stray local profile dirs (canonical is /data/local, already ignored)
+**/data/local/

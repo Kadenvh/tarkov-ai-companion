@@ -73,11 +73,28 @@ function sidecarConfigs(ports: { service: number; agent: number }): SidecarConfi
   ];
 }
 
+/**
+ * Packaged-mode env pointing the sidecars' @tac/data-core path resolution at the
+ * installed layout: read-only snapshots/story ship under `resources/data`
+ * (electron-builder `extraResources`), the writable data-local root lives under
+ * the app's userData dir (never Program Files). Empty in dev, so the sidecars
+ * keep their REPO_ROOT-based defaults.
+ */
+function packagedDataEnv(): Record<string, string> {
+  if (!app.isPackaged) return {};
+  return {
+    TAC_SNAPSHOT_DIR: resolve(process.resourcesPath, "data", "snapshots"),
+    TAC_STORY_DIR: resolve(process.resourcesPath, "data", "story"),
+    TAC_DATA_DIR: resolve(app.getPath("userData"), "data"),
+  };
+}
+
 function launch(cfg: SidecarConfig): void {
   const plan = buildSidecarSpawn(cfg, {
     baseEnv: process.env,
     isPackaged: app.isPackaged,
     resourcesPath: process.resourcesPath,
+    packagedEnv: packagedDataEnv(),
   });
   log(`spawning ${cfg.name}: ${plan.command} ${plan.args.join(" ")} (port ${cfg.port})`);
 

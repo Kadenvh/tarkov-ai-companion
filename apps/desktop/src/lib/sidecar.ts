@@ -63,6 +63,14 @@ export interface BuildSpawnOptions {
   readonly nodeCommand?: string;
   /** Base environment to inherit; defaults to `process.env` at the call site. */
   readonly baseEnv?: Readonly<Record<string, string | undefined>>;
+  /**
+   * Env injected ONLY in packaged mode, applied last (wins over baseEnv). Used
+   * to point the sidecars' @tac/data-core path resolution at the installed
+   * layout: `TAC_SNAPSHOT_DIR` / `TAC_STORY_DIR` (read-only, under
+   * `<resourcesPath>/data`) and `TAC_DATA_DIR` (writable, under the app's
+   * userData dir). Ignored on the dev path, so the REPO_ROOT defaults stand.
+   */
+  readonly packagedEnv?: Readonly<Record<string, string>>;
 }
 
 /** Join path segments with forward slashes (spawn-safe on Windows). */
@@ -106,6 +114,9 @@ export function buildSidecarSpawn(cfg: SidecarConfig, options: BuildSpawnOptions
     const sidecarsDir = joinPath(options.resourcesPath, "sidecars");
     const runtime = joinPath(options.resourcesPath, "runtime", "node.exe");
     const bundledEntry = cfg.bundledEntry ?? `${cfg.name}.mjs`;
+    // Point @tac/data-core's path resolution at the installed layout (dev mode
+    // never sets these, keeping the REPO_ROOT-based defaults).
+    for (const [k, v] of Object.entries(options.packagedEnv ?? {})) env[k] = v;
     return {
       command: runtime,
       args: [joinPath(sidecarsDir, bundledEntry)],

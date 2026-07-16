@@ -2,7 +2,7 @@ import { join } from "node:path";
 import type { DatabaseSync } from "node:sqlite";
 import { z } from "zod";
 import { GameMode } from "@tac/shared";
-import { REPO_ROOT } from "@tac/data-core";
+import { dataLocalDir } from "@tac/data-core";
 import { openDatabase } from "./db.js";
 import { EngineEmitter, type RaidOutcome } from "./events.js";
 import type { RaidDraft } from "./logs/raids.js";
@@ -720,9 +720,9 @@ export class ProfileStore {
   }
 }
 
-/** Default on-disk location for profile databases (CONTRACTS §2). */
+/** Default on-disk location for profile databases (CONTRACTS §2; honours TAC_DATA_DIR). */
 export function defaultProfileDir(): string {
-  return join(REPO_ROOT, "data", "local", "profiles");
+  return join(dataLocalDir(), "profiles");
 }
 
 /**

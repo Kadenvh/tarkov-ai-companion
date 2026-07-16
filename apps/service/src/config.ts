@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { z } from "zod";
 import { GameMode } from "@tac/shared";
-import { REPO_ROOT } from "@tac/data-core";
+import { dataLocalDir } from "@tac/data-core";
 
 /**
  * Service configuration (M8.3) — `data/local/config.json`, created with
@@ -45,7 +45,7 @@ export function defaultConfig(): ServiceConfig {
 
 /** data/local root — TAC_DATA_DIR override for tests and relocated installs. */
 export function defaultDataDir(): string {
-  return process.env["TAC_DATA_DIR"] ?? join(REPO_ROOT, "data", "local");
+  return dataLocalDir();
 }
 
 export function configPath(dataDir: string = defaultDataDir()): string {

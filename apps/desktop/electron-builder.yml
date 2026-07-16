@@ -24,12 +24,11 @@
 #   2. The Electron binary fetch (electron-builder's normal download step).
 #   3. `pnpm --filter @tac/desktop dist` to emit the NSIS .exe + MSI.
 #
-# KNOWN FOLLOW-UP (separate milestone, NOT in apps/desktop): the sidecars still
-# resolve their snapshot/story/data-local/web dirs relative to their own file
-# location via @tac/data-core REPO_ROOT (no env override). In the relocated
-# install layout those paths won't line up, so a follow-up must make @tac/service
-# + @tac/data-core path-configurable (e.g. a TAC_APP_ROOT / TAC_SNAPSHOT_DIR env)
-# and stage the data payload alongside the sidecars.
+# DATA-DIR RESOLUTION (done): the sidecars resolve snapshots/story/data-local via
+# @tac/data-core, which now honours TAC_SNAPSHOT_DIR / TAC_STORY_DIR / TAC_DATA_DIR
+# (REPO_ROOT-based fallbacks when unset). main.ts injects these in packaged mode:
+# read-only snapshots+story from resources/data (staged below), and the writable
+# data-local root under the app's userData dir (never Program Files).
 
 appId: me.vhtech.tarkovaicompanion
 productName: Tarkov AI Companion
@@ -59,6 +58,17 @@ extraResources:
   # The built web UI the service serves at /.
   - from: ../../apps/web/dist
     to: sidecars/web/dist
+    filter:
+      - "**/*"
+  # Read-only game data the sidecars load (snapshots + curated story dataset).
+  # main.ts points TAC_SNAPSHOT_DIR / TAC_STORY_DIR here in packaged mode. The
+  # writable data/local is NOT staged — it is created under the userData dir.
+  - from: ../../data/snapshots
+    to: data/snapshots
+    filter:
+      - "**/*"
+  - from: ../../data/story
+    to: data/story
     filter:
       - "**/*"
   # Standalone Node 26 runtime (populate-runtime.mjs). Spawns the .mjs bundles.

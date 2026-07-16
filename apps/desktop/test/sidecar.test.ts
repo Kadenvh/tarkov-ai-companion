@@ -119,6 +119,31 @@ describe("buildSidecarSpawn", () => {
         /resourcesPath is required/,
       );
     });
+
+    it("injects packagedEnv (data-core path overrides) in packaged mode", () => {
+      const plan = buildSidecarSpawn(serviceCfg, {
+        isPackaged: true,
+        resourcesPath: "C:/app/resources",
+        baseEnv: {},
+        packagedEnv: {
+          TAC_SNAPSHOT_DIR: "C:/app/resources/data/snapshots",
+          TAC_STORY_DIR: "C:/app/resources/data/story",
+          TAC_DATA_DIR: "C:/Users/x/AppData/Roaming/TAC/data",
+        },
+      });
+      expect(plan.env["TAC_SNAPSHOT_DIR"]).toBe("C:/app/resources/data/snapshots");
+      expect(plan.env["TAC_STORY_DIR"]).toBe("C:/app/resources/data/story");
+      expect(plan.env["TAC_DATA_DIR"]).toBe("C:/Users/x/AppData/Roaming/TAC/data");
+    });
+  });
+
+  it("ignores packagedEnv on the dev path (defaults stand)", () => {
+    const plan = buildSidecarSpawn(serviceCfg, {
+      baseEnv: {},
+      packagedEnv: { TAC_SNAPSHOT_DIR: "C:/should/not/leak" },
+    });
+    expect(plan.command).toBe("node");
+    expect("TAC_SNAPSHOT_DIR" in plan.env).toBe(false);
   });
 });
 

@@ -6,7 +6,7 @@ import {
   loadMarket,
   parseStoryDataset,
   detectGameVersion,
-  STORY_DIR,
+  storyDir,
   type LoadedWorld,
   type Market,
   type StoryDataset,
@@ -230,7 +230,7 @@ export class ServiceRuntime {
   /** Curated story dataset (null when data/story/story.json is absent). */
   story(): StoryDataset | null {
     if (this.storyCache === undefined) {
-      const file = join(STORY_DIR, "story.json");
+      const file = join(storyDir(), "story.json");
       this.storyCache = existsSync(file)
         ? parseStoryDataset(JSON.parse(readFileSync(file, "utf8")))
         : null;
