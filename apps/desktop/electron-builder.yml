@@ -6,13 +6,30 @@
 # deferred (personal/unsigned first); Windows SmartScreen will warn on first run
 # of an unsigned build (see README).
 #
-# PACKAGING GAP: `extraResources` below wires a bundled Node 26 runtime + the
-# service/agent sources into the installed app, but the shell does not yet point
-# its sidecar spawner at that bundled runtime (it uses `node --import tsx` from
-# PATH, which is correct for `app:dev`). Finishing the standalone `.exe`/`.msi`
-# requires (a) dropping a real node.exe under resources/runtime/, and (b) an
-# `nodeCommand` override in main.ts for the packaged case. See README "Standalone
-# packaging — what remains".
+# STANDALONE PACKAGING (M11.2) — what's now wired vs. what the operator runs.
+#
+# DONE in code:
+#   - scripts/build-sidecars.mjs esbuild-bundles @tac/service + @tac/agent into
+#     standalone ESM at dist-electron/sidecars/{service,agent}.mjs (Node builtins
+#     external; @anthropic-ai/claude-agent-sdk external — see that script).
+#   - main.ts + lib/sidecar.ts spawn the BUNDLED node.exe on the BUNDLED .mjs
+#     when app.isPackaged, and keep `node --import tsx <src>` for `app:dev`.
+#   - `extraResources` below ships the bundles, the web build, and the Node 26
+#     runtime into <install>/resources/{sidecars,runtime}.
+#
+# OPERATOR STILL RUNS (handled outside this file, foreground):
+#   1. `node scripts/populate-runtime.mjs`  -> resources/runtime/node.exe
+#      (or `pnpm --filter @tac/desktop prepackage`, which also builds + bundles).
+#      node.exe is NOT committed (large, machine-specific) — it must be Node 26+.
+#   2. The Electron binary fetch (electron-builder's normal download step).
+#   3. `pnpm --filter @tac/desktop dist` to emit the NSIS .exe + MSI.
+#
+# KNOWN FOLLOW-UP (separate milestone, NOT in apps/desktop): the sidecars still
+# resolve their snapshot/story/data-local/web dirs relative to their own file
+# location via @tac/data-core REPO_ROOT (no env override). In the relocated
+# install layout those paths won't line up, so a follow-up must make @tac/service
+# + @tac/data-core path-configurable (e.g. a TAC_APP_ROOT / TAC_SNAPSHOT_DIR env)
+# and stage the data payload alongside the sidecars.
 
 appId: me.vhtech.tarkovaicompanion
 productName: Tarkov AI Companion
@@ -32,22 +49,19 @@ asar: true
 
 # Bundled sidecar payload + Node runtime, copied verbatim into
 # <install>/resources/. These are the pieces the standalone build needs; the
-# `runtime/` node.exe is NOT committed — see README for how to populate it.
+# `runtime/` node.exe is NOT committed — populate-runtime.mjs regenerates it.
 extraResources:
-  - from: ../../apps/service
-    to: sidecars/service
+  # esbuild-bundled sidecars (dist-electron/sidecars/{service,agent}.mjs, maps).
+  - from: dist-electron/sidecars
+    to: sidecars
     filter:
-      - "src/**/*"
-      - "package.json"
-  - from: ../../apps/agent
-    to: sidecars/agent
-    filter:
-      - "src/**/*"
-      - "package.json"
+      - "**/*"
+  # The built web UI the service serves at /.
   - from: ../../apps/web/dist
     to: sidecars/web/dist
     filter:
       - "**/*"
+  # Standalone Node 26 runtime (populate-runtime.mjs). Spawns the .mjs bundles.
   - from: resources/runtime
     to: runtime
     filter:

@@ -1,0 +1,9 @@
+# esbuild output: Electron main/preload + bundled sidecars
+dist-electron/
+
+# electron-builder installer output (.exe / .msi)
+dist/
+
+# Standalone Node runtime dropped in by scripts/populate-runtime.mjs.
+# Large (~100 MB) and machine-specific — regenerated, never committed.
+resources/runtime/

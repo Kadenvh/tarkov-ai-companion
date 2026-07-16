@@ -9,11 +9,14 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "build": "node scripts/build-electron.mjs",
+    "build": "node scripts/build-electron.mjs && node scripts/build-sidecars.mjs",
+    "build:sidecars": "node scripts/build-sidecars.mjs",
+    "populate-runtime": "node scripts/populate-runtime.mjs",
     "icon": "node scripts/make-icon.mjs",
     "start": "electron dist-electron/main.js",
     "dev": "node scripts/build-electron.mjs && electron dist-electron/main.js",
-    "dist": "node scripts/build-electron.mjs && electron-builder --config electron-builder.yml"
+    "prepackage": "pnpm run build && node scripts/populate-runtime.mjs",
+    "dist": "pnpm run prepackage && electron-builder --config electron-builder.yml"
   },
   "devDependencies": {
     "@types/node": "^26.1.1",

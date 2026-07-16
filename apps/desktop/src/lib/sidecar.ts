@@ -22,8 +22,13 @@ export interface SidecarConfig {
   readonly port: number;
   /** Absolute path to the sidecar package dir (used as spawn cwd + entry base). */
   readonly cwd: string;
-  /** Entry file relative to `cwd`. Default `src/main.ts`. */
+  /** Entry file relative to `cwd` for the dev path. Default `src/main.ts`. */
   readonly entry?: string;
+  /**
+   * Bundled ESM entry filename inside `<resources>/sidecars/` used by the
+   * packaged path. Default `<name>.mjs` (matches build-sidecars.mjs output).
+   */
+  readonly bundledEntry?: string;
   /** Extra env vars merged last (e.g. agent → TAC_SERVICE_URL). */
   readonly extraEnv?: Readonly<Record<string, string>>;
 }
@@ -37,35 +42,55 @@ export interface SpawnPlan {
 
 export interface BuildSpawnOptions {
   /**
-   * Runtime to launch. In dev this is the system Node 26 binary (`node`), which
-   * runs the TypeScript entry via the tsx loader (`--import tsx`). A packaged
-   * build overrides this with the bundled Node runtime + compiled JS entry.
+   * Whether the Electron app is running from a packaged build (`app.isPackaged`).
+   * When true we launch the *bundled* sidecar ESM on the *bundled* Node 26
+   * runtime; when false we use the dev path (`node --import tsx <src>`).
+   * Injected (not read from `app`) so this stays a pure, unit-testable function.
+   */
+  readonly isPackaged?: boolean;
+  /**
+   * `process.resourcesPath` in a packaged build — the root that
+   * electron-builder's `extraResources` populate. The bundled Node runtime is
+   * at `<resourcesPath>/runtime/node.exe` and the sidecar bundles at
+   * `<resourcesPath>/sidecars/<name>.mjs`. Required when `isPackaged` is true.
+   */
+  readonly resourcesPath?: string;
+  /**
+   * Dev-path runtime override. In dev this is the system Node 26 binary
+   * (`node`), which runs the TypeScript entry via the tsx loader
+   * (`--import tsx`). Ignored in packaged mode.
    */
   readonly nodeCommand?: string;
   /** Base environment to inherit; defaults to `process.env` at the call site. */
   readonly baseEnv?: Readonly<Record<string, string | undefined>>;
 }
 
+/** Join path segments with forward slashes (spawn-safe on Windows). */
+function joinPath(...segments: string[]): string {
+  return segments
+    .map((s) => s.replace(/[/\\]+$/, ""))
+    .join("/")
+    .replace(/\\/g, "/");
+}
+
 /** Join a package dir + entry into a forward-slash path (spawn-safe on Windows). */
 function entryPath(cwd: string, entry: string): string {
-  const base = cwd.replace(/[/\\]+$/, "");
-  return `${base}/${entry}`;
+  return joinPath(cwd, entry);
 }
 
 /**
- * Build the spawn plan for one sidecar. Default form:
+ * Build the spawn plan for one sidecar. Two forms, selected on `isPackaged`:
  *
- *   node --import tsx <cwd>/src/main.ts
+ *   dev      : node --import tsx <cwd>/src/main.ts
+ *   packaged : <resourcesPath>/runtime/node.exe <resourcesPath>/sidecars/<name>.mjs
  *
  * with the sidecar's port injected via its `portEnv` var plus any `extraEnv`.
- * This runs the *same* code path as the package's `start` script (`tsx
- * src/main.ts`) but on the explicit Node runtime we pass, so we can point it at
- * a bundled Node 26 in a packaged build.
+ * The dev form runs the *same* code path as the package's `start` script (`tsx
+ * src/main.ts`). The packaged form runs the standalone bundle produced by
+ * build-sidecars.mjs on the Node 26 runtime dropped in by populate-runtime.mjs,
+ * so the installed app needs neither pnpm nor tsx nor the workspace on disk.
  */
 export function buildSidecarSpawn(cfg: SidecarConfig, options: BuildSpawnOptions = {}): SpawnPlan {
-  const nodeCommand = options.nodeCommand ?? "node";
-  const entry = cfg.entry ?? "src/main.ts";
-
   const env: Record<string, string> = {};
   const baseEnv = options.baseEnv ?? {};
   for (const [k, v] of Object.entries(baseEnv)) {
@@ -74,6 +99,23 @@ export function buildSidecarSpawn(cfg: SidecarConfig, options: BuildSpawnOptions
   env[cfg.portEnv] = String(cfg.port);
   for (const [k, v] of Object.entries(cfg.extraEnv ?? {})) env[k] = v;
 
+  if (options.isPackaged) {
+    if (!options.resourcesPath) {
+      throw new Error("buildSidecarSpawn: resourcesPath is required when isPackaged is true");
+    }
+    const sidecarsDir = joinPath(options.resourcesPath, "sidecars");
+    const runtime = joinPath(options.resourcesPath, "runtime", "node.exe");
+    const bundledEntry = cfg.bundledEntry ?? `${cfg.name}.mjs`;
+    return {
+      command: runtime,
+      args: [joinPath(sidecarsDir, bundledEntry)],
+      cwd: sidecarsDir,
+      env,
+    };
+  }
+
+  const nodeCommand = options.nodeCommand ?? "node";
+  const entry = cfg.entry ?? "src/main.ts";
   return {
     command: nodeCommand,
     args: ["--import", "tsx", entryPath(cfg.cwd, entry)],

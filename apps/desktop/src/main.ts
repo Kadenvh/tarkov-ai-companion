@@ -74,7 +74,11 @@ function sidecarConfigs(ports: { service: number; agent: number }): SidecarConfi
 }
 
 function launch(cfg: SidecarConfig): void {
-  const plan = buildSidecarSpawn(cfg, { baseEnv: process.env });
+  const plan = buildSidecarSpawn(cfg, {
+    baseEnv: process.env,
+    isPackaged: app.isPackaged,
+    resourcesPath: process.resourcesPath,
+  });
   log(`spawning ${cfg.name}: ${plan.command} ${plan.args.join(" ")} (port ${cfg.port})`);
 
   const child = spawn(plan.command, plan.args, {

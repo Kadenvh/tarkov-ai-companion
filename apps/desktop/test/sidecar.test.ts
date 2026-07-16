@@ -52,13 +52,73 @@ describe("buildSidecarSpawn", () => {
     expect(plan.env["TAC_SERVICE_URL"]).toBe("http://127.0.0.1:3141");
   });
 
-  it("honours a nodeCommand override + custom entry for the packaged case", () => {
-    const plan = buildSidecarSpawn(
-      { ...serviceCfg, entry: "dist/main.js" },
-      { nodeCommand: "C:/app/resources/runtime/node.exe", baseEnv: {} },
-    );
-    expect(plan.command).toBe("C:/app/resources/runtime/node.exe");
-    expect(plan.args).toEqual(["--import", "tsx", "C:/repo/apps/service/dist/main.js"]);
+  it("honours a nodeCommand override on the dev path", () => {
+    const plan = buildSidecarSpawn(serviceCfg, {
+      nodeCommand: "C:/custom/node.exe",
+      baseEnv: {},
+    });
+    expect(plan.command).toBe("C:/custom/node.exe");
+    expect(plan.args).toEqual(["--import", "tsx", "C:/repo/apps/service/src/main.ts"]);
+  });
+
+  describe("packaged mode", () => {
+    it("spawns the bundled node runtime on the bundled service .mjs", () => {
+      const plan = buildSidecarSpawn(serviceCfg, {
+        isPackaged: true,
+        resourcesPath: "C:/Program Files/Tarkov AI Companion/resources",
+        baseEnv: {},
+      });
+      expect(plan.command).toBe("C:/Program Files/Tarkov AI Companion/resources/runtime/node.exe");
+      expect(plan.args).toEqual([
+        "C:/Program Files/Tarkov AI Companion/resources/sidecars/service.mjs",
+      ]);
+      expect(plan.cwd).toBe("C:/Program Files/Tarkov AI Companion/resources/sidecars");
+      // No tsx loader flags in packaged mode — it runs the standalone bundle.
+      expect(plan.args).not.toContain("--import");
+    });
+
+    it("derives <name>.mjs for the agent and still injects env", () => {
+      const plan = buildSidecarSpawn(
+        {
+          name: "agent",
+          filter: "@tac/agent",
+          portEnv: "TAC_AGENT_PORT",
+          port: 3142,
+          cwd: "C:/repo/apps/agent",
+          extraEnv: { TAC_SERVICE_URL: "http://127.0.0.1:3141" },
+        },
+        { isPackaged: true, resourcesPath: "C:/app/resources", baseEnv: { PATH: "/usr/bin" } },
+      );
+      expect(plan.command).toBe("C:/app/resources/runtime/node.exe");
+      expect(plan.args).toEqual(["C:/app/resources/sidecars/agent.mjs"]);
+      expect(plan.env["TAC_AGENT_PORT"]).toBe("3142");
+      expect(plan.env["TAC_SERVICE_URL"]).toBe("http://127.0.0.1:3141");
+      expect(plan.env["PATH"]).toBe("/usr/bin");
+    });
+
+    it("respects an explicit bundledEntry override", () => {
+      const plan = buildSidecarSpawn(
+        { ...serviceCfg, bundledEntry: "service.bundle.mjs" },
+        { isPackaged: true, resourcesPath: "C:/app/resources", baseEnv: {} },
+      );
+      expect(plan.args).toEqual(["C:/app/resources/sidecars/service.bundle.mjs"]);
+    });
+
+    it("normalizes backslash resourcesPath to forward slashes", () => {
+      const plan = buildSidecarSpawn(serviceCfg, {
+        isPackaged: true,
+        resourcesPath: "C:\\app\\resources",
+        baseEnv: {},
+      });
+      expect(plan.command).toBe("C:/app/resources/runtime/node.exe");
+      expect(plan.args).toEqual(["C:/app/resources/sidecars/service.mjs"]);
+    });
+
+    it("throws when packaged but resourcesPath is missing", () => {
+      expect(() => buildSidecarSpawn(serviceCfg, { isPackaged: true, baseEnv: {} })).toThrow(
+        /resourcesPath is required/,
+      );
+    });
   });
 });
 
