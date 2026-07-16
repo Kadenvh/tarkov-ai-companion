@@ -39,6 +39,8 @@ export interface HttpResponse {
 export interface FetchInit {
   method?: string;
   headers?: Record<string, string>;
+  /** Serialized request body (POST submissions — the global `fetch` accepts it). */
+  body?: string;
   signal?: AbortSignal;
 }
 

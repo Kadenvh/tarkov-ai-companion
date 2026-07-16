@@ -3,9 +3,10 @@
 // discipline (cache-first TTL, conditional 304s, quota budgeting, retry/backoff)
 // for every remote data feed. Sibling to @tac/connectors (local tools). This
 // slice ships M10.1 (registry + cache + quota + retry), M10.2 (tarkov.dev JSON
-// game-data/prices + TarkovTracker progress-read, both read-only), and the M10.3
-// status shape. M10.4 (wiki/story + submit) is NOT built yet. All read-only,
-// network-only — no game process, no writes.
+// game-data/prices + TarkovTracker progress-read, both read-only), the M10.3
+// status shape, and M10.4 (eft-wiki story reads + the tarkov.dev-manager submit
+// source — opt-in, off by default). All read-only + network-only except the
+// manager submit path, which is a WRITE gated behind an explicit opt-in.
 export { SOURCE_CAPABILITIES, isSourceCapability, type SourceCapability } from "./capabilities.js";
 export {
   systemClock,
@@ -59,3 +60,22 @@ export {
   TARKOVTRACKER_PROGRESS_REQUEST,
   type TarkovTrackerSourceOptions,
 } from "./sources/tarkovtracker.js";
+export {
+  createEftWikiSource,
+  eftWikiSource,
+  eftWikiStoryRequest,
+  MediaWikiParseResponse,
+  STORY_TTL_MS,
+  type WikiStoryContent,
+  type EftWikiSourceOptions,
+} from "./sources/eft-wiki.js";
+export {
+  createTarkovDevManagerSource,
+  SubmitDisabledError,
+  type SubmitKind,
+  type QueueSubmission,
+  type GoonsSubmission,
+  type SubmitResult,
+  type TarkovDevManagerSource,
+  type TarkovDevManagerSourceOptions,
+} from "./sources/tarkov-dev-manager.js";

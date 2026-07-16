@@ -10,6 +10,8 @@ import {
   SourceRegistry,
   createTarkovDevJsonSource,
   createTarkovTrackerSource,
+  createEftWikiSource,
+  createTarkovDevManagerSource,
   type FetchLike,
 } from "@tac/sources";
 
@@ -22,12 +24,19 @@ import {
  * above T1, so these are all it will accept. All read-only here — the EFT
  * game-config connector's write path stays gated (enableWrites default off).
  *
- * Sources: the tarkov.dev JSON feed (public game-data/prices) and TarkovTracker
- * (the user's own progress-read). TarkovTracker is ALWAYS registered — when no
- * token is configured it is constructed with an empty token, so its `health()`
- * reports `missing` (surfaced as unconfigured/`up:false` in the status view)
- * rather than crashing or blocking startup. `fetchImpl` is injectable so tests
- * drive the sources from fixtures and never touch the network.
+ * Sources: the tarkov.dev JSON feed (public game-data/prices), TarkovTracker
+ * (the user's own progress-read), the EFT-wiki `story` source (read-only
+ * MediaWiki — the one source with a real UA that gets past Fandom's bot-block),
+ * and the tarkov.dev-manager `submit` source. TarkovTracker is ALWAYS registered
+ * — when no token is configured it is constructed with an empty token, so its
+ * `health()` reports `missing` (surfaced as unconfigured/`up:false` in the status
+ * view) rather than crashing or blocking startup.
+ *
+ * The manager submit source is registered but LEFT DISABLED (opt-in, off by
+ * default per SPEC-10 M10.4): it appears in `/api/sources` and the status view,
+ * but `submit()` throws until explicitly enabled and NO submit route is exposed —
+ * this pass performs no writes. `fetchImpl` is injectable so tests drive the
+ * sources from fixtures and never touch the network.
  */
 
 export function buildConnectorRegistry(): ConnectorRegistry {
@@ -55,6 +64,17 @@ export function buildSourceRegistry(opts: SourceRegistryOptions = {}): SourceReg
   registry.register(
     createTarkovTrackerSource({
       token: opts.token ?? "",
+      ...(opts.fetchImpl !== undefined ? { fetchImpl: opts.fetchImpl } : {}),
+    }),
+  );
+  registry.register(
+    createEftWikiSource(opts.fetchImpl !== undefined ? { fetchImpl: opts.fetchImpl } : {}),
+  );
+  // Opt-in, OFF by default (SPEC-10 M10.4): registered for visibility/status only,
+  // enabled:false → submit() throws, and no submit route is wired in this pass.
+  registry.register(
+    createTarkovDevManagerSource({
+      enabled: false,
       ...(opts.fetchImpl !== undefined ? { fetchImpl: opts.fetchImpl } : {}),
     }),
   );

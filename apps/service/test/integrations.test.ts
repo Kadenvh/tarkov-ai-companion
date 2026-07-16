@@ -144,10 +144,21 @@ describe("sources routes (CONTRACTS §5.7)", () => {
     const sources = buildSourceRegistry({ fetchImpl: fixtureFetch });
     const app = await testApp({ sources });
     const body = (await app.inject({ method: "GET", url: "/api/sources" })).json();
-    expect(body.map((s: { id: string }) => s.id)).toEqual(["tarkov-dev-json", "tarkovtracker"]);
+    expect(body.map((s: { id: string }) => s.id)).toEqual([
+      "tarkov-dev-json",
+      "tarkovtracker",
+      "eft-wiki",
+      "tarkov-dev-manager",
+    ]);
     const tt = body.find((s: { id: string }) => s.id === "tarkovtracker");
     expect(tt.capabilities).toContain("progress-read");
     expect(tt.baseUrl).toContain("tarkovtracker.org");
+    // M10.4: eft-wiki (mediawiki/story) + tarkov-dev-manager (submit) now present.
+    const wiki = body.find((s: { id: string }) => s.id === "eft-wiki");
+    expect(wiki.kind).toBe("mediawiki");
+    expect(wiki.capabilities).toContain("story");
+    const manager = body.find((s: { id: string }) => s.id === "tarkov-dev-manager");
+    expect(manager.capabilities).toContain("submit");
   });
 
   it("GET /api/sources/status marks an un-configured TarkovTracker as down (no token)", async () => {
