@@ -13,9 +13,10 @@ import { QuartermasterView } from "./views/Quartermaster";
 import { InsightsView } from "./views/Insights";
 import { EnvironmentView } from "./views/Environment";
 import { MapView } from "./views/MapView";
+import { SourcesView } from "./views/Sources";
 import { OnboardingModal } from "./views/Onboarding";
 
-type ViewId = "plan" | "goals" | "quartermaster" | "insights" | "environment" | "map";
+type ViewId = "plan" | "goals" | "quartermaster" | "insights" | "environment" | "map" | "sources";
 
 /** One broken view must never white-screen the shell — render the error in place. */
 class ViewBoundary extends Component<
@@ -55,6 +56,7 @@ const VIEWS: { id: ViewId; label: string }[] = [
   { id: "insights", label: "Insights" },
   { id: "environment", label: "Environment" },
   { id: "map", label: "Map" },
+  { id: "sources", label: "Sources & Connectors" },
 ];
 
 function StatusBar(): ReactNode {
@@ -156,6 +158,7 @@ export function App(): ReactNode {
             {view === "insights" ? <InsightsView /> : null}
             {view === "environment" ? <EnvironmentView /> : null}
             {view === "map" ? <MapView /> : null}
+            {view === "sources" ? <SourcesView /> : null}
           </ViewBoundary>
         </div>
       </div>

@@ -34,3 +34,9 @@ export {
   type PlanPipelineOptions,
 } from "./plan.js";
 export { Metrics, type MetricsSnapshot } from "./metrics.js";
+export {
+  buildConnectorRegistry,
+  buildSourceRegistry,
+  type SourceRegistryOptions,
+} from "./registries.js";
+export { registerIntegrationRoutes } from "./routes/integrations.js";

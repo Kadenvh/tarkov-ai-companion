@@ -8,7 +8,13 @@
  * connector above T1 — the account-safe-by-construction Never-list, enforced.
  */
 import type { Capability } from "./capabilities.js";
-import type { Connector, ConnectorReading, HealthStatus, RiskTier } from "./connector.js";
+import type {
+  Connector,
+  ConnectorReading,
+  HealthStatus,
+  RiskTier,
+  WriteResult,
+} from "./connector.js";
 
 /** Tiers a connector may register at. Anything else is refused (SPEC-8 principle 2). */
 const ALLOWED_TIERS: ReadonlySet<string> = new Set<RiskTier>(["T0", "T1"]);
@@ -91,6 +97,28 @@ export class ConnectorRegistry {
       throw new Error(`No connector satisfies capability "${cap}".`);
     }
     return connector.read(cap);
+  }
+
+  /**
+   * Resolve then perform an opt-in write (M9.5). Refuses with a clear error
+   * unless the resolved connector both advertises `write` AND is write-enabled
+   * (`writesEnabled === true` — the per-connector opt-in gate). Mirrors `read`:
+   * the same `resolve`/`prefer` path selects the connector; only the dispatch
+   * differs. No connector is ever coerced into writing — writes are refused,
+   * never silently downgraded.
+   */
+  async write(cap: Capability, patch: unknown, opts?: ResolveOptions): Promise<WriteResult> {
+    const connector = await this.resolve(cap, opts);
+    if (!connector) {
+      throw new Error(`No connector satisfies capability "${cap}".`);
+    }
+    if (typeof connector.write !== "function" || connector.writesEnabled !== true) {
+      throw new Error(
+        `Connector "${connector.id}" cannot write capability "${cap}": ` +
+          `it advertises no write path or has writes disabled (M9.5 is opt-in).`,
+      );
+    }
+    return connector.write(cap, patch);
   }
 
   /** Health of every registered connector, keyed by connector id. */

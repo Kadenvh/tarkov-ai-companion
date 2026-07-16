@@ -93,6 +93,9 @@ importers:
       '@fastify/websocket':
         specifier: ^11.0.0
         version: 11.3.0
+      '@tac/connectors':
+        specifier: workspace:*
+        version: link:../../packages/connectors
       '@tac/data-core':
         specifier: workspace:*
         version: link:../../packages/data-core
@@ -108,6 +111,9 @@ importers:
       '@tac/shared':
         specifier: workspace:*
         version: link:../../packages/shared
+      '@tac/sources':
+        specifier: workspace:*
+        version: link:../../packages/sources
       '@tac/state-engine':
         specifier: workspace:*
         version: link:../../packages/state-engine

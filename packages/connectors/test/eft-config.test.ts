@@ -11,11 +11,13 @@ const FIXED = "2026-01-01T00:00:00.000Z";
 describe("eft-config connector (fixture settings dir)", () => {
   const connector = createEftConfigConnector({ settingsDir: FIXTURE_DIR, clock: () => FIXED });
 
-  it("advertises game-config at riskTier T1, read-only", () => {
+  it("advertises game-config at riskTier T1, writes disabled by default", () => {
     expect(connector.id).toBe("eft-config");
     expect(connector.capabilities).toEqual(["game-config"]);
     expect(connector.riskTier).toBe("T1");
-    expect(connector.write).toBeUndefined();
+    // write is present (M9.5) but gated: writesEnabled is false unless opted in.
+    expect(connector.writesEnabled).toBe(false);
+    expect(typeof connector.write).toBe("function");
   });
 
   it("detect finds the fixture config dir", async () => {

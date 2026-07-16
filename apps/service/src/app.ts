@@ -13,6 +13,7 @@ import { registerEnvironmentRoutes } from "./routes/environment.js";
 import { registerInsightsRoutes } from "./routes/insights.js";
 import { registerAgentRoutes } from "./routes/agent.js";
 import { registerPlatformRoutes } from "./routes/platform.js";
+import { registerIntegrationRoutes } from "./routes/integrations.js";
 
 /**
  * Fastify app factory (M5.1) — builds the fully-registered app WITHOUT
@@ -71,6 +72,7 @@ export async function buildApp(opts: BuildAppOptions = {}): Promise<FastifyInsta
   registerInsightsRoutes(app, rt);
   registerAgentRoutes(app, rt);
   registerPlatformRoutes(app, rt);
+  registerIntegrationRoutes(app, rt);
 
   // Serve the web build at / with SPA fallback (§6): non-/api GETs -> index.html.
   const staticDir = opts.staticDir ?? defaultWebDist();

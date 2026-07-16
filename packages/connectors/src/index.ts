@@ -1,8 +1,10 @@
 // @tac/connectors — M9 Connectors (see docs/spec/SPEC-8.md, CONTRACTS §1/§5.4/§9).
 // Capability-first, account-safe (T0/T1 only), provenance-tagged reads. This
 // slice ships M9.1 (registry + interface), M9.2 (EFT game-config), M9.3
-// (Wootility keyboard-actuation), and M9.4 (manual-capture fallback). Writes
-// (M9.5) and the out-of-tree plugin loader (M9.6) are not implemented yet.
+// (Wootility keyboard-actuation), and M9.4 (manual-capture fallback). It also
+// ships M9.5 opt-in reversible writes for the game-config capability only (EFT
+// Settings, backup-first, game-closed-only). NVIDIA DRS and Sonar writes remain
+// deferred; the out-of-tree plugin loader (M9.6) is not implemented yet.
 export { CAPABILITIES, isCapability, type Capability } from "./capabilities.js";
 export {
   systemClock,
@@ -24,8 +26,14 @@ export {
 export {
   createEftConfigConnector,
   eftConfigConnector,
+  WritesDisabledError,
   type EftConfigConnectorOptions,
+  type GameConfigConnector,
+  type GameConfigWriteResult,
 } from "./connectors/eft-config.js";
+// Re-exported for callers of the game-config write/revert path (M9.5):
+// `write` takes a RecommendationProfile patch; `revert` returns a BackupManifest.
+export { GameRunningError, type BackupManifest, type RecommendationProfile } from "@tac/environment";
 export {
   createWootilityConnector,
   wootilityConnector,
@@ -43,3 +51,23 @@ export {
   type ManualCapturePayload,
   type ManualCaptureInputMode,
 } from "./connectors/manual-capture.js";
+export {
+  createNvidiaConnector,
+  nvidiaConnector,
+  defaultDrsStorePath,
+  parseTelemetryCsv,
+  NVIDIA_TELEMETRY_QUERY,
+  type NvidiaConnectorOptions,
+  type NvidiaTelemetry,
+  type NvidiaPerfTelemetry,
+  type NvidiaGpu3dProfile,
+} from "./connectors/nvidia.js";
+export {
+  createSteelSeriesSonarConnector,
+  steelSeriesSonarConnector,
+  defaultSonarConfigPath,
+  SonarConfig,
+  SonarChannel,
+  SonarEqBand,
+  type SteelSeriesSonarConnectorOptions,
+} from "./connectors/steelseries-sonar.js";

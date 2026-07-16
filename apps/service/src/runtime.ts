@@ -22,10 +22,13 @@ import {
   type TrackerMirrorStatus,
 } from "@tac/state-engine";
 import { isEftRunning, type NvidiaSmiRunner } from "@tac/environment";
+import type { ConnectorRegistry } from "@tac/connectors";
+import type { SourceRegistry } from "@tac/sources";
 import { loadConfig, saveConfig, resolveAgentUrl, type ProfileEntry, type ServiceConfig } from "./config.js";
 import { Metrics } from "./metrics.js";
 import { WsHub } from "./ws.js";
 import { PlanPipeline } from "./plan.js";
+import { buildConnectorRegistry, buildSourceRegistry } from "./registries.js";
 
 /**
  * ServiceRuntime — everything the routes share: config, the active
@@ -56,6 +59,10 @@ export interface RuntimeOptions {
   planDebounceMs?: number;
   detectGameVersionFn?: () => string | null;
   version?: string;
+  /** M9 connectors registry (defaults to the three account-safe adapters). */
+  connectors?: ConnectorRegistry;
+  /** M10 sources registry (defaults to tarkov.dev-JSON + TarkovTracker). */
+  sources?: SourceRegistry;
 }
 
 export class ServiceRuntime {
@@ -65,6 +72,10 @@ export class ServiceRuntime {
   readonly metrics = new Metrics();
   readonly hub: WsHub;
   readonly planner: PlanPipeline;
+  /** M9 capability-first connector registry (EFT config / Wootility / manual-capture). */
+  readonly connectors: ConnectorRegistry;
+  /** M10 remote-source registry (tarkov.dev JSON / TarkovTracker progress-read). */
+  readonly sources: SourceRegistry;
   readonly agentUrl: string;
   readonly fetchImpl: typeof fetch;
   readonly isGameRunning: () => Promise<boolean> | boolean;
@@ -109,6 +120,15 @@ export class ServiceRuntime {
     this.screenshotsDir = opts.screenshotsDir;
     this.version = opts.version ?? "0.1.0";
     this.watch = opts.watch ?? false;
+    this.connectors = opts.connectors ?? buildConnectorRegistry();
+    this.sources =
+      opts.sources ??
+      buildSourceRegistry({
+        fetchImpl: this.fetchImpl,
+        ...(this.config.tarkovTrackerToken !== undefined
+          ? { token: this.config.tarkovTrackerToken }
+          : {}),
+      });
     if (opts.story !== undefined) this.storyCache = opts.story;
 
     if (opts.world) this.worlds.set(opts.world.mode, opts.world);

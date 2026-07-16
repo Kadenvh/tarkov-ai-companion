@@ -43,6 +43,8 @@ export interface FrameHandlers {
   onPatchDetected?(payload: { version?: string }): void;
   onStateChanged?(payload: { reason?: string; ts?: string }): void;
   onNotice?(payload: NoticePayload): void;
+  /** §5.7 source.status — a remote source's status row changed. */
+  onSourceStatus?(payload: Record<string, unknown>): void;
   onUnknown?(frame: WsFrame): void;
 }
 
@@ -88,6 +90,9 @@ export function routeFrame(frame: WsFrame, handlers: FrameHandlers): boolean {
       return true;
     case "notice":
       handlers.onNotice?.(noticePayload(frame.payload));
+      return true;
+    case "source.status":
+      handlers.onSourceStatus?.(payload);
       return true;
     default:
       handlers.onUnknown?.(frame);

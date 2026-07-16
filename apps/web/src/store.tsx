@@ -24,6 +24,7 @@ import type {
   HealthResponse,
   PlanResponse,
   PositionPayload,
+  SourceStatusRow,
   StateResponse,
   StoryResponse,
 } from "./api/types";
@@ -31,6 +32,7 @@ import {
   normalizePlanResponse,
   normalizeStoryResponse,
   readPlayerState,
+  readSourceStatusRow,
   type NormalizedPlayerState,
 } from "./lib/normalize";
 import type { DecisionsMade, StageProgress } from "./lib/story";
@@ -91,6 +93,8 @@ export interface AppStore {
   foresight: ForesightWarning[];
   positions: PositionPayload[];
   raidBanner: RaidBanner | null;
+  /** Live per-source status pushed over WS (§5.7); merged over the fetched rows by the Sources view. */
+  liveSourceStatus: Record<string, SourceStatusRow>;
 
   horizon: number;
   setHorizon(h: number): void;
@@ -168,6 +172,7 @@ export function AppProvider({ children }: { children: ReactNode }): ReactNode {
   const [foresight, setForesight] = useState<ForesightWarning[]>([]);
   const [positions, setPositions] = useState<PositionPayload[]>([]);
   const [raidBanner, setRaidBanner] = useState<RaidBanner | null>(null);
+  const [liveSourceStatus, setLiveSourceStatus] = useState<Record<string, SourceStatusRow>>({});
   const [onboardingOpen, setOnboardingOpen] = useState(false);
 
   const [horizon, setHorizonState] = useState<number>(() => loadLocal("tac-horizon", 5));
@@ -295,6 +300,10 @@ export function AppProvider({ children }: { children: ReactNode }): ReactNode {
     onPatchDetected: (payload) => {
       pushToast("warning", `New game version detected${payload.version ? `: ${payload.version}` : ""} — snapshot refresh needed.`, "Patch detected");
     },
+    onSourceStatus: (payload) => {
+      const row = readSourceStatusRow(payload);
+      if (row) setLiveSourceStatus((prev) => ({ ...prev, [row.id]: row }));
+    },
   });
 
   // ---------- client-local story progress ----------
@@ -373,6 +382,7 @@ export function AppProvider({ children }: { children: ReactNode }): ReactNode {
     foresight,
     positions,
     raidBanner,
+    liveSourceStatus,
     horizon,
     setHorizon,
     toasts,

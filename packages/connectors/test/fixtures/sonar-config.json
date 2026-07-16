@@ -1,0 +1,32 @@
+{
+  "version": "1.4.0",
+  "chatMix": { "enabled": true, "balance": -0.2, "hotkey": "F13" },
+  "channels": [
+    {
+      "name": "Game",
+      "volume": 0.85,
+      "muted": false,
+      "devices": ["Speakers (Sonar Gaming)"],
+      "eq": [
+        { "frequency": 60, "gain": -2.0, "q": 1.0, "type": "lowshelf", "enabled": true },
+        { "frequency": 2200, "gain": 4.5, "q": 1.4, "type": "peak", "enabled": true },
+        { "frequency": 8000, "gain": 3.0, "q": 1.0, "type": "highshelf" }
+      ]
+    },
+    {
+      "name": "Chat",
+      "volume": 0.7,
+      "muted": false,
+      "devices": ["Speakers (Sonar Chat)"]
+    },
+    {
+      "name": "Mic",
+      "volume": 0.9,
+      "devices": ["Microphone (Sonar Mic)"],
+      "noiseSuppression": "high"
+    }
+  ],
+  "eq": [{ "frequency": 100, "gain": 1.0, "q": 0.7 }],
+  "routing": { "game": "Speakers", "chat": "Discord", "aux": "Spotify" },
+  "extraVendorBlob": { "unknownFutureKey": 123 }
+}

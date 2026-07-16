@@ -71,6 +71,13 @@ export interface Connector {
   read(cap: Capability): Promise<ConnectorReading>;
   /** Opt-in, reversible write (M9.5). Absent on read-only connectors. */
   write?(cap: Capability, patch: unknown): Promise<WriteResult>;
+  /**
+   * True only when this connector both implements `write` AND has been
+   * constructed with writes explicitly enabled (M9.5 opt-in). The registry
+   * checks this flag before dispatching a write; a `write` that is present but
+   * gated will throw when called directly. Absent/false ⇒ read-only.
+   */
+  writesEnabled?: boolean;
   /** Live health of the backing source. */
   health(): Promise<HealthStatus>;
 }
