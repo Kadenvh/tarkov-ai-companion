@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "license": "GPL-3.0-only",
+  "author": "vhtech",
   "description": "Electron app shell (M11) — supervises the @tac/service + @tac/agent sidecars and renders the web UI as a single installable Windows app.",
   "type": "module",
   "main": "dist-electron/main.js",

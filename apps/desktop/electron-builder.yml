@@ -79,13 +79,13 @@ extraResources:
 
 icon: resources/icon.png
 
+# MSI target is DEFERRED: WiX needs a real .ico + Manufacturer and failed the
+# `light.exe` link on the default icon. NSIS (.exe) is the shipped installer;
+# re-enable `- target: msi` once a proper .ico is committed and `author` is set.
 win:
   icon: resources/icon.png
   target:
     - target: nsis
-      arch:
-        - x64
-    - target: msi
       arch:
         - x64
 
