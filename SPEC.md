@@ -175,8 +175,8 @@ Efficient monitoring of *remote* data sources; sibling to M9. Cache + quota ledg
 Single installable Windows app (Electron): main spawns service+agent sidecars on bundled Node 26, renderer = the service's web UI.
 | Req | Requirement | Acceptance |
 |---|---|---|
-| M11.1 | Shell + sidecar lifecycle (health-gate, tray, single-instance, clean shutdown) | ⏳ open |
-| M11.2 | Installer: `pnpm app:dist` → NSIS `.exe` + `.msi` | ⏳ open |
+| M11.1 | Shell + sidecar lifecycle (health-gate, tray, single-instance, clean shutdown) | ✅ built (32 tests; bundled service boots to /api/health) |
+| M11.2 | Installer: `pnpm --filter @tac/desktop dist` → NSIS `.exe` (137MB, signed) | ✅ built (MSI deferred — WiX needs .ico + author) |
 | M11.3 | Auto-update channel (electron-updater; ties to M8.1) | ⏳ deferred |
 
 ## 3. Phase mapping (build order)

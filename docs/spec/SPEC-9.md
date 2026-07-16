@@ -1,6 +1,6 @@
 # SPEC-9 — Desktop App Shell & Packaging (M11)
 
-> Status: **draft** (2026-07-16). The single-application + installer track: turn the service + agent + web + monitor into one installable Windows app (`.exe`/`.msi`), TarkovMonitor-style. Where this and [CONTRACTS.md](CONTRACTS.md) disagree, CONTRACTS wins. New module **M11**; SPEC.md registry needs the row.
+> Status: **M11.1 + M11.2 shipped** (2026-07-16) — `apps/desktop` produces a 137 MB signed **NSIS `.exe`** (`Tarkov AI Companion-0.1.0-x64.exe`) bundling the shell + service/agent sidecars + a Node 26 runtime + web UI + read-only data. The bundled service is verified booting to a 200 `/api/health` with the real snapshot loaded. **MSI deferred** (WiX needs a committed `.ico` + author). M11.3 auto-update still open. Where this and [CONTRACTS.md](CONTRACTS.md) disagree, CONTRACTS wins. Module **M11**.
 
 ## Decision: **Electron**, not Tauri
 
