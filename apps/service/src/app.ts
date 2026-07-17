@@ -35,8 +35,13 @@ export interface BuildAppOptions extends Partial<Omit<RuntimeOptions, "dataDir">
   logger?: boolean;
 }
 
-/** apps/web/dist relative to this file (apps/service/src). */
+/**
+ * SPA build dir served at `/`. Honors `TAC_WEB_DIR` (set by the packaged desktop
+ * app to `<resources>/sidecars/web/dist`); falls back to `apps/web/dist` relative
+ * to this file for dev/source runs.
+ */
 export function defaultWebDist(): string {
+  if (process.env.TAC_WEB_DIR) return process.env.TAC_WEB_DIR;
   return resolve(fileURLToPath(import.meta.url), "../../../web/dist");
 }
 

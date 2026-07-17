@@ -74,11 +74,16 @@ function sidecarConfigs(ports: { service: number; agent: number }): SidecarConfi
 }
 
 /**
- * Packaged-mode env pointing the sidecars' @tac/data-core path resolution at the
- * installed layout: read-only snapshots/story ship under `resources/data`
- * (electron-builder `extraResources`), the writable data-local root lives under
- * the app's userData dir (never Program Files). Empty in dev, so the sidecars
- * keep their REPO_ROOT-based defaults.
+ * Packaged-mode env pointing the sidecars at the installed layout: read-only
+ * snapshots/story + the built web UI ship under `resources/` (electron-builder
+ * `extraResources`), the writable data-local root lives under the app's userData
+ * dir (never Program Files). Empty in dev, so the sidecars keep their
+ * REPO_ROOT-based defaults.
+ *
+ * `TAC_WEB_DIR` is the one the service serves at `/` — without it the packaged
+ * service resolves `web/dist` relative to its bundled location and finds nothing
+ * (the "Cannot GET /" symptom). The web build is staged at
+ * `<resources>/sidecars/web/dist`.
  */
 function packagedDataEnv(): Record<string, string> {
   if (!app.isPackaged) return {};
@@ -86,6 +91,7 @@ function packagedDataEnv(): Record<string, string> {
     TAC_SNAPSHOT_DIR: resolve(process.resourcesPath, "data", "snapshots"),
     TAC_STORY_DIR: resolve(process.resourcesPath, "data", "story"),
     TAC_DATA_DIR: resolve(app.getPath("userData"), "data"),
+    TAC_WEB_DIR: resolve(process.resourcesPath, "sidecars", "web", "dist"),
   };
 }
 
