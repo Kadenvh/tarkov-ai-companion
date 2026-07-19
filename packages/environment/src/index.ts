@@ -77,3 +77,11 @@ export {
   type AmmoTier,
   type AmmoEntry,
 } from "./ammo.js";
+export {
+  perfAdvice,
+  PHYSICAL_CORE_ON_THRESHOLD,
+  RAM_CLEANER_OFF_GB,
+  RAM_CLEANER_ON_GB,
+  type HardwareFacts,
+  type PerfSettingAdvice,
+} from "./perf-advice.js";

@@ -560,6 +560,24 @@ export interface FingerprintResponse {
   lowConfidence: boolean;
 }
 
+/** GET /api/environment/hardware — detected specs + hardware-dependent perf advice. */
+export interface HardwareFacts {
+  logicalCores: number;
+  physicalCores: number | null;
+  totalRamGB: number;
+}
+export interface PerfSettingAdvice {
+  key: "OnlyUsePhysicalCores" | "AutomaticRamCleaner";
+  label: string;
+  recommend: "on" | "off";
+  confidence: "high" | "medium";
+  why: string;
+}
+export interface HardwareResponse {
+  hardware: HardwareFacts;
+  advice: PerfSettingAdvice[];
+}
+
 /** One proposed planner-weight change (agent M4.5). */
 export interface WeightChange {
   key: string;
