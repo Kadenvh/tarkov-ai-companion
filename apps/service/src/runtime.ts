@@ -20,15 +20,47 @@ import {
   detectInstallDir,
   type ProfileStore,
   type TrackerMirrorStatus,
+  type TarkovTrackerApplyCounts,
+  type TarkovTrackerProgress,
 } from "@tac/state-engine";
 import { isEftRunning, type NvidiaSmiRunner } from "@tac/environment";
 import type { ConnectorRegistry } from "@tac/connectors";
-import type { SourceRegistry } from "@tac/sources";
+import {
+  QuotaExhaustedError,
+  HttpError,
+  TARKOVTRACKER_PROGRESS_REQUEST,
+  type SourceRegistry,
+  type QuotaState,
+} from "@tac/sources";
 import { loadConfig, saveConfig, resolveAgentUrl, type ProfileEntry, type ServiceConfig } from "./config.js";
 import { Metrics } from "./metrics.js";
 import { WsHub } from "./ws.js";
 import { PlanPipeline } from "./plan.js";
+import { TrackerSyncScheduler } from "./tracker-sync.js";
 import { buildConnectorRegistry, buildSourceRegistry, type SourceQuotaSeed } from "./registries.js";
+
+/** Default minutes between scheduled TarkovTracker read syncs (config override wins). */
+export const DEFAULT_TRACKER_SYNC_MINUTES = 10;
+
+/**
+ * Scheduled syncs skip when the shared read budget is at/under this floor, so
+ * the poller never eats into headroom the user's other tools (TarkovMonitor,
+ * tarkov.dev, RatScanner) need. An EXPLICIT sync via the route ignores the floor
+ * and only stops at a hard 0 (QuotaExhaustedError).
+ */
+export const TRACKER_SYNC_QUOTA_FLOOR = 50;
+
+/** Outcome of a best-effort TarkovTracker read sync — never a thrown error. */
+export interface TarkovTrackerSyncResult {
+  ok: boolean;
+  applied?: TarkovTrackerApplyCounts;
+  changed?: boolean;
+  progress?: TarkovTrackerProgress;
+  fromCache?: boolean;
+  quota?: QuotaState;
+  reason?: "no-token" | "no-source" | "quota-low" | "quota-exhausted" | "unauthorized" | "unreachable";
+  error?: string;
+}
 
 /**
  * Fold the persisted `source_quota` rows into the `quotaSeeds` record
@@ -80,6 +112,14 @@ export interface RuntimeOptions {
   connectors?: ConnectorRegistry;
   /** M10 sources registry (defaults to tarkov.dev-JSON + TarkovTracker). */
   sources?: SourceRegistry;
+  /**
+   * Override the scheduled TarkovTracker sync period (ms). `0` disables the
+   * scheduler entirely (tests drive `syncTarkovTracker()` / the scheduler class
+   * directly). Absent → `config.tarkovTrackerSyncMinutes` or the 10-min default.
+   */
+  trackerSyncIntervalMs?: number;
+  /** Run a sync on startup when a token is configured (default true). */
+  trackerSyncOnStart?: boolean;
 }
 
 export class ServiceRuntime {
@@ -91,8 +131,12 @@ export class ServiceRuntime {
   readonly planner: PlanPipeline;
   /** M9 capability-first connector registry (EFT config / Wootility / manual-capture). */
   readonly connectors: ConnectorRegistry;
-  /** M10 remote-source registry (tarkov.dev JSON / TarkovTracker progress-read). */
-  readonly sources: SourceRegistry;
+  /**
+   * M10 remote-source registry (tarkov.dev JSON / TarkovTracker progress-read).
+   * Mutable: rebuilt when the TarkovTracker token changes so the read feed uses
+   * the fresh token (quota is reseeded from the persisted ledger on rebuild).
+   */
+  sources: SourceRegistry;
   readonly agentUrl: string;
   readonly fetchImpl: typeof fetch;
   readonly isGameRunning: () => Promise<boolean> | boolean;
@@ -118,6 +162,9 @@ export class ServiceRuntime {
   private screenshotWatcher: ScreenshotWatcher | null = null;
   private unbindPatch: (() => void) | null = null;
   private mirror: TarkovTrackerMirror | null = null;
+  private trackerScheduler: TrackerSyncScheduler | null = null;
+  private readonly trackerSyncIntervalMs: number;
+  private readonly trackerSyncOnStart: boolean;
 
   constructor(opts: RuntimeOptions) {
     this.dataDir = opts.dataDir;
@@ -137,6 +184,10 @@ export class ServiceRuntime {
     this.screenshotsDir = opts.screenshotsDir;
     this.version = opts.version ?? "0.1.0";
     this.watch = opts.watch ?? false;
+    this.trackerSyncIntervalMs =
+      opts.trackerSyncIntervalMs ??
+      (this.config.tarkovTrackerSyncMinutes ?? DEFAULT_TRACKER_SYNC_MINUTES) * 60_000;
+    this.trackerSyncOnStart = opts.trackerSyncOnStart ?? true;
     // Open the profile store before building the source registry: the M10
     // quota restore seeds each source's ledger from the persisted `source_quota`.
     this.store = openProfile(this.config.activeProfile, this.storeOpts());
@@ -172,13 +223,22 @@ export class ServiceRuntime {
     this.planner.bind();
     this.bindPatchSentinel();
     this.restartMirror();
+    this.restartTrackerSync();
     if (this.watch) this.startWatchers();
   }
 
   /**
-   * (Re)start the TarkovTracker mirror (M2.7) from the configured token.
-   * Local quest completions/failures push to .org debounced+batched; no token
-   * → mirror stays off. Called at boot, after token import, on profile switch.
+   * (Re)start the TarkovTracker mirror (M2.7) from the configured token. No
+   * token → mirror stays off. Called at boot, after token import, on profile
+   * switch.
+   *
+   * READ-MOSTLY STANCE (SPEC-8): the outbound WRITE push (local quest
+   * completions → `.org`) only attaches when `config.tarkovTrackerWrites` is
+   * explicitly enabled. It is OFF by default because Kaden runs TarkovMonitor,
+   * which owns the write path — pushing here too would double-spend the shared
+   * 100/day write quota (research/02 §4/§6). The mirror is still constructed so
+   * `/api/health` can report token/connection status; the read feed is the
+   * scheduled sync, not this mirror.
    */
   restartMirror(): void {
     this.mirror?.stop();
@@ -186,12 +246,111 @@ export class ServiceRuntime {
     const token = this.config.tarkovTrackerToken;
     if (!token) return;
     this.mirror = new TarkovTrackerMirror(this.store, { token, fetchImpl: this.fetchImpl });
-    this.mirror.attach();
+    if (this.config.tarkovTrackerWrites === true) this.mirror.attach();
   }
 
   /** Mirror status for /api/health (null = no token configured). */
   mirrorStatus(): TrackerMirrorStatus | null {
     return this.mirror?.status ?? null;
+  }
+
+  /**
+   * Rebuild the M10 source registry from the CURRENT config token, reseeding the
+   * quota ledger from the persisted `source_quota` so a token change doesn't
+   * re-open a budget already spent. Called after a token import/change so the
+   * read feed authenticates with the new token.
+   */
+  rebuildSources(): void {
+    this.sources = buildSourceRegistry({
+      fetchImpl: this.fetchImpl,
+      quotaSeeds: sourceQuotaSeeds(this.store),
+      ...(this.config.tarkovTrackerToken !== undefined ? { token: this.config.tarkovTrackerToken } : {}),
+    });
+  }
+
+  /**
+   * (Re)start the scheduled TarkovTracker read feed (SPEC-8). Off with no token
+   * or a non-positive interval. Each tick runs a best-effort, quota-floored sync
+   * through the single sync path; startup fires one immediately (unless
+   * disabled). Stoppable + idempotent.
+   */
+  restartTrackerSync(): void {
+    this.trackerScheduler?.stop();
+    this.trackerScheduler = null;
+    if (!this.config.tarkovTrackerToken || this.trackerSyncIntervalMs <= 0) return;
+    this.trackerScheduler = new TrackerSyncScheduler({
+      intervalMs: this.trackerSyncIntervalMs,
+      syncOnStart: this.trackerSyncOnStart,
+      sync: () => this.syncTarkovTracker({ quotaFloor: TRACKER_SYNC_QUOTA_FLOOR }),
+    });
+    this.trackerScheduler.start();
+  }
+
+  /** Whether the scheduled read feed is currently running (for status/tests). */
+  trackerSyncRunning(): boolean {
+    return this.trackerScheduler?.running ?? false;
+  }
+
+  /**
+   * The SINGLE sync code path: pull `GET /progress` through the M10
+   * `progress-read` source (cache-first, conditional, quota-aware) and apply it
+   * to the store via the change-aware mapper. Read-only; NEVER throws — a
+   * missing token, quota floor/exhaustion, 401, or an unreachable API all resolve
+   * to `{ ok: false, reason }`. Folds the freshly-learned budget into
+   * `source_quota` (best-effort) on every attempt.
+   *
+   * `quotaFloor` (scheduler) refuses proactively when the shared budget is low;
+   * omit it (on-demand route) to read unless the budget is a hard 0.
+   */
+  async syncTarkovTracker(opts: { quotaFloor?: number } = {}): Promise<TarkovTrackerSyncResult> {
+    if (!this.config.tarkovTrackerToken) return { ok: false, reason: "no-token" };
+    const source = this.sources.get("tarkovtracker");
+    if (!source) return { ok: false, reason: "no-source" };
+
+    const quotaBefore = source.quota?.();
+    if (
+      opts.quotaFloor !== undefined &&
+      quotaBefore?.readsRemaining !== undefined &&
+      quotaBefore.readsRemaining <= opts.quotaFloor
+    ) {
+      return { ok: false, reason: "quota-low", ...(quotaBefore !== undefined ? { quota: quotaBefore } : {}) };
+    }
+
+    try {
+      const reading = await source.fetch<TarkovTrackerProgress>(TARKOVTRACKER_PROGRESS_REQUEST);
+      const result = this.store.importTarkovTracker(reading.data);
+      const quota = source.quota?.();
+      if (quota !== undefined) this.persistSourceQuota("tarkovtracker", quota);
+      return {
+        ok: true,
+        applied: result.applied,
+        changed: result.changed,
+        progress: result.progress,
+        fromCache: reading.fromCache,
+        ...(quota !== undefined ? { quota } : {}),
+      };
+    } catch (err) {
+      const quota = source.quota?.();
+      if (quota !== undefined) this.persistSourceQuota("tarkovtracker", quota);
+      const q = quota !== undefined ? { quota } : {};
+      if (err instanceof QuotaExhaustedError) return { ok: false, reason: "quota-exhausted", ...q };
+      if (err instanceof HttpError && err.status === 401)
+        return { ok: false, reason: "unauthorized", error: err.message, ...q };
+      return { ok: false, reason: "unreachable", error: err instanceof Error ? err.message : String(err), ...q };
+    }
+  }
+
+  /** Fold a source's current budget into `source_quota` (best-effort; never throws). */
+  private persistSourceQuota(sourceId: string, quota: QuotaState): void {
+    try {
+      this.store.upsertSourceQuota(sourceId, {
+        ...(quota.readsRemaining !== undefined ? { readsRemaining: quota.readsRemaining } : {}),
+        ...(quota.writesRemaining !== undefined ? { writesRemaining: quota.writesRemaining } : {}),
+        ...(quota.resetsAt !== undefined ? { resetsAt: quota.resetsAt } : {}),
+      });
+    } catch {
+      // best-effort: a store failure must never fail the read
+    }
   }
 
   private storeOpts(): { dir: string } | { memory: true } {
@@ -323,6 +482,10 @@ export class ServiceRuntime {
     this.planner.retarget(this.world(entry.gameMode), this.store);
     this.bindPatchSentinel();
     this.restartMirror();
+    // Reseed the M10 quota ledger from the new profile's persisted budget, then
+    // (re)start the read feed against it.
+    this.rebuildSources();
+    this.restartTrackerSync();
     saveConfig(this.config, this.dataDir);
     if (wasWatching || this.watch) this.startWatchers();
     this.hub.broadcast("notice", { title: "Profile switched", body: `Active profile is now ${entry.label}` });
@@ -331,6 +494,8 @@ export class ServiceRuntime {
 
   async close(): Promise<void> {
     await this.stopWatchers();
+    this.trackerScheduler?.stop();
+    this.trackerScheduler = null;
     await this.mirror?.flush(); // drain queued tracker writes before shutdown
     this.mirror?.stop();
     this.mirror = null;

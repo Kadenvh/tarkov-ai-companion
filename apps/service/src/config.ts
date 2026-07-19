@@ -28,6 +28,18 @@ export const ServiceConfig = z.object({
   profiles: z.array(ProfileEntry).min(1),
   activeProfile: z.string(),
   tarkovTrackerToken: z.string().optional(),
+  /**
+   * Minutes between scheduled TarkovTracker read syncs (SPEC-8, read-mostly
+   * mirror). Default ~10 when absent; `0` disables the scheduled feed (an
+   * on-demand sync via the route still works).
+   */
+  tarkovTrackerSyncMinutes: z.number().min(0).optional(),
+  /**
+   * Opt-in outbound WRITE mirror (M2.7). OFF by default: the read-mostly stance
+   * treats TarkovMonitor as the owner of the write path so the shared 100/day
+   * write budget isn't double-spent. Only enable if TarkovMonitor is NOT running.
+   */
+  tarkovTrackerWrites: z.boolean().optional(),
   eftPath: z.string().optional(),
   agentUrl: z.string().optional(),
 });

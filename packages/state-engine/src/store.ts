@@ -144,9 +144,39 @@ export const TarkovTrackerProgress = z
     pmcFaction: z.string().optional(),
     displayName: z.string().optional(),
     userId: z.union([z.string(), z.number()]).optional(),
+    /**
+     * Trader standings — NOT returned by the public `/progress` API today
+     * (research/02 §1: hideout modules, traders, skills are read-only / absent),
+     * but tolerated "if present" so a future gateway that exposes the Supabase
+     * `traders{level,reputation}` blob syncs without a schema change.
+     */
+    traders: z
+      .record(
+        z.string(),
+        z.object({ level: z.number().optional(), reputation: z.number().optional() }).passthrough(),
+      )
+      .optional(),
   })
   .passthrough();
 export type TarkovTrackerProgress = z.infer<typeof TarkovTrackerProgress>;
+
+/** Per-field counts of what a `/progress` sync actually mutated (unchanged rows are skipped). */
+export interface TarkovTrackerApplyCounts {
+  tasks: number;
+  objectives: number;
+  hideout: number;
+  traders: number;
+  level: boolean;
+  faction: boolean;
+}
+
+/** Result of {@link ProfileStore.importTarkovTracker} — the parsed payload + a change summary. */
+export interface TarkovTrackerImportResult {
+  progress: TarkovTrackerProgress;
+  applied: TarkovTrackerApplyCounts;
+  /** True iff at least one row/field was mutated (drives "emit only when changed"). */
+  changed: boolean;
+}
 
 /** hideout module ids in the 1.0.6 snapshot are `<stationId>-<level>` */
 const MODULE_ID = /^([0-9a-f]{24})-(\d+)$/;
@@ -183,6 +213,16 @@ export class ProfileStore {
         .prepare("INSERT INTO meta (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value")
         .run(key, value);
     this.changed(reason);
+  }
+
+  /**
+   * Write `value` only when it differs from what's stored (so a no-op sync emits
+   * no `state.changed`). Returns whether it actually wrote.
+   */
+  private setMetaIfChanged(key: string, value: string, reason = `meta.${key}`): boolean {
+    if (this.getMeta(key) === value) return false;
+    this.setMeta(key, value, reason);
+    return true;
   }
 
   private metaNumber(key: string, fallback: number): number {
@@ -474,23 +514,56 @@ export class ProfileStore {
   // -- TarkovTracker import/export (M2.1 / M2.7) ------------------------------
 
   /**
-   * Seed the store from a TarkovTracker `GET /progress` payload (either the
-   * bare progress object or the `{ data: ... }` wrapper). Lossless: fields the
-   * local schema has no table for (hideout parts, edition, display name, raw
-   * module list) are kept in meta so `exportTarkovTracker()` round-trips.
+   * Apply a TarkovTracker `GET /progress` payload to the store (either the bare
+   * progress object or the `{ data: ... }` wrapper). This is the SINGLE mapper —
+   * the M2.7 one-shot seed, the on-demand sync route, and the scheduled read
+   * feed (SPEC-8) all funnel through here so field coverage never forks.
+   *
+   * Change-aware: every field is compared to what's stored and a setter fires
+   * ONLY on a real difference, so a no-op sync mutates nothing and emits no
+   * `state.changed`. Returns per-field counts of what was applied.
+   *
+   * Field coverage: tasksProgress → task_state, taskObjectivesProgress (with
+   * counts) → objective_state, hideoutModulesProgress → hideout_state (station =
+   * max completed level), playerLevel → level, pmcFaction → faction, and
+   * `traders` (level/rep) if the payload ever carries them. Lossless: fields the
+   * local schema has no table for (raw module list, hideout parts, edition,
+   * display name) are kept in meta so `exportTarkovTracker()` round-trips.
    */
-  importTarkovTracker(progressJson: unknown): TarkovTrackerProgress {
+  importTarkovTracker(progressJson: unknown): TarkovTrackerImportResult {
     const wrapped = progressJson as { data?: unknown } | null;
     const body = wrapped && typeof wrapped === "object" && "data" in wrapped ? wrapped.data : progressJson;
     const progress = TarkovTrackerProgress.parse(body);
 
+    const applied: TarkovTrackerApplyCounts = {
+      tasks: 0,
+      objectives: 0,
+      hideout: 0,
+      traders: 0,
+      level: false,
+      faction: false,
+    };
+
     for (const t of progress.tasksProgress) {
       if (t.invalid) continue;
-      this.setTaskState(t.id, { complete: t.complete ?? false, failed: t.failed ?? false, ts: null }, "import");
+      const complete = t.complete ?? false;
+      const failed = t.failed ?? false;
+      const existing = this.getTask(t.id);
+      if (existing && existing.complete === complete && existing.failed === failed) continue;
+      this.setTaskState(t.id, { complete, failed, ts: null }, "import");
+      applied.tasks++;
     }
+
     for (const o of progress.taskObjectivesProgress) {
       if (o.invalid) continue;
-      this.setObjectiveState(o.id, { count: o.count ?? 0, complete: o.complete ?? false, ts: null }, "import");
+      const count = o.count ?? 0;
+      const complete = o.complete ?? false;
+      const existing = this.db
+        .prepare("SELECT count, complete FROM objective_state WHERE objective_id = ?")
+        .get(o.id) as { count: number; complete: number } | undefined;
+      if (existing && existing.count === count && !!existing.complete === complete) continue;
+      this.setObjectiveState(o.id, { count, complete, ts: null }, "import");
+      applied.objectives++;
     }
 
     // hideout module ids are `<stationId>-<level>` in current tarkov.dev data
@@ -503,18 +576,52 @@ export class ProfileStore {
       const level = Number(levelRaw);
       if (stationId && level > (stationLevels.get(stationId) ?? 0)) stationLevels.set(stationId, level);
     }
-    for (const [stationId, level] of stationLevels) this.setHideoutLevel(stationId, level, null);
+    const existingHideout = new Map(this.getHideout().map((h) => [h.stationId, h.level]));
+    for (const [stationId, level] of stationLevels) {
+      if (existingHideout.get(stationId) === level) continue;
+      this.setHideoutLevel(stationId, level, null);
+      applied.hideout++;
+    }
 
-    if (progress.playerLevel !== undefined) this.setLevel(progress.playerLevel);
-    if (progress.pmcFaction === "USEC" || progress.pmcFaction === "BEAR") this.setFaction(progress.pmcFaction);
+    // traders (if the payload carries them — see the schema note; normally absent)
+    if (progress.traders) {
+      const existingTraders = new Map(this.getTraders().map((t) => [t.traderId, t]));
+      for (const [traderId, t] of Object.entries(progress.traders)) {
+        const existing = existingTraders.get(traderId);
+        const levelDiffers = t.level !== undefined && t.level !== existing?.level;
+        const repDiffers = t.reputation !== undefined && t.reputation !== existing?.rep;
+        if (!levelDiffers && !repDiffers) continue;
+        this.setTraderState(traderId, {
+          ...(t.level !== undefined ? { level: t.level } : {}),
+          ...(t.reputation !== undefined ? { rep: t.reputation } : {}),
+        });
+        applied.traders++;
+      }
+    }
 
-    this.setMeta("trackerHideoutModules", JSON.stringify(progress.hideoutModulesProgress), "import");
-    this.setMeta("trackerHideoutParts", JSON.stringify(progress.hideoutPartsProgress), "import");
-    if (progress.gameEdition !== undefined) this.setMeta("gameEdition", String(progress.gameEdition), "import");
-    if (progress.displayName !== undefined) this.setMeta("displayName", progress.displayName, "import");
+    if (progress.playerLevel !== undefined && progress.playerLevel !== this.level) {
+      this.setLevel(progress.playerLevel);
+      applied.level = true;
+    }
+    if ((progress.pmcFaction === "USEC" || progress.pmcFaction === "BEAR") && progress.pmcFaction !== this.faction) {
+      this.setFaction(progress.pmcFaction);
+      applied.faction = true;
+    }
 
-    this.changed("tarkovtracker.import");
-    return progress;
+    let metaChanged = this.setMetaIfChanged("trackerHideoutModules", JSON.stringify(progress.hideoutModulesProgress), "import");
+    metaChanged = this.setMetaIfChanged("trackerHideoutParts", JSON.stringify(progress.hideoutPartsProgress), "import") || metaChanged;
+    if (progress.gameEdition !== undefined)
+      metaChanged = this.setMetaIfChanged("gameEdition", String(progress.gameEdition), "import") || metaChanged;
+    if (progress.displayName !== undefined)
+      metaChanged = this.setMetaIfChanged("displayName", progress.displayName, "import") || metaChanged;
+
+    const changed =
+      applied.tasks + applied.objectives + applied.hideout + applied.traders > 0 ||
+      applied.level ||
+      applied.faction ||
+      metaChanged;
+    if (changed) this.changed("tarkovtracker.import");
+    return { progress, applied, changed };
   }
 
   /** Rebuild a TarkovTracker-progress-shaped object from local state (round-trip counterpart). */

@@ -1,7 +1,9 @@
 /**
- * Insights (M7 surface) — survival by map/hour, session rhythm, flea income
- * sparkline (inline SVG), playstyle fingerprint card. Every metric carries the
- * insights package's small-n honesty (n / lowConfidence) inline.
+ * Debrief (M7 surface, formerly "Insights") — your raid journal, quantified and
+ * framed as a post-raid after-action review: survival by map/hour/duration,
+ * session rhythm, flea income sparkline, and the playstyle fingerprint. Every
+ * metric carries the insights package's small-n honesty (n / lowConfidence)
+ * inline. Data: GET /api/insights/{raids,economy,fingerprint}.
  */
 
 import { useEffect, useState, type ReactNode } from "react";
@@ -21,7 +23,7 @@ function LowN({ low }: { low?: boolean }): ReactNode {
   return low ? <Badge kind="warn">low n</Badge> : null;
 }
 
-export function InsightsView(): ReactNode {
+export function DebriefView(): ReactNode {
   const { api } = useApp();
   const [raids, setRaids] = useState<ReturnType<typeof readInsightsRaids> | null>(null);
   const [economy, setEconomy] = useState<ReturnType<typeof readInsightsEconomy> | null>(null);
@@ -53,8 +55,14 @@ export function InsightsView(): ReactNode {
 
   return (
     <div>
-      <h2>Insights</h2>
-      <p className="sub">Your raid journal, quantified — survival, rhythm, economy, playstyle.</p>
+      <div className="pagehead">
+        <h2>Debrief</h2>
+        <span className="count">after-action review</span>
+      </div>
+      <p className="sub">
+        Your raid journal, quantified — survival, rhythm, economy, and playstyle across every raid
+        the service has journaled.
+      </p>
 
       {loaded && !raids?.byMap.length && !rhythm && !economy?.income && !fingerprint ? (
         <Empty>

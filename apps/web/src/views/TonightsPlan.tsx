@@ -29,8 +29,15 @@ function PrepLine({ item }: { item: AcquisitionItem }): ReactNode {
 }
 
 function RaidCard({ raid }: { raid: RaidCardVM }): ReactNode {
+  const cat = raid.warnings.some((w) => w.severity === "critical")
+    ? "cat-danger"
+    : raid.warnings.length > 0
+      ? "cat-warn"
+      : raid.fillerOnly
+        ? "cat-filler"
+        : "";
   return (
-    <div className="card raid-card">
+    <div className={`card raid-card${cat ? ` ${cat}` : ""}`}>
       <div className="raid-head">
         <span className="raid-index">RAID {raid.index}</span>
         <span className="raid-map">{raid.mapName}</span>
@@ -104,7 +111,10 @@ export function TonightsPlan(): ReactNode {
 
   return (
     <div>
-      <h2>Tonight's Plan</h2>
+      <div className="pagehead">
+        <h2>Tonight's Plan</h2>
+        <span className="count">next {horizon} raids · replans after each</span>
+      </div>
       <p className="sub">Rolling raid batches toward your goals — replans live on raid end.</p>
 
       <div className="controls-row">

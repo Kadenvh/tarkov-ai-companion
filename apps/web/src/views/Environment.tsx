@@ -133,7 +133,10 @@ export function EnvironmentView(): ReactNode {
 
   return (
     <div>
-      <h2>Environment</h2>
+      <div className="pagehead">
+        <h2>Settings &amp; Perf</h2>
+        <span className="count">around the game · never in it</span>
+      </div>
       <p className="sub">
         Settings, driver, and performance around the game — never touching the game process.
         Settings writes only happen with the game closed, after a backup.
