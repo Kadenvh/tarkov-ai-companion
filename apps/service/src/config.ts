@@ -1,5 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { hostname, networkInterfaces } from "node:os";
 import { z } from "zod";
 import { GameMode } from "@tac/shared";
 import { dataLocalDir } from "@tac/data-core";
@@ -42,8 +43,33 @@ export const ServiceConfig = z.object({
   tarkovTrackerWrites: z.boolean().optional(),
   eftPath: z.string().optional(),
   agentUrl: z.string().optional(),
+  /**
+   * Two-PC / LAN exposure (opt-in). OFF by default → the service binds loopback
+   * only and rejects any non-local Host header (DNS-rebinding guard). When
+   * `enabled`, it binds the LAN (0.0.0.0) and the Host allowlist is widened to
+   * this machine's own LAN IPv4s + hostname + `allowHosts`, so a second PC (e.g.
+   * a streaming PC) can reach the HUD. Trusted-home-LAN model: no auth, never
+   * exposed beyond the LAN. `TAC_BIND_LAN=1` / `TAC_ALLOW_HOSTS=a,b` override.
+   */
+  lan: z
+    .object({
+      enabled: z.boolean().default(false),
+      allowHosts: z.array(z.string()).default([]),
+    })
+    .optional(),
 });
 export type ServiceConfig = z.infer<typeof ServiceConfig>;
+
+export interface NetworkConfig {
+  /** address passed to app.listen — loopback by default, 0.0.0.0 when LAN-exposed */
+  bindHost: string;
+  lanEnabled: boolean;
+  /** lowercased Host-header values allowed past the rebinding guard (port stripped) */
+  allowedHosts: Set<string>;
+}
+
+/** Always-allowed local Host header values (empty = no Host header sent). */
+export const LOCAL_HOSTS: readonly string[] = ["localhost", "127.0.0.1", "[::1]", ""];
 
 export const DEFAULT_PORT = 3141;
 export const DEFAULT_AGENT_PORT = 3142;
@@ -105,4 +131,39 @@ export function resolveAgentUrl(config?: ServiceConfig): string {
 
 export function watchDisabled(): boolean {
   return process.env["TAC_NO_WATCH"] === "1";
+}
+
+/** This machine's non-internal IPv4 addresses (the ones a second PC would use). */
+function lanIPv4s(): string[] {
+  const out: string[] = [];
+  for (const list of Object.values(networkInterfaces())) {
+    for (const ni of list ?? []) {
+      if (ni.family === "IPv4" && !ni.internal) out.push(ni.address);
+    }
+  }
+  return out;
+}
+
+/**
+ * Resolve bind host + Host-header allowlist. LAN exposure is opt-in via
+ * `config.lan.enabled` or `TAC_BIND_LAN=1`; extra hosts via `config.lan.allowHosts`
+ * or `TAC_ALLOW_HOSTS` (comma-separated). Loopback-only + local-only otherwise,
+ * preserving the original DNS-rebinding guard exactly.
+ */
+export function resolveNetwork(config?: ServiceConfig): NetworkConfig {
+  const lanEnabled = process.env["TAC_BIND_LAN"] === "1" || config?.lan?.enabled === true;
+  const allowedHosts = new Set<string>(LOCAL_HOSTS);
+  if (lanEnabled) {
+    for (const ip of lanIPv4s()) allowedHosts.add(ip.toLowerCase());
+    allowedHosts.add(hostname().toLowerCase());
+    const extras = [
+      ...(config?.lan?.allowHosts ?? []),
+      ...String(process.env["TAC_ALLOW_HOSTS"] ?? "")
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean),
+    ];
+    for (const h of extras) allowedHosts.add(h.toLowerCase());
+  }
+  return { bindHost: lanEnabled ? "0.0.0.0" : "127.0.0.1", lanEnabled, allowedHosts };
 }

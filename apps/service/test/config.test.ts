@@ -6,10 +6,12 @@ import {
   defaultConfig,
   loadConfig,
   resolveAgentUrl,
+  resolveNetwork,
   saveConfig,
   servicePort,
   DEFAULT_AGENT_PORT,
   DEFAULT_PORT,
+  LOCAL_HOSTS,
 } from "../src/config.js";
 import { tempDir } from "./helpers.js";
 
@@ -19,9 +21,43 @@ describe("config (M8.3)", () => {
     delete process.env["TAC_PORT"];
     delete process.env["TAC_AGENT_URL"];
     delete process.env["TAC_AGENT_PORT"];
+    delete process.env["TAC_BIND_LAN"];
+    delete process.env["TAC_ALLOW_HOSTS"];
     if (savedEnv["TAC_PORT"]) process.env["TAC_PORT"] = savedEnv["TAC_PORT"];
     if (savedEnv["TAC_AGENT_URL"]) process.env["TAC_AGENT_URL"] = savedEnv["TAC_AGENT_URL"];
     if (savedEnv["TAC_AGENT_PORT"]) process.env["TAC_AGENT_PORT"] = savedEnv["TAC_AGENT_PORT"];
+  });
+
+  it("resolveNetwork: loopback + local-only by default", () => {
+    const net = resolveNetwork(defaultConfig());
+    expect(net.bindHost).toBe("127.0.0.1");
+    expect(net.lanEnabled).toBe(false);
+    for (const h of LOCAL_HOSTS) expect(net.allowedHosts.has(h)).toBe(true);
+    expect(net.allowedHosts.has("192.168.1.50")).toBe(false);
+  });
+
+  it("resolveNetwork: LAN exposure binds 0.0.0.0 and widens the allowlist", () => {
+    const net = resolveNetwork({ ...defaultConfig(), lan: { enabled: true, allowHosts: ["StreamPC"] } });
+    expect(net.bindHost).toBe("0.0.0.0");
+    expect(net.lanEnabled).toBe(true);
+    expect(net.allowedHosts.has("localhost")).toBe(true);
+    expect(net.allowedHosts.has("streampc")).toBe(true); // lowercased
+  });
+
+  it("resolveNetwork: TAC_BIND_LAN / TAC_ALLOW_HOSTS env overrides win", () => {
+    process.env["TAC_BIND_LAN"] = "1";
+    process.env["TAC_ALLOW_HOSTS"] = "gaming-rig, 10.0.0.9";
+    const net = resolveNetwork(defaultConfig());
+    expect(net.lanEnabled).toBe(true);
+    expect(net.allowedHosts.has("gaming-rig")).toBe(true);
+    expect(net.allowedHosts.has("10.0.0.9")).toBe(true);
+  });
+
+  it("lan config round-trips through saveConfig/loadConfig", () => {
+    const dir = tempDir();
+    const config = { ...defaultConfig(), lan: { enabled: true, allowHosts: ["streampc"] } };
+    saveConfig(config, dir);
+    expect(loadConfig(dir).lan).toEqual({ enabled: true, allowHosts: ["streampc"] });
   });
 
   it("creates config.json with main-regular defaults on first boot", () => {

@@ -30,6 +30,34 @@ describe("core routes (CONTRACTS §5.1)", () => {
     expect(local.statusCode).toBe(200);
   });
 
+  it("widens the Host allowlist when LAN exposure is opted in, still rejecting others", async () => {
+    const app = await testApp({
+      config: {
+        profiles: [{ key: "main-regular", label: "Main (PvP)", gameMode: "regular" }],
+        activeProfile: "main-regular",
+        lan: { enabled: true, allowHosts: ["streampc"] },
+      },
+    });
+    // Configured LAN host is allowed…
+    const stream = await app.inject({
+      method: "GET",
+      url: "/api/health",
+      headers: { host: "streampc:3141" },
+    });
+    expect(stream.statusCode).toBe(200);
+    // …localhost still works…
+    const local = await app.inject({ method: "GET", url: "/api/health", headers: { host: "localhost:3141" } });
+    expect(local.statusCode).toBe(200);
+    // …but an unknown host is still refused (now with the LAN-allowlist message).
+    const evil = await app.inject({
+      method: "GET",
+      url: "/api/health",
+      headers: { host: "evil.example.com:3141" },
+    });
+    expect(evil.statusCode).toBe(403);
+    expect(evil.json().error).toMatch(/LAN allowlist/);
+  });
+
   it("GET /api/health reports version, snapshot, profile, and patch sentinel", async () => {
     const app = await testApp();
     const res = await app.inject({ method: "GET", url: "/api/health" });

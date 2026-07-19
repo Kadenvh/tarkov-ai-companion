@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import fastify, { type FastifyInstance } from "fastify";
 import fastifyWebsocket from "@fastify/websocket";
 import fastifyStatic from "@fastify/static";
-import { defaultDataDir } from "./config.js";
+import { defaultDataDir, resolveNetwork } from "./config.js";
 import { ServiceRuntime, type RuntimeOptions } from "./runtime.js";
 import type { HubSocket } from "./ws.js";
 import { registerCoreRoutes } from "./routes/core.js";
@@ -54,13 +54,18 @@ export async function buildApp(opts: BuildAppOptions = {}): Promise<FastifyInsta
   const app = fastify({ logger: opts.logger ?? false, forceCloseConnections: true });
   app.decorate("tac", rt);
 
-  // DNS-rebinding guard: the daemon is loopback-bound and unauthenticated, so
-  // reject any request whose Host header isn't a local name — a hostile page
-  // resolving its own domain to 127.0.0.1 must not reach side-effectful routes.
+  // DNS-rebinding guard: the daemon is unauthenticated, so reject any request
+  // whose Host header isn't allowed — a hostile page resolving its own domain to
+  // 127.0.0.1 must not reach side-effectful routes. Loopback-only by default;
+  // when LAN exposure is opted in (config.lan / TAC_BIND_LAN) the allowlist is
+  // widened to this machine's LAN IPs + hostname + configured hosts.
+  const net = resolveNetwork(rt.config);
   app.addHook("onRequest", async (req, reply) => {
     const host = (req.headers.host ?? "").split(":")[0]?.toLowerCase() ?? "";
-    if (host !== "localhost" && host !== "127.0.0.1" && host !== "[::1]" && host !== "") {
-      return reply.code(403).send({ error: `Host "${host}" not allowed — this API is local-only.` });
+    if (!net.allowedHosts.has(host)) {
+      return reply.code(403).send({
+        error: `Host "${host}" not allowed — ${net.lanEnabled ? "not in the LAN allowlist" : "this API is local-only"}.`,
+      });
     }
     // M5.6 request counter
     rt.metrics.countRequest(req.url);
