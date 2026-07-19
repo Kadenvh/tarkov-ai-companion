@@ -560,6 +560,23 @@ export interface FingerprintResponse {
   lowConfidence: boolean;
 }
 
+/** One proposed planner-weight change (agent M4.5). */
+export interface WeightChange {
+  key: string;
+  from: number;
+  to: number;
+  rationale: string;
+}
+
+/** GET /api/agent/propose-weights — a reviewable, never-auto-applied delta. */
+export interface ProposeWeightsResponse {
+  proposed: PlannerWeights;
+  current: PlannerWeights;
+  changes: WeightChange[];
+  /** true when nothing had enough journal sample to justify a change */
+  noChange: boolean;
+}
+
 // ---------- §5.6 connectors & §5.7 sources ----------
 
 export type ConnectorHealth = "connected" | "stale" | "missing" | "error";

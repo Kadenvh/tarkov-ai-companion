@@ -43,6 +43,16 @@ export function registerPlanningRoutes(app: FastifyInstance, rt: ServiceRuntime)
     return { ok: true, goals: goalsOf(rt.store), weights: weightsOf(rt.store) };
   });
 
+  // Apply planner weights on their own (no goals required) — the confirm step
+  // for a learned-weights proposal (GET /api/agent/propose-weights). setWeights
+  // emits state.changed → debounced replan + plan.updated broadcast.
+  app.post("/api/weights", async (req, reply) => {
+    const body = z.object({ weights: WeightsSchema }).safeParse(req.body);
+    if (!body.success) return reply.status(400).send({ error: body.error.issues[0]?.message ?? "invalid body" });
+    rt.store.setWeights(body.data.weights);
+    return { ok: true, weights: weightsOf(rt.store) };
+  });
+
   app.get("/api/plan", async (req) => {
     const horizon = intQuery((req.query as Record<string, unknown>)["horizon"], DEFAULT_HORIZON, MAX_HORIZON);
     return rt.planner.get(horizon);

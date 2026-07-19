@@ -27,10 +27,140 @@ import type {
   InsightsEconomyResponse,
   InsightsRaidsResponse,
   NetWorthGoalResponse,
+  ProposeWeightsResponse,
+  WeightChange,
 } from "../api/types";
 
 function LowN({ low }: { low?: boolean }): ReactNode {
   return low ? <Badge kind="warn">low n</Badge> : null;
+}
+
+/** Humanize a proposer weight key ("mapCost.customs" → "Map cost · Customs"). */
+function weightLabel(key: string): string {
+  if (key.startsWith("mapCost.")) {
+    const slug = key.slice("mapCost.".length).replace(/_/g, " ");
+    return `Map cost · ${mapDisplayName(slug)}`;
+  }
+  switch (key) {
+    case "task":
+      return "Task weight";
+    case "xp":
+      return "XP weight";
+    case "criticality":
+      return "Criticality weight";
+    default:
+      return key;
+  }
+}
+
+/**
+ * Coach adaptation — surfaces the agent's learned-weights proposal (M4.5): a
+ * reviewable delta derived from your playstyle fingerprint + journal outcomes.
+ * Never auto-applied — every change shows from→to and a plain-English rationale,
+ * and nothing is written until you confirm (CONTRACTS §8, human-in-the-loop).
+ * Degrades gracefully: a 503 (agent offline) shows a calm note, not an error.
+ */
+function CoachAdaptation(): ReactNode {
+  const { api, pushToast, refreshPlan, refreshGoals } = useApp();
+  const [proposal, setProposal] = useState<ProposeWeightsResponse | null>(null);
+  const [offline, setOffline] = useState(false);
+  const [applying, setApplying] = useState(false);
+  const [applied, setApplied] = useState(false);
+
+  const load = () => {
+    setOffline(false);
+    return api
+      .get<ProposeWeightsResponse>("/api/agent/propose-weights")
+      .then((res) => setProposal(res))
+      .catch(() => setOffline(true));
+  };
+
+  useEffect(() => {
+    void load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [api]);
+
+  const apply = async (): Promise<void> => {
+    if (!proposal || proposal.changes.length === 0) return;
+    setApplying(true);
+    try {
+      await api.post("/api/weights", { weights: proposal.proposed });
+      pushToast(
+        "info",
+        `Applied ${proposal.changes.length} weight change${proposal.changes.length === 1 ? "" : "s"} — replanning.`,
+        "Coach tuned",
+      );
+      setApplied(true);
+      await Promise.all([refreshPlan(), refreshGoals(), load()]);
+    } catch {
+      /* client already toasts the error */
+    } finally {
+      setApplying(false);
+    }
+  };
+
+  const changes: WeightChange[] = proposal?.changes ?? [];
+
+  return (
+    <div className="card">
+      <h3 style={{ marginTop: 0 }}>
+        Coach adaptation{" "}
+        {changes.length > 0 ? (
+          <Badge kind="warn">
+            {changes.length} proposed
+          </Badge>
+        ) : null}
+      </h3>
+      <p className="sub">
+        How the Coach proposes to reweight your plan from your own journal — always your call to
+        apply. Feeds directly into Tonight&apos;s Plan.
+      </p>
+
+      {offline ? (
+        <p className="sub" style={{ marginTop: 10 }}>
+          <span className="dim">
+            Copilot offline — start the agent (or set <code>ANTHROPIC_API_KEY</code>) and refresh to
+            see proposed tuning. Nothing about your plan is blocked.
+          </span>
+        </p>
+      ) : proposal == null ? (
+        <p className="sub dim" style={{ marginTop: 10 }}>
+          Reading your fingerprint…
+        </p>
+      ) : changes.length === 0 ? (
+        <p className="sub" style={{ marginTop: 10 }}>
+          {applied ? "Applied — " : ""}No adjustments proposed. Your current planner weights already
+          fit your journaled outcomes{applied ? "." : " (or there aren't enough raids on a map yet)."}
+        </p>
+      ) : (
+        <>
+          <ul className="objective-list">
+            {changes.map((c) => {
+              const up = c.to > c.from;
+              return (
+                <li key={c.key}>
+                  <span className="tick">{up ? "▲" : "▼"}</span>
+                  <span>
+                    <strong>{weightLabel(c.key)}</strong>{" "}
+                    <span className="mono dim">
+                      {c.from} → {c.to}
+                    </span>
+                    <div className="note">{c.rationale}</div>
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+          <div style={{ marginTop: 12, display: "flex", gap: 10, alignItems: "center" }}>
+            <button className="primary" disabled={applying} onClick={() => void apply()}>
+              {applying ? "Applying…" : "Apply proposed weights"}
+            </button>
+            <span className="sub dim">Writes to your local profile and replans — reversible any time.</span>
+          </div>
+        </>
+      )}
+    </div>
+  );
 }
 
 type GoalProjection = NonNullable<ReturnType<typeof readNetWorthGoal>["goal"]>;
@@ -460,6 +590,8 @@ export function DebriefView(): ReactNode {
           </div>
         </div>
       ) : null}
+
+      <CoachAdaptation />
     </div>
   );
 }

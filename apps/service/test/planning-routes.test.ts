@@ -29,6 +29,31 @@ describe("planning routes (CONTRACTS §5.2)", () => {
     expect(body.isDefault).toBe(false);
   });
 
+  it("POST /api/weights applies weights alone (no goals) and GET reflects them", async () => {
+    const app = await testApp();
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/weights",
+      payload: { weights: { task: 1.3, xp: 0.2, criticality: 0.1, mapCost: { lighthouse: 1.8 } } },
+    });
+    expect(res.statusCode).toBe(200);
+    expect(res.json()).toMatchObject({ ok: true, weights: { task: 1.3, mapCost: { lighthouse: 1.8 } } });
+    // Goals are untouched — still the default — while weights now reflect the apply.
+    const goals = (await app.inject({ method: "GET", url: "/api/goals" })).json();
+    expect(goals.goals).toEqual([{ type: "kappa" }]);
+    expect(goals.weights.mapCost).toEqual({ lighthouse: 1.8 });
+  });
+
+  it("POST /api/weights 400s on a malformed body", async () => {
+    const app = await testApp();
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/weights",
+      payload: { weights: { task: "lots" } },
+    });
+    expect(res.statusCode).toBe(400);
+  });
+
   it("POST /api/goals 400s on an unknown goal type", async () => {
     const app = await testApp();
     const res = await app.inject({

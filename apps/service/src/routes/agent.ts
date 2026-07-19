@@ -10,6 +10,8 @@ import type { ServiceRuntime } from "../runtime.js";
 
 const CHAT_TIMEOUT_MS = 120_000;
 const HEALTH_TIMEOUT_MS = 2_000;
+/** Proposer is a pure, fast computation, but round-trips agent→service→insights. */
+const PROPOSE_TIMEOUT_MS = 15_000;
 
 async function forward(
   rt: ServiceRuntime,
@@ -54,5 +56,13 @@ export function registerAgentRoutes(app: FastifyInstance, rt: ServiceRuntime): v
 
   app.get("/api/agent/health", async (_req, reply) =>
     forward(rt, reply, "/health", { method: "GET", timeoutMs: HEALTH_TIMEOUT_MS }),
+  );
+
+  // Learned-weights proposal (M4.5): forwards to the agent, which reads the
+  // playstyle fingerprint + journal outcomes and returns a PROPOSED weights
+  // delta with a rationale per change. Never applied here — the client reviews
+  // and confirms via POST /api/weights (CONTRACTS §8, human-in-the-loop).
+  app.get("/api/agent/propose-weights", async (_req, reply) =>
+    forward(rt, reply, "/propose-weights", { method: "GET", timeoutMs: PROPOSE_TIMEOUT_MS }),
   );
 }
