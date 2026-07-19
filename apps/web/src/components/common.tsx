@@ -53,7 +53,18 @@ export function Badge({
   children,
   dot = false,
 }: {
-  kind?: "live" | "down" | "warn" | "kappa" | "anymap" | "fir" | "tier";
+  kind?:
+    | "live"
+    | "down"
+    | "warn"
+    | "kappa"
+    | "anymap"
+    | "fir"
+    | "tier"
+    | "ok"
+    | "sev-high"
+    | "sev-medium"
+    | "sev-low";
   children: ReactNode;
   dot?: boolean;
 }): ReactNode {

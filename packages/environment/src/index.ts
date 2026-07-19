@@ -14,6 +14,7 @@ export {
 } from "./eft-settings.js";
 export {
   PROFILES,
+  META_PROFILE,
   getProfile,
   diffSettings,
   diffAllProfiles,
@@ -21,6 +22,19 @@ export {
   type RecommendationProfile,
   type SettingDiff,
 } from "./profiles.js";
+export {
+  ADS_ONE_TO_ONE_COEFFICIENT,
+  ADS_ONE_TO_ONE_TOLERANCE,
+  adsOneToOne,
+  adsMatchesOneToOne,
+  readSensitivity,
+  auditConfig,
+  type AuditSeverity,
+  type AuditFinding,
+  type AuditConfirmation,
+  type SensitivityReadout,
+  type AuditResult,
+} from "./audit.js";
 export {
   EFT_PROCESS_NAME,
   GameRunningError,

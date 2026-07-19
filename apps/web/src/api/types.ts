@@ -253,8 +253,42 @@ export interface SettingDiff {
   why: string;
 }
 
-/** Tolerant — normalized via readSettingsDiffs(). */
+/** Tolerant — normalized via readSettingsDiffs() / readAudit(). */
 export type EnvironmentSettingsResponse = Record<string, unknown>;
+
+// ---------- Coach Config Audit + ADS 1:1 helper ----------
+
+export type AuditSeverity = "high" | "medium" | "low";
+
+export interface AuditFinding {
+  key: string;
+  current?: SettingValue | undefined;
+  recommended: SettingValue;
+  why: string;
+  severity: AuditSeverity;
+}
+
+export interface AuditConfirmation {
+  key: string;
+  label: string;
+  current: SettingValue;
+  why: string;
+}
+
+export interface SensitivityReadout {
+  hipfire?: number;
+  ads?: number;
+  optic?: number;
+  oneToOneTarget?: number;
+  ratio?: number;
+  matchesOneToOne: boolean;
+}
+
+export interface AuditResult {
+  findings: AuditFinding[];
+  confirmations: AuditConfirmation[];
+  sensitivity: SensitivityReadout;
+}
 
 export interface ApplyResultResponse {
   backupId?: string | null;

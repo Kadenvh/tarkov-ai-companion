@@ -5,6 +5,7 @@ import {
   PROFILES,
   getProfile,
   applyProfile,
+  auditConfig,
   diffAllProfiles,
   loadEftSettings,
   nvidiaReport,
@@ -27,7 +28,15 @@ import type { ServiceRuntime } from "../runtime.js";
  * timestamped backup before any write — all enforced inside @tac/environment.
  */
 
-const ApplyBody = z.object({ profile: z.enum(["max-fps", "balanced", "max-visibility"]) });
+const ApplyBody = z.object({
+  profile: z.enum(["max-fps", "balanced", "max-visibility", "meta"]),
+  /**
+   * Optional subset filter (Config Audit "one-click Apply"): apply only these
+   * flat keys of the named profile. Reuses the same game-closed / backup-first
+   * applyProfile path — just a narrower profile.
+   */
+  keys: z.array(z.string()).optional(),
+});
 
 const PerfImportBody = z
   .object({
@@ -79,6 +88,10 @@ export function registerEnvironmentRoutes(app: FastifyInstance, rt: ServiceRunti
         name: p.name,
         description: p.description,
       })),
+      // Coach Config Audit + ADS 1:1 helper (meta divergences, on-meta green
+      // checks, and the mouse-sensitivity 1:1 readout). Degrades to empty
+      // arrays / undefined fields when files are missing.
+      audit: auditConfig(settings),
     };
   });
 
@@ -86,7 +99,13 @@ export function registerEnvironmentRoutes(app: FastifyInstance, rt: ServiceRunti
     const body = ApplyBody.safeParse(req.body);
     if (!body.success) return reply.status(400).send({ error: body.error.issues[0]?.message ?? "invalid body" });
     try {
-      const result = await applyProfile(getProfile(body.data.profile), {
+      const base = getProfile(body.data.profile);
+      const keys = body.data.keys;
+      const profile =
+        keys && keys.length > 0
+          ? { ...base, settings: base.settings.filter((s) => keys.includes(s.key)) }
+          : base;
+      const result = await applyProfile(profile, {
         isGameRunning: rt.isGameRunning,
         backupDir: rt.backupDir,
         ...(rt.settingsDir ? { settingsDir: rt.settingsDir } : {}),

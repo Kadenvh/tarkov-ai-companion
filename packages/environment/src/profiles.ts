@@ -29,7 +29,7 @@ export interface ProfileSetting {
 }
 
 export interface RecommendationProfile {
-  key: "max-fps" | "balanced" | "max-visibility";
+  key: "max-fps" | "balanced" | "max-visibility" | "meta";
   name: string;
   description: string;
   settings: ProfileSetting[];
@@ -119,8 +119,69 @@ export const PROFILES: RecommendationProfile[] = [
   },
 ];
 
+/**
+ * Competitive-meta reference for the Coach **Config Audit** (not a performance
+ * preset, and deliberately NOT in `PROFILES`). It encodes only the handful of
+ * settings where a personal config tends to drift from documented competitive
+ * canon, so `diffSettings(current, META_PROFILE)` yields exactly the audit's
+ * outliers.
+ *
+ * Sourcing honesty (docs/research/12-pro-configs.md): there are NO trustworthy
+ * pro-config presets to ship — every "pro settings" page online is uncited and
+ * usually two wipes stale, and the two streamers researched (LVNDMARK, Viibin)
+ * publish nothing parseable. So these values are community **meta norms**, not
+ * any one player's numbers.
+ *
+ * Deliberately encodes NO mouse-sensitivity key. ADS sensitivity is owned by
+ * the 1:1 helper in audit.ts, where an ADS ≈ hipfire × √2 is the intentional
+ * "true aim" tune — not an outlier. Keeping ADS out of the meta diff is how the
+ * audit and the 1:1 helper are reconciled so they can never contradict.
+ *
+ * NOTE: `Sound.MusicVolume` is the music-volume key (confirmed against a real
+ * Sound.ini — it reads `"MusicVolume": 4`). Apply is game-closed, backup-first,
+ * and only ever touches the keys listed here.
+ */
+export const META_PROFILE: RecommendationProfile = {
+  key: "meta",
+  name: "Competitive meta",
+  description:
+    "Documented competitive-meta norms for the visibility/clarity/audio settings a personal config tends to drift on. Not a pro's config — there are none to cite (see docs/research/12-pro-configs.md) — just the community consensus baseline.",
+  settings: [
+    {
+      key: "Graphics.SSR",
+      value: "Off",
+      why: "Screen-space reflections cost frames and add shimmer that hides movement — meta runs SSR Off.",
+    },
+    {
+      key: "Graphics.ChromaticAberrations",
+      value: false,
+      why: "Edge colour-fringing is pure visual noise on the frame; competitive configs turn it Off.",
+    },
+    {
+      key: "PostFx.Clarity",
+      value: 50,
+      why: "Negative Clarity flattens mid-tone contrast; meta runs it positive (~+50) so shaded players pop.",
+    },
+    {
+      key: "PostFx.Brightness",
+      value: 0,
+      why: "High Brightness washes out shadow detail; meta keeps Brightness near 0 for flat, readable darks.",
+    },
+    {
+      key: "PostFx.Intensity",
+      value: 0,
+      why: "Colour-filter Intensity tints the whole frame; meta leaves it at 0 (no filter).",
+    },
+    {
+      key: "Sound.MusicVolume",
+      value: 0,
+      why: "Music masks footsteps and gunfire cues; meta runs music volume at 0 for audio clarity.",
+    },
+  ],
+};
+
 export function getProfile(key: RecommendationProfile["key"]): RecommendationProfile {
-  const profile = PROFILES.find((p) => p.key === key);
+  const profile = [...PROFILES, META_PROFILE].find((p) => p.key === key);
   if (!profile) throw new Error(`Unknown settings profile: ${key}`);
   return profile;
 }
