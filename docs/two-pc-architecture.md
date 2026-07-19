@@ -1,8 +1,41 @@
 # Two-PC Architecture — Companion on the Streaming PC (pull model)
 
-> Planning + decision scaffold for the pivot Kaden set on 2026-07-19. Nothing
-> here is built yet except where noted ("✅ exists"). Diagrams render on GitHub
-> and in Artifacts. This doc is the place to argue the decisions before code.
+> Planning + decision scaffold for the pivot Kaden set on 2026-07-19. Diagrams
+> render on GitHub and in Artifacts.
+
+## Status (2026-07-19)
+
+**Decisions locked** (from Kaden): gaming PC = **`hero`**, streaming PC = **`Zoe`**,
+same **Tailscale** tailnet with `hero`'s `C:\` shared to every device. **D1** =
+read `hero`'s shared `Logs` over Tailscale (no agent). **D3** = **logs only** (no
+positions/screenshots). **D5** = Stream Deck on Zoe; fancy icon page is "later".
+
+**✅ Built** (`b496c0f`): on-demand pull sync — `POST /api/sync` drives one
+cursor-based read of the configured logs dir and reports a summary; a **"⟲ Sync
+logs"** button in the HUD; `TAC_LOGS_DIR` / `config.logsDir` point at `hero`'s
+share; with the continuous watcher off there is **no background polling**. See
+"Setup on Zoe" at the bottom.
+
+### TarkovMonitor — the "anything counterintuitive?" question
+
+You have TarkovMonitor on `hero` **and** a second one on `Zoe` watching `hero`'s
+shared Logs. Two things to know:
+
+1. **Don't run two TMs against the same TarkovTracker account.** Both would push
+   to TT, double-spending its shared **100 writes/day** and racing each other's
+   state — the exact contention our read-mostly stance avoids. Pick **one** TM as
+   the TT writer (either the `hero` one, or the `Zoe`-watching-`hero` one — not
+   both). This is separate from our Companion, which only **reads** logs.
+2. **TM watches continuously.** A remote `FileSystemWatcher` over SMB either gets
+   change notifications or silently falls back to polling the share — either way
+   it's a steady trickle of network reads while TM runs. It won't hurt `hero`'s
+   FPS meaningfully (SMB serving is cheap), but it's not "nothing". **Our** sync
+   is deliberately different: **on-demand only**, so between button presses there
+   is zero traffic. If you keep a TM on Zoe for TT, that's fine — just know our
+   Companion doesn't add any continuous load on top.
+
+Net: keep **one** TM as your TarkovTracker writer; let the Companion pull logs
+on demand for the coaching/planning it owns.
 
 ## Principles (the new hard constraints)
 
@@ -120,18 +153,37 @@ sequenceDiagram
 - ✅ **Env-configurable paths** (`TAC_EFT_PATH`, `TAC_SNAPSHOT_DIR`, …) — the service can be pointed at a UNC path (`\\GAMINGPC\EftLogs`) instead of a local dir.
 - ✅ **Installer** runs anywhere — installing on `Zoe` is just running the same `.exe` there.
 
-## What needs building (once decisions land)
+## What needs building
 
-1. **Pull-sync mode** — a flag that **disables the continuous watcher** and instead exposes an on-demand sync: read each log file from a stored byte-cursor over SMB/UNC, parse on Zoe, advance the cursor. (Reuses the existing log parsers; only the *trigger* changes from "watch" to "pull".)
-2. **`POST /api/sync`** endpoint returning a summary (events applied, new raids, cursor), + a **"Sync logs" button** in the UI header with last-synced time.
-3. **Config**: `sync.mode = "watch" | "pull"`, `sync.source` (UNC path or TT-only), Zoe hostname in the LAN allowlist.
-4. **Stream Deck doc** — how to bind a key to `POST /api/sync` (and later, optional status feedback).
-5. **UI gating (D4)** — hide same-PC-only perf panels when running remote.
+1. ✅ **Pull-sync** — `POST /api/sync` drives one cursor-based cycle over `TAC_LOGS_DIR`; continuous watcher off ⇒ no polling. UI "⟲ Sync logs" button. *(shipped `b496c0f`)*
+2. ⏳ **UI gating (D4)** — hide the same-PC-only perf panels (live telemetry / bottleneck / thermals) when the service runs on Zoe rather than `hero`, since they'd read Zoe.
+3. ⏳ **Stream Deck** — plain URL key to `POST /api/sync` works today; a dedicated plugin with sync status on the key is the "later" nice-to-have.
+4. 💭 **Last-synced-time in the UI** and optional "sync failed / share unreachable" surfacing (basic error toast already fires).
 
-## Open questions for Kaden
+## Setup on Zoe (once you're ready to try it)
 
-- **D1**: read-only SMB share OK, or do you want to avoid sharing a folder (→ we'd need a tiny agent, which has *some* footprint)?
-- Where does **TarkovMonitor** run in the new setup? It also reads logs → we should not double-own the log path. If TM stays on the gaming PC feeding TarkovTracker, the Companion on Zoe may only need the **TT cloud sync** for progress and SMB purely for extras (positions, anything TT lacks).
-- Positions/screenshots on Zoe — **wanted**, or logs-only to keep the share minimal?
-- Stream Deck — happy starting with a plain URL button, or do you want a dedicated plugin with status on the key?
-```
+1. Install the Companion on **Zoe** (same `.exe`).
+2. Find `hero`'s EFT `Logs` path over the Tailscale share — something like
+   `\\hero\c\Users\<you>\Documents\Escape from Tarkov\Logs` (or a mapped drive).
+3. Point the service at it and turn the continuous watcher off:
+   - `TAC_LOGS_DIR=\\hero\c\...\Escape from Tarkov\Logs`
+   - `TAC_NO_WATCH=1`  (on-demand only — no polling)
+   - (config.json equivalents: `"logsDir": "..."`)
+4. Launch, click **⟲ Sync logs** in the header (or bind a Stream Deck key to
+   `POST http://localhost:3141/api/sync`). Each press ingests only what's new.
+5. Optional: for progress that TarkovTracker already has, connect your TT token
+   in Settings — the Companion mirrors it read-only, no `hero` access needed.
+
+> Note: because everything (UI, service, Stream Deck) lives on Zoe and the sync
+> is Zoe→hero **file** access, the Companion doesn't need its HTTP port exposed
+> on the LAN at all for this. LAN exposure (built) is only for viewing Zoe's UI
+> from another device.
+
+## Resolved (2026-07-19)
+
+- **D1** — Tailscale `C:\` share on `hero`, read on demand. No agent. ✅
+- **TarkovMonitor** — keep **one** instance as the TarkovTracker writer (avoid double-write); the Companion only reads logs and can lean on the TT read-mirror for progress. See the TM note up top. ✅
+- **Positions/screenshots** — not wanted; **logs only**. ✅
+- **Stream Deck** — start with a plain URL key → `POST /api/sync`; dedicated plugin later. ✅
+
+Still open / "when we get to it": the Stream Deck icon **page**, and UI gating of the same-PC perf panels (D4).
