@@ -15,6 +15,7 @@ import { ApiError } from "../api/client";
 import { readAttribution, readAudit, readPerfRows, readSettingsDiffs } from "../lib/normalize";
 import { adsMatchCopy, sortFindings } from "../lib/audit";
 import { analyzeBottleneck, type BottleneckReading } from "../lib/bottleneck";
+import { analyzeThermals, type ThermalReading } from "../lib/thermals";
 import { mapDisplayName } from "../lib/maps";
 import { pctDelta } from "../components/charts/geometry";
 import {
@@ -109,11 +110,38 @@ function BottleneckCard({ reading }: { reading: BottleneckReading }): ReactNode 
   );
 }
 
+/** GPU thermal-throttle read — only shown when hot/throttling (calm when fine). */
+function ThermalCard({ reading }: { reading: ThermalReading }): ReactNode {
+  if (reading.verdict !== "throttling" && reading.verdict !== "hot") return null;
+  return (
+    <div className="card bottleneck-card">
+      <div className="scav-head">
+        <h3 style={{ margin: 0 }}>GPU thermals</h3>
+        <span className={`badge ${reading.verdict === "throttling" ? "down" : "warn"}`}>
+          {reading.verdict === "throttling" ? "THROTTLING" : "RUNNING HOT"}
+        </span>
+      </div>
+      <p className="sub" style={{ margin: "8px 0 0" }}>
+        <strong>{reading.headline}</strong>
+      </p>
+      <ul className="objective-list" style={{ marginTop: 10 }}>
+        {reading.guidance.map((g, i) => (
+          <li key={i}>
+            <span className="tick">▸</span>
+            <span>{g}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 function LiveTab(): ReactNode {
   const { telemetry, telemetryLoaded } = useApp();
 
   const times = useMemo(() => telemetry.map((s) => s.ts), [telemetry]);
   const bottleneck = useMemo(() => analyzeBottleneck(telemetry), [telemetry]);
+  const thermals = useMemo(() => analyzeThermals(telemetry), [telemetry]);
   const hasGpu = telemetry.some((s) => s.gpu);
   const last: TelemetrySample | undefined = telemetry[telemetry.length - 1];
   const prev = telemetry[Math.max(0, telemetry.length - 1 - DELTA_LOOKBACK)];
@@ -203,6 +231,7 @@ function LiveTab(): ReactNode {
   return (
     <>
       <BottleneckCard reading={bottleneck} />
+      <ThermalCard reading={thermals} />
 
       <div className="tile-grid">
         <StatTile
