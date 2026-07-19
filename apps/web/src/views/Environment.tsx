@@ -14,6 +14,7 @@ import { useApp } from "../store";
 import { ApiError } from "../api/client";
 import { readAttribution, readAudit, readPerfRows, readSettingsDiffs } from "../lib/normalize";
 import { adsMatchCopy, sortFindings } from "../lib/audit";
+import { analyzeBottleneck, type BottleneckReading } from "../lib/bottleneck";
 import { mapDisplayName } from "../lib/maps";
 import { pctDelta } from "../components/charts/geometry";
 import {
@@ -70,10 +71,49 @@ const int = (v: number): string => String(Math.round(v));
 /** Sample ~this many points back for the StatTile delta (context, not noise). */
 const DELTA_LOOKBACK = 15;
 
+/** Live CPU-vs-GPU bottleneck read (Tarkov is CPU-bound; GPU util is the signal). */
+function BottleneckCard({ reading }: { reading: BottleneckReading }): ReactNode {
+  const tone =
+    reading.verdict === "gpu-bound"
+      ? "warn"
+      : reading.verdict === "cpu-bound"
+        ? "warn"
+        : reading.verdict === "well-matched"
+          ? "live"
+          : "anymap";
+  return (
+    <div className="card bottleneck-card">
+      <div className="scav-head">
+        <h3 style={{ margin: 0 }}>Bottleneck</h3>
+        <span className={`badge ${tone}`}>{reading.verdict.replace("-", " ").toUpperCase()}</span>
+        {reading.confidence !== "high" ? <Badge kind="warn">{reading.confidence} confidence</Badge> : null}
+      </div>
+      <p className="sub" style={{ margin: "8px 0 0" }}>
+        <strong>{reading.headline}</strong>
+      </p>
+      <div className="kv" style={{ margin: "8px 0 0" }}>
+        <span className="k">GPU util (median)</span>
+        <span className="mono">{reading.gpuUtilMedian == null ? "—" : `${reading.gpuUtilMedian}%`}</span>
+        <span className="k">Host CPU (median)</span>
+        <span className="mono">{reading.cpuPctMedian}%</span>
+      </div>
+      <ul className="objective-list" style={{ marginTop: 10 }}>
+        {reading.guidance.map((g, i) => (
+          <li key={i}>
+            <span className="tick">▸</span>
+            <span>{g}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 function LiveTab(): ReactNode {
   const { telemetry, telemetryLoaded } = useApp();
 
   const times = useMemo(() => telemetry.map((s) => s.ts), [telemetry]);
+  const bottleneck = useMemo(() => analyzeBottleneck(telemetry), [telemetry]);
   const hasGpu = telemetry.some((s) => s.gpu);
   const last: TelemetrySample | undefined = telemetry[telemetry.length - 1];
   const prev = telemetry[Math.max(0, telemetry.length - 1 - DELTA_LOOKBACK)];
@@ -162,6 +202,8 @@ function LiveTab(): ReactNode {
 
   return (
     <>
+      <BottleneckCard reading={bottleneck} />
+
       <div className="tile-grid">
         <StatTile
           label="CPU"
