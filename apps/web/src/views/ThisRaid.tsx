@@ -153,13 +153,6 @@ function ScavTimer(): ReactNode {
   const [prefs, setPrefs] = useState<ScavPrefs>(() => loadScav());
   const [, force] = useState(0);
 
-  const running = prefs.startedAt !== null;
-  useEffect(() => {
-    if (!running) return;
-    const timer = setInterval(() => force((x) => x + 1), 1000);
-    return () => clearInterval(timer);
-  }, [running]);
-
   const update = (next: ScavPrefs): void => {
     setPrefs(next);
     saveScav(next);
@@ -167,6 +160,15 @@ function ScavTimer(): ReactNode {
 
   const cooldown = intelCenterCooldown(DEFAULT_SCAV_COOLDOWN_SEC, prefs.intel);
   const status = prefs.startedAt !== null ? scavStatus((Date.now() - prefs.startedAt) / 1000, cooldown) : null;
+
+  // Tick only while actively counting down — stop once ready (or unset) so we
+  // don't spin a 1s re-render loop indefinitely behind the "SCAV READY" card.
+  const ticking = status !== null && !status.ready;
+  useEffect(() => {
+    if (!ticking) return;
+    const timer = setInterval(() => force((x) => x + 1), 1000);
+    return () => clearInterval(timer);
+  }, [ticking]);
 
   // Fire the "scav ready" alert exactly once per cooldown (reset on restart).
   const readyFiredRef = useRef(false);
