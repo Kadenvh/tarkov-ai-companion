@@ -1,0 +1,226 @@
+/* TarkovTracker — Color tokens (from the TarkovTracker Design System project).
+   Two-layer system: HSL base values (fallback) + OKLCH overrides for modern browsers.
+   Mirrors app/assets/css/tailwind.css from the TarkovTracker repo. */
+:root {
+  /* Primary — brand golden-tan (primary actions) */
+  --color-primary-50: hsl(40 45% 95%);
+  --color-primary-100: hsl(39 42% 88%);
+  --color-primary-200: hsl(38 40% 76%);
+  --color-primary-300: hsl(37 42% 64%);
+  --color-primary-400: hsl(36 45% 52%);
+  --color-primary-500: hsl(35 48% 46%);
+  --color-primary-600: hsl(34 50% 40%);
+  --color-primary-700: hsl(33 48% 32%);
+  --color-primary-800: hsl(32 42% 24%);
+  --color-primary-900: hsl(30 35% 16%);
+  --color-primary-950: hsl(28 30% 10%);
+
+  /* Secondary — muted cyan/teal (general UI accent) */
+  --color-secondary-50: hsl(185 50% 96%);
+  --color-secondary-100: hsl(185 50% 90%);
+  --color-secondary-200: hsl(185 50% 78%);
+  --color-secondary-300: hsl(185 50% 65%);
+  --color-secondary-400: hsl(185 50% 50%);
+  --color-secondary-500: hsl(185 50% 40%);
+  --color-secondary-600: hsl(185 50% 34%);
+  --color-secondary-700: hsl(185 50% 28%);
+  --color-secondary-800: hsl(185 50% 22%);
+  --color-secondary-900: hsl(185 50% 16%);
+  --color-secondary-950: hsl(185 50% 10%);
+
+  /* Accent — deep forest/teal */
+  --color-accent-50: hsl(180 14% 94%);
+  --color-accent-100: hsl(180 14% 86%);
+  --color-accent-200: hsl(184 16% 72%);
+  --color-accent-300: hsl(186 18% 58%);
+  --color-accent-400: hsl(187 22% 44%);
+  --color-accent-500: hsl(189 28% 32%);
+  --color-accent-600: hsl(189 30% 26%);
+  --color-accent-700: hsl(190 32% 20%);
+  --color-accent-800: hsl(190 34% 15%);
+  --color-accent-900: hsl(192 38% 11%);
+  --color-accent-950: hsl(192 42% 8%);
+
+  /* Surface ladder — pure neutral gray (no tint)
+     canvas(950) -> shell(900) -> content(850) -> raised(800) -> state(700) -> border(600) */
+  --color-surface-50: hsl(0 0% 98%);
+  --color-surface-100: hsl(0 0% 96%);
+  --color-surface-200: hsl(0 0% 90%);
+  --color-surface-300: hsl(0 0% 83%);
+  --color-surface-400: hsl(0 0% 64%);
+  --color-surface-500: hsl(0 0% 45%);
+  --color-surface-600: hsl(0 0% 32%);
+  --color-surface-700: hsl(0 0% 25%);
+  --color-surface-800: hsl(0 0% 15%);
+  --color-surface-850: hsl(0 0% 12%);
+  --color-surface-900: hsl(0 0% 9%);
+  --color-surface-950: hsl(0 0% 4%);
+
+  /* PvP — in-game tan (#DBD5C1 family) */
+  --color-pvp-50: hsl(40 60% 99%);
+  --color-pvp-100: hsl(38 44.4% 96.5%);
+  --color-pvp-200: hsl(37 47.4% 92.5%);
+  --color-pvp-300: hsl(38 38.5% 87.3%);
+  --color-pvp-400: hsl(46 26.5% 80.8%);
+  --color-pvp-500: hsl(41 22.3% 72.7%);
+  --color-pvp-600: hsl(36 20.2% 61.2%);
+  --color-pvp-700: hsl(34 14.2% 48.4%);
+  --color-pvp-800: hsl(31 14.6% 36.3%);
+  --color-pvp-900: hsl(32 14.7% 25.3%);
+  --color-pvp-950: hsl(39 18.4% 14.9%);
+
+  /* PvE — in-game blue (#73ADC3 family) */
+  --color-pve-50: hsl(196 57.9% 96.3%);
+  --color-pve-100: hsl(196 57.9% 92.5%);
+  --color-pve-200: hsl(196 57.9% 85.1%);
+  --color-pve-300: hsl(197 55.6% 75.3%);
+  --color-pve-400: hsl(196 40% 60.8%);
+  --color-pve-500: hsl(196 35.2% 52.2%);
+  --color-pve-600: hsl(197 33.3% 43.5%);
+  --color-pve-700: hsl(198 32.6% 35.5%);
+  --color-pve-800: hsl(199 32.4% 27.3%);
+  --color-pve-900: hsl(201 32% 19.6%);
+  --color-pve-950: hsl(201 31.2% 12.5%);
+
+  /* Success — vibrant teal-green */
+  --color-success-50: hsl(158 60% 96%);
+  --color-success-100: hsl(158 58% 88%);
+  --color-success-200: hsl(158 56% 75%);
+  --color-success-300: hsl(158 60% 62%);
+  --color-success-400: hsl(158 64% 52%);
+  --color-success-500: hsl(158 68% 42%);
+  --color-success-600: hsl(158 70% 36%);
+  --color-success-700: hsl(158 68% 28%);
+  --color-success-800: hsl(158 64% 22%);
+  --color-success-900: hsl(158 60% 15%);
+  --color-success-950: hsl(158 55% 9%);
+
+  /* Completed — muted olive-green (military/tactical) */
+  --color-completed-400: hsl(95 18% 42%);
+  --color-completed-600: hsl(95 15% 28%);
+  --color-completed-800: hsl(95 12% 18%);
+  --color-completed-900: hsl(95 10% 12%);
+  --color-completed-950: hsl(95 8% 8%);
+
+  /* Locked — legacy task lock accent */
+  --color-locked-500: hsl(20 100% 50%);
+
+  /* Warning — amber */
+  --color-warning-50: hsl(45 80% 96%);
+  --color-warning-100: hsl(45 80% 90%);
+  --color-warning-200: hsl(45 80% 80%);
+  --color-warning-300: hsl(45 80% 68%);
+  --color-warning-400: hsl(45 80% 56%);
+  --color-warning-500: hsl(45 80% 45%);
+  --color-warning-600: hsl(45 80% 38%);
+  --color-warning-700: hsl(45 80% 30%);
+  --color-warning-800: hsl(45 80% 24%);
+  --color-warning-900: hsl(45 80% 18%);
+  --color-warning-950: hsl(45 80% 12%);
+
+  /* Info — blue */
+  --color-info-50: hsl(205 75% 96%);
+  --color-info-100: hsl(205 75% 90%);
+  --color-info-200: hsl(205 70% 80%);
+  --color-info-300: hsl(205 70% 68%);
+  --color-info-400: hsl(205 70% 55%);
+  --color-info-500: hsl(205 70% 45%);
+  --color-info-600: hsl(205 70% 38%);
+  --color-info-700: hsl(205 70% 30%);
+  --color-info-800: hsl(205 65% 24%);
+  --color-info-900: hsl(205 60% 18%);
+  --color-info-950: hsl(205 55% 12%);
+
+  /* Error — muted red */
+  --color-error-50: hsl(0 55% 96%);
+  --color-error-100: hsl(0 55% 90%);
+  --color-error-200: hsl(0 55% 80%);
+  --color-error-300: hsl(0 55% 70%);
+  --color-error-400: hsl(0 55% 58%);
+  --color-error-500: hsl(0 55% 45%);
+  --color-error-600: hsl(0 55% 38%);
+  --color-error-700: hsl(0 55% 30%);
+  --color-error-800: hsl(0 55% 24%);
+  --color-error-900: hsl(0 55% 18%);
+  --color-error-950: hsl(0 55% 12%);
+
+  /* Kappa — vibrant red (the endgame collector quest) */
+  --color-kappa-400: hsl(0 80% 60%);
+  --color-kappa-500: hsl(0 80% 50%);
+  --color-kappa-600: hsl(0 80% 42%);
+
+  /* Lightkeeper — gold/yellow (endgame trader questline) */
+  --color-lightkeeper-400: hsl(45 90% 54%);
+  --color-lightkeeper-500: hsl(45 90% 48%);
+  --color-lightkeeper-600: hsl(45 90% 40%);
+
+  /* Community / brand-partner colors */
+  --color-twitch: hsl(264 100% 64%);
+  --color-discord: hsl(235 86% 65%);
+  --color-github: hsl(210 12% 20%);
+
+  /* Text hierarchy: primary 90% -> secondary 74% -> tertiary 64% -> disabled 44% */
+  --color-text: hsl(0 0% 90%);
+  --color-text-secondary: hsl(216 8% 74%);
+  --color-text-muted: hsl(216 7% 64%);
+  --color-text-disabled: hsl(215 6% 44%);
+
+  /* Semantic surface aliases */
+  --color-bg: var(--color-surface-950);
+  --color-panel: var(--color-surface-900);
+  --color-raised: var(--color-surface-800);
+  --color-hover: var(--color-surface-700);
+  --color-divider: var(--color-surface-600);
+
+  /* Semantic app aliases */
+  --color-link: hsl(208 93% 52%);
+  --color-link-hover: hsl(208 93% 65%);
+  --color-complete: var(--color-success-700);
+  --color-failed: var(--color-error-300);
+}
+
+/* Modern browsers: perceptually-tuned OKLCH overrides */
+@supports (color: oklch(0 0 0)) {
+  :root {
+    --color-primary-50: oklch(0.958531 0.009845 87.47);
+    --color-primary-100: oklch(0.920558 0.016115 82.79);
+    --color-primary-200: oklch(0.838958 0.032256 84.59);
+    --color-primary-300: oklch(0.756775 0.049173 83.87);
+    --color-primary-400: oklch(0.672055 0.066713 84.66);
+    --color-primary-500: oklch(0.634237 0.052556 83.12);
+    --color-primary-600: oklch(0.588274 0.048467 80.24);
+    --color-primary-700: oklch(0.492406 0.040305 80.92);
+    --color-primary-800: oklch(0.395258 0.025655 78.78);
+    --color-primary-900: oklch(0.291603 0.010623 73.5);
+    --color-primary-950: oklch(0.209826 0.008289 84.59);
+    --color-secondary-400: oklch(0.6 0.09 195);
+    --color-secondary-500: oklch(0.52 0.08 195);
+    --color-secondary-600: oklch(0.46 0.07 195);
+    --color-surface-50: oklch(0.985 0 0);
+    --color-surface-100: oklch(0.97 0 0);
+    --color-surface-200: oklch(0.92 0 0);
+    --color-surface-300: oklch(0.87 0 0);
+    --color-surface-400: oklch(0.71 0 0);
+    --color-surface-500: oklch(0.55 0 0);
+    --color-surface-600: oklch(0.44 0 0);
+    --color-surface-700: oklch(0.37 0 0);
+    --color-surface-800: oklch(0.27 0 0);
+    --color-surface-850: oklch(0.23 0 0);
+    --color-surface-900: oklch(0.2 0 0);
+    --color-surface-950: oklch(0.14 0 0);
+    --color-pvp-400: oklch(0.872401 0.027713 93.13);
+    --color-pvp-500: oklch(0.807177 0.030874 85.57);
+    --color-pvp-800: oklch(0.486765 0.027433 69.19);
+    --color-pve-400: oklch(0.71572 0.068204 223.86);
+    --color-pve-500: oklch(0.649348 0.073321 223.58);
+    --color-pve-600: oklch(0.567896 0.06509 225.53);
+    --color-success-400: oklch(0.66 0.15 165);
+    --color-success-500: oklch(0.58 0.14 165);
+    --color-error-400: oklch(0.613876 0.1522 15.95);
+    --color-error-500: oklch(0.514643 0.161326 16.46);
+    --color-kappa-400: oklch(0.68 0.2 25);
+    --color-kappa-500: oklch(0.6 0.22 25);
+    --color-lightkeeper-400: oklch(0.72 0.19 90);
+    --color-lightkeeper-500: oklch(0.68 0.18 90);
+  }
+}
