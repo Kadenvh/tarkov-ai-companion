@@ -14,7 +14,14 @@ import { useEffect, useState, type ReactNode } from "react";
 import { useApp } from "../store";
 import { mapDisplayName, mapDeepLink, resolveMap } from "../lib/maps";
 import { timeAgo } from "../lib/format";
-import { runthroughStatus, fmtClock } from "../lib/raidClock";
+import {
+  runthroughStatus,
+  scavStatus,
+  intelCenterCooldown,
+  fmtClock,
+  DEFAULT_SCAV_COOLDOWN_SEC,
+  type IntelLevel,
+} from "../lib/raidClock";
 import { readHighlights } from "../lib/normalize";
 import { Badge, Empty } from "../components/common";
 import { HighlightTimeline } from "../components/HighlightTimeline";
@@ -42,6 +49,118 @@ function objectivesForMap(
     if (target && resolveMap(raid.map)?.id === target) return raid;
   }
   return null;
+}
+
+interface ScavPrefs {
+  startedAt: number | null;
+  intel: IntelLevel;
+}
+
+const SCAV_KEY = "tac.scav";
+
+function loadScav(): ScavPrefs {
+  try {
+    const raw = window.localStorage.getItem(SCAV_KEY);
+    if (!raw) return { startedAt: null, intel: 0 };
+    const p = JSON.parse(raw) as Partial<ScavPrefs>;
+    const intel = p.intel === 1 || p.intel === 2 ? p.intel : 0;
+    return { startedAt: typeof p.startedAt === "number" ? p.startedAt : null, intel };
+  } catch {
+    return { startedAt: null, intel: 0 };
+  }
+}
+
+function saveScav(prefs: ScavPrefs): void {
+  try {
+    window.localStorage.setItem(SCAV_KEY, JSON.stringify(prefs));
+  } catch {
+    // storage unavailable — the timer just won't persist across reloads
+  }
+}
+
+/**
+ * Scav cooldown timer — the second account-safe monitor signal in-shell. The
+ * real remaining time lives in the profile (T4, never read), so this is an
+ * opt-in estimate the player starts by hand; Intel Center level trims the base
+ * (mirrors apps/monitor). Persists across reloads via localStorage.
+ */
+function ScavTimer(): ReactNode {
+  const [prefs, setPrefs] = useState<ScavPrefs>(() => loadScav());
+  const [, force] = useState(0);
+
+  const running = prefs.startedAt !== null;
+  useEffect(() => {
+    if (!running) return;
+    const timer = setInterval(() => force((x) => x + 1), 1000);
+    return () => clearInterval(timer);
+  }, [running]);
+
+  const update = (next: ScavPrefs): void => {
+    setPrefs(next);
+    saveScav(next);
+  };
+
+  const cooldown = intelCenterCooldown(DEFAULT_SCAV_COOLDOWN_SEC, prefs.intel);
+  const status = prefs.startedAt !== null ? scavStatus((Date.now() - prefs.startedAt) / 1000, cooldown) : null;
+
+  return (
+    <div className={`card scav-card ${status?.ready ? "cleared" : ""}`}>
+      <div className="scav-head">
+        <h3 style={{ margin: 0 }}>Scav cooldown</h3>
+        {status?.ready ? (
+          <span className="pill live">
+            <span className="dot" /> SCAV READY
+          </span>
+        ) : null}
+      </div>
+
+      {status === null ? (
+        <>
+          <p className="sub" style={{ margin: "6px 0 10px" }}>
+            An estimate you start when your scav goes on cooldown — the true timer lives in your
+            profile, which this app never reads. Base {Math.round(DEFAULT_SCAV_COOLDOWN_SEC / 60)} min,
+            trimmed by Intel Center.
+          </p>
+          <div className="scav-controls">
+            <label className="scav-intel">
+              Intel Center
+              <select
+                value={prefs.intel}
+                onChange={(e) => update({ ...prefs, intel: Number(e.target.value) as IntelLevel })}
+              >
+                <option value={0}>None</option>
+                <option value={1}>Level 1 (~-35%)</option>
+                <option value={2}>Level 2+ (~-50%)</option>
+              </select>
+            </label>
+            <button className="primary" onClick={() => update({ ...prefs, startedAt: Date.now() })}>
+              Start ({fmtClock(cooldown)})
+            </button>
+          </div>
+        </>
+      ) : status.ready ? (
+        <div className="scav-controls" style={{ marginTop: 8 }}>
+          <span className="rt-note">
+            Your scav is off cooldown — <strong>scav out</strong> when you're ready.
+          </span>
+          <button onClick={() => update({ ...prefs, startedAt: null })}>Reset</button>
+        </div>
+      ) : (
+        <div className="progress" style={{ margin: "6px 0 0" }}>
+          <div className="p-head">
+            <span className="dim">Ready in — estimate (Intel {prefs.intel || "none"})</span>
+            <span className="pct">{fmtClock(status.remainingSec)}</span>
+          </div>
+          <div className="track">
+            <div className="fill" style={{ width: `${Math.round(status.progress * 100)}%` }} />
+          </div>
+          <div className="scav-controls" style={{ marginTop: 10 }}>
+            <button onClick={() => update({ ...prefs, startedAt: null })}>Cancel</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export function ThisRaidView(): ReactNode {
@@ -106,6 +225,8 @@ export function ThisRaidView(): ReactNode {
             your objectives for that map. Take an in-game screenshot to drop a position marker.
           </Empty>
         )}
+
+        <ScavTimer />
 
         {lastHighlights && lastHighlights.markers.length > 1 ? (
           <div className="card">
@@ -208,6 +329,8 @@ export function ThisRaidView(): ReactNode {
           </div>
         )}
       </div>
+
+      <ScavTimer />
 
       <div className="sectionlabel">
         <span className="eyebrow">Objectives · this map</span>

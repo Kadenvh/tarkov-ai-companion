@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { runthroughStatus, fmtClock, DEFAULT_RUNTHROUGH_SEC } from "../src/lib/raidClock";
+import {
+  runthroughStatus,
+  scavStatus,
+  intelCenterCooldown,
+  fmtClock,
+  DEFAULT_RUNTHROUGH_SEC,
+  DEFAULT_SCAV_COOLDOWN_SEC,
+} from "../src/lib/raidClock";
 
 describe("raid clock — run-through status", () => {
   it("counts down toward the threshold and is not met before it", () => {
@@ -33,6 +40,34 @@ describe("raid clock — run-through status", () => {
   it("ceils fractional remaining seconds so the visible clock never undershoots", () => {
     // 420 - 100.4 = 319.6 -> ceil 320
     expect(runthroughStatus(100.4, 420).remainingSec).toBe(320);
+  });
+});
+
+describe("scav cooldown", () => {
+  it("Intel Center trims the base cooldown per the monitor's factors", () => {
+    expect(DEFAULT_SCAV_COOLDOWN_SEC).toBe(1500);
+    expect(intelCenterCooldown(1500, 0)).toBe(1500);
+    expect(intelCenterCooldown(1500, 1)).toBe(975); // -35%
+    expect(intelCenterCooldown(1500, 2)).toBe(750); // -50%
+  });
+
+  it("counts down and flips to ready at the cooldown, with clamped progress", () => {
+    const mid = scavStatus(300, 1500);
+    expect(mid.ready).toBe(false);
+    expect(mid.remainingSec).toBe(1200);
+    expect(mid.progress).toBeCloseTo(0.2, 5);
+
+    const done = scavStatus(1500, 1500);
+    expect(done.ready).toBe(true);
+    expect(done.remainingSec).toBe(0);
+
+    const over = scavStatus(9999, 1500);
+    expect(over.ready).toBe(true);
+    expect(over.progress).toBe(1);
+  });
+
+  it("guards non-positive cooldown by falling back to the default", () => {
+    expect(scavStatus(0, 0).cooldownSec).toBe(1500);
   });
 });
 
