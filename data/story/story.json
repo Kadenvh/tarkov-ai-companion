@@ -170,7 +170,7 @@
         { "id": "tt-15", "name": "Collect the encryption device", "hint": "Activate Kruglov's keycard; optional: Kruglov's apartment, Cardinal building, Streets", "condition": { "decision": "ticket_kerman", "option": "yes" } },
         { "id": "tt-16", "name": "GATHER EVIDENCE?", "hint": "Agree: Savior or Debtor. Refuse: locked into Fallen", "decision": "ticket_evidence", "condition": { "decision": "ticket_kerman", "option": "yes" } },
         { "id": "tt-17", "name": "Obtain Intelligence Center level 3", "hint": "Needs the major evidence from They Are Already Here (second chance offered if missed)", "condition": { "decision": "ticket_evidence", "option": "yes" } },
-        { "id": "tt-18", "name": "Deliver the TerraGroup evidence", "hint": "8 major evidence items (optionally 36 minor), then negotiate with Kerman", "condition": { "decision": "ticket_evidence", "option": "yes" } },
+        { "id": "tt-18", "name": "Deliver the TerraGroup evidence", "hint": "8 of 9 major evidence items (miss at most one chapter's; optionally 36 minor), then negotiate with Kerman", "condition": { "decision": "ticket_evidence", "option": "yes" } },
         { "id": "tt-19", "name": "HAND OVER ALL EVIDENCE?", "hint": "Deliver everything: Savior. Withhold (max 2 major): Debtor via Lightkeeper", "decision": "ticket_final", "condition": { "decision": "ticket_evidence", "option": "yes" } },
         { "id": "tt-20", "name": "Fence loyalty chain", "hint": "Savior: reach 4.0 Fence rep, complete his assignments, keep it above 4.0", "condition": { "decision": "ticket_final", "option": "hand_over_all" } },
         { "id": "tt-21", "name": "Co-op extracts", "hint": "Savior: Friendship Bridge (Woods) + Scav Lands (Reserve); PvE: PMC-kill alternatives on Interchange/Shoreline", "condition": { "decision": "ticket_final", "option": "hand_over_all" } },
@@ -283,7 +283,7 @@
       "question": "Hand over all the TerraGroup evidence to Mr. Kerman?",
       "confidence": "verified",
       "options": [
-        { "id": "hand_over_all", "label": "Deliver everything", "effects": { "setsOnlyEnding": "savior", "notes": "All 8 major (optionally 36 minor) evidence items, then the Fence 4.0 rep chain, two co-op extracts (PvE: PMC-kill alternatives) and 0.4 BTR Driver standing. Exit item: Reprogrammed RFID keycard with Mr. Kerman's hash codes." } },
+        { "id": "hand_over_all", "label": "Deliver everything", "effects": { "setsOnlyEnding": "savior", "notes": "8 of 9 major evidence items (miss at most one chapter's; optionally 36 minor), then the Fence 4.0 rep chain, two co-op extracts (PvE: PMC-kill alternatives) and 0.4 BTR Driver standing. Exit item: Reprogrammed RFID keycard with Mr. Kerman's hash codes." } },
         { "id": "withhold_evidence", "label": "Withhold it (hand in max 2 major)", "effects": { "setsOnlyEnding": "debtor", "notes": "Debtor route via Lightkeeper: topographic intel flash drive, 30 PMC kills on Woods, 100 PMC dogtags, stash 6 Sacred Amulets on Lighthouse. Exit item: RFID keycard with unknown name (from LK for 1 Blue Folders material)." } }
       ]
     }

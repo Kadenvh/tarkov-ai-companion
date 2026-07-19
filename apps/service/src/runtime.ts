@@ -7,9 +7,14 @@ import {
   parseStoryDataset,
   detectGameVersion,
   storyDir,
+  checkInvariants,
+  diffSnapshots,
+  snapshotExists,
   type LoadedWorld,
   type Market,
   type StoryDataset,
+  type InvariantReport,
+  type SnapshotDiff,
 } from "@tac/data-core";
 import {
   openProfile,
@@ -61,6 +66,28 @@ export interface TarkovTrackerSyncResult {
   quota?: QuotaState;
   reason?: "no-token" | "no-source" | "quota-low" | "quota-exhausted" | "unauthorized" | "unreachable";
   error?: string;
+}
+
+/**
+ * M8.2 patch-drift readiness report exposed at `GET /api/patch/status`. When the
+ * installed game version differs from the loaded data snapshot, `drift` carries
+ * whether a snapshot for the new version exists locally and — if it does — the
+ * structural diff. The operator, not the service, decides to pull a new snapshot
+ * (that is a network fetch); this only surfaces the readiness state.
+ */
+export interface PatchStatus {
+  snapshotVersion: string;
+  detectedVersion?: string;
+  drift?: {
+    /** is there a committed snapshot on disk for the detected version? */
+    snapshotAvailable: boolean;
+    /** structural diff snapshot->detected (only when the detected snapshot exists) */
+    diff?: SnapshotDiff;
+    /** human-readable readiness note */
+    note: string;
+  };
+  invariants: InvariantReport;
+  lastChecked: string;
 }
 
 /**
@@ -159,6 +186,8 @@ export class ServiceRuntime {
 
   store: ProfileStore;
   patchDetected: { version: string; ts: string } | null = null;
+  /** Cached M8.2 report, keyed by (snapshot|detected|mode) so `lastChecked` is stable until inputs move. */
+  private patchStatusCache: { key: string; status: PatchStatus } | null = null;
 
   private readonly memoryDb: boolean;
   private readonly loadWorldFn: (mode: GameMode) => LoadedWorld;
@@ -476,6 +505,57 @@ export class ServiceRuntime {
     };
     this.store.events.on("patch.detected", listener);
     this.unbindPatch = () => this.store.events.off("patch.detected", listener);
+  }
+
+  /**
+   * M8.2 patch-drift readiness report. Runs the structural invariant checks on
+   * the active snapshot and — when the installed game version differs and a
+   * snapshot for it exists locally — the snapshot diff. Result is cached by
+   * (snapshot|detected|mode) so repeated polls return a stable `lastChecked`
+   * until the versions actually move.
+   */
+  patchStatus(): PatchStatus {
+    const snapshotVersion = this.snapshotVersion();
+    const detected = this.gameVersion();
+    const mode = this.gameMode;
+    const key = `${snapshotVersion}|${detected ?? ""}|${mode}`;
+    if (this.patchStatusCache?.key === key) return this.patchStatusCache.status;
+
+    const invariants = checkInvariants(this.world(mode));
+    const status: PatchStatus = { snapshotVersion, invariants, lastChecked: new Date().toISOString() };
+
+    if (detected && detected !== snapshotVersion) {
+      status.detectedVersion = detected;
+      const available = snapshotExists(detected);
+      if (available) {
+        try {
+          const diff = diffSnapshots(snapshotVersion, detected, mode);
+          status.drift = {
+            snapshotAvailable: true,
+            diff,
+            note:
+              `EFT ${detected} differs from the active snapshot ${snapshotVersion}; ` +
+              `a snapshot for ${detected} is on disk — review the diff` +
+              (diff.invariants.ok ? "." : " (invariants BROKEN on the new snapshot)."),
+          };
+        } catch (err) {
+          status.drift = {
+            snapshotAvailable: true,
+            note: `snapshot for ${detected} exists but failed to diff: ${err instanceof Error ? err.message : String(err)}`,
+          };
+        }
+      } else {
+        status.drift = {
+          snapshotAvailable: false,
+          note:
+            `EFT ${detected} differs from the active snapshot ${snapshotVersion}; ` +
+            `no snapshot for ${detected} on disk — run \`pnpm snapshot\` to pull one, then re-check.`,
+        };
+      }
+    }
+
+    this.patchStatusCache = { key, status };
+    return status;
   }
 
   // -- profile switching --------------------------------------------------------
