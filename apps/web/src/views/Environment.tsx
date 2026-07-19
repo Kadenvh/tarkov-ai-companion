@@ -12,7 +12,8 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useApp } from "../store";
 import { ApiError } from "../api/client";
-import { readAttribution, readPerfRows, readSettingsDiffs } from "../lib/normalize";
+import { readAttribution, readAudit, readPerfRows, readSettingsDiffs } from "../lib/normalize";
+import { adsMatchCopy, sortFindings } from "../lib/audit";
 import { mapDisplayName } from "../lib/maps";
 import { pctDelta } from "../components/charts/geometry";
 import {
@@ -30,6 +31,7 @@ import type {
   AmmoResponse,
   ApplyResultResponse,
   AttributionResponse,
+  AuditResult,
   EnvironmentSettingsResponse,
   NvidiaReportResponse,
   PerfResponse,
@@ -385,7 +387,167 @@ function PerfTab({
 
 // ---------------------------------------------------------------- Settings tab
 
+const SEV_LABEL = { high: "high", medium: "med", low: "low" } as const;
+
+/** Config Audit — divergences from the competitive meta + on-meta green checks. */
+function AuditPanel({
+  audit,
+  settingsLoaded,
+  applying,
+  gameRunning,
+  applyKeys,
+}: {
+  audit: AuditResult | null;
+  settingsLoaded: boolean;
+  applying: boolean;
+  gameRunning: boolean;
+  applyKeys: (keys?: string[]) => void;
+}): ReactNode {
+  const findings = audit ? sortFindings(audit.findings) : [];
+  const confirmations = audit?.confirmations ?? [];
+  return (
+    <div className="card">
+      <h3 style={{ marginTop: 0 }}>Config audit — vs competitive meta</h3>
+      <p className="sub">
+        Where your live EFT config drifts from the competitive-meta baseline, worst first. There are
+        deliberately <strong>no pro presets</strong> here — every &quot;pro settings&quot; page online
+        is uncited and usually stale (see <code>docs/research/12-pro-configs.md</code>), so these are
+        community <em>meta norms</em>, not any one streamer&apos;s numbers.
+      </p>
+
+      {gameRunning ? (
+        <div className="warning-box">
+          <div className="w-kind">game running</div>
+          Escape from Tarkov is running — settings only write while the game is closed. Nothing was
+          changed.
+        </div>
+      ) : null}
+
+      {!audit ? (
+        <Empty>
+          {settingsLoaded
+            ? "Couldn't read the EFT settings files — the audit needs Graphics/PostFx/Game/Sound to compare."
+            : "Loading audit…"}
+        </Empty>
+      ) : findings.length === 0 ? (
+        <p className="sub">
+          No meta divergences — your visibility, clarity, and audio settings match the baseline.
+        </p>
+      ) : (
+        <>
+          <div className="controls-row">
+            <button
+              className="primary"
+              disabled={applying}
+              onClick={() => applyKeys()}
+              title="Apply every meta fix below in one write (game closed, backup first)"
+            >
+              {applying ? "Applying…" : `Fix all ${findings.length} (game closed only)`}
+            </button>
+          </div>
+          <div className="table-scroll">
+            <table className="data">
+              <thead>
+                <tr>
+                  <th>Severity</th>
+                  <th>Setting</th>
+                  <th>Current</th>
+                  <th>Meta</th>
+                  <th>Why</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {findings.map((f) => (
+                  <tr key={f.key}>
+                    <td>
+                      <span className={`badge sev-${f.severity}`}>{SEV_LABEL[f.severity]}</span>
+                    </td>
+                    <td>
+                      <code>{f.key}</code>
+                    </td>
+                    <td>{fmtValue(f.current)}</td>
+                    <td>
+                      <strong>{fmtValue(f.recommended)}</strong>
+                    </td>
+                    <td className="dim">{f.why}</td>
+                    <td>
+                      <button disabled={applying} onClick={() => applyKeys([f.key])}>
+                        Apply
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
+
+      {confirmations.length > 0 ? (
+        <div className="audit-checks">
+          {confirmations.map((c) => (
+            <Badge key={c.key} kind="ok">
+              <span title={c.why}>✓ {c.label}</span>
+            </Badge>
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+/** ADS 1:1 (true-aim) sensitivity helper. */
+function SensitivityPanel({ audit }: { audit: AuditResult | null }): ReactNode {
+  const s = audit?.sensitivity;
+  const copy = s ? adsMatchCopy(s) : null;
+  return (
+    <div className="card">
+      <h3 style={{ marginTop: 0 }}>ADS 1:1 sensitivity</h3>
+      <p className="sub">
+        The community <strong>&quot;1:1 / true aim&quot;</strong> rule-of-thumb: set your ADS coefficient
+        to <code>hipfire × √2 (≈1.42)</code> so a hipfire flick and an aimed turn cover the same mouse
+        distance. This is <strong>not authoritatively sourced</strong>, is <em>patch-dependent</em>{" "}
+        (BSG has changed ADS scaling across wipes), and is best verified in-game with a 360° test.
+      </p>
+      {!s || s.hipfire === undefined || s.ads === undefined ? (
+        <Empty>
+          Needs Control.ini (<code>MouseSensitivity</code> + <code>MouseAimingSensitivity</code>) — not
+          found or unreadable.
+        </Empty>
+      ) : (
+        <>
+          <div className="kv">
+            <span className="k">Hipfire</span>
+            <span>{s.hipfire}</span>
+            <span className="k">ADS (current)</span>
+            <span>{s.ads}</span>
+            <span className="k">1:1 target</span>
+            <span>{s.oneToOneTarget !== undefined ? Math.round(s.oneToOneTarget * 1000) / 1000 : "—"}</span>
+            {s.ratio !== undefined ? (
+              <>
+                <span className="k">Ratio</span>
+                <span>{Math.round(s.ratio * 100) / 100}×</span>
+              </>
+            ) : null}
+            {s.optic !== undefined ? (
+              <>
+                <span className="k">Optic</span>
+                <span>{s.optic}</span>
+              </>
+            ) : null}
+          </div>
+          {copy ? (
+            <p className={`ads-readout ${copy.matched ? "ok" : "warn"}`}>{copy.text}</p>
+          ) : null}
+        </>
+      )}
+    </div>
+  );
+}
+
 function SettingsTab({
+  audit,
   profiles,
   activeProfile,
   setActiveProfile,
@@ -393,12 +555,14 @@ function SettingsTab({
   gameRunning,
   settingsLoaded,
   applyProfile,
+  applyKeys,
   nvidia,
   caliber,
   ammo,
   ammoLoading,
   lookupAmmo,
 }: {
+  audit: AuditResult | null;
   profiles: Record<string, SettingDiff[]>;
   activeProfile: string;
   setActiveProfile: (p: string) => void;
@@ -406,6 +570,7 @@ function SettingsTab({
   gameRunning: boolean;
   settingsLoaded: boolean;
   applyProfile: () => void;
+  applyKeys: (keys?: string[]) => void;
   nvidia: NvidiaReportResponse | null;
   caliber: string;
   ammo: AmmoEntry[];
@@ -415,6 +580,15 @@ function SettingsTab({
   const diffs = profiles[activeProfile] ?? [];
   return (
     <>
+      <AuditPanel
+        audit={audit}
+        settingsLoaded={settingsLoaded}
+        applying={applying}
+        gameRunning={gameRunning}
+        applyKeys={applyKeys}
+      />
+      <SensitivityPanel audit={audit} />
+
       <div className="card">
         <h3 style={{ marginTop: 0 }}>EFT settings vs curated profiles</h3>
         {Object.keys(profiles).length === 0 ? (
@@ -608,8 +782,9 @@ export function EnvironmentView(): ReactNode {
   const { api, pushToast, wsStatus } = useApp();
   const [tab, setTab] = useState<Tab>("live");
 
-  // ---------- settings diffs ----------
+  // ---------- settings diffs + audit ----------
   const [profiles, setProfiles] = useState<Record<string, SettingDiff[]>>({});
+  const [audit, setAudit] = useState<AuditResult | null>(null);
   const [activeProfile, setActiveProfile] = useState<string>("");
   const [applying, setApplying] = useState(false);
   const [gameRunning, setGameRunning] = useState(false);
@@ -620,26 +795,32 @@ export function EnvironmentView(): ReactNode {
       const res = await api.get<EnvironmentSettingsResponse>("/api/environment/settings");
       const diffs = readSettingsDiffs(res);
       setProfiles(diffs);
+      setAudit(readAudit(res));
       const keys = Object.keys(diffs);
       setActiveProfile((prev) => (prev && diffs[prev] ? prev : (keys[0] ?? "")));
     } catch {
-      /* view shows empty state */
+      setAudit(null); // view shows empty state
     } finally {
       setSettingsLoaded(true);
     }
   };
 
-  const applyProfile = async (): Promise<void> => {
-    if (!activeProfile) return;
+  /**
+   * Apply a profile via the existing apply route. `keys` narrows it to a subset
+   * (the audit's per-finding / fix-all buttons apply the "meta" profile). 409 →
+   * game-running banner, inline, nothing changed.
+   */
+  const applyChanges = async (profile: string, keys?: string[]): Promise<void> => {
+    if (!profile) return;
     setApplying(true);
     setGameRunning(false);
     try {
-      const res = await api.post<ApplyResultResponse>("/api/environment/settings/apply", {
-        profile: activeProfile,
-      });
+      const body: Record<string, unknown> = { profile };
+      if (keys && keys.length > 0) body["keys"] = keys;
+      const res = await api.post<ApplyResultResponse>("/api/environment/settings/apply", body);
       pushToast(
         "info",
-        `Applied "${activeProfile}"${res.backupId ? ` — backup ${res.backupId}` : ""}.`,
+        `Applied ${res.applied?.length ?? 0} change(s)${res.backupId ? ` — backup ${res.backupId}` : ""}.`,
         "Settings applied",
       );
       await loadSettings();
@@ -728,13 +909,15 @@ export function EnvironmentView(): ReactNode {
       {tab === "perf" ? <PerfTab perf={perf} attribution={attribution} /> : null}
       {tab === "settings" ? (
         <SettingsTab
+          audit={audit}
           profiles={profiles}
           activeProfile={activeProfile}
           setActiveProfile={setActiveProfile}
           applying={applying}
           gameRunning={gameRunning}
           settingsLoaded={settingsLoaded}
-          applyProfile={() => void applyProfile()}
+          applyProfile={() => void applyChanges(activeProfile)}
+          applyKeys={(keys) => void applyChanges("meta", keys)}
           nvidia={nvidia}
           caliber={caliber}
           ammo={ammo}

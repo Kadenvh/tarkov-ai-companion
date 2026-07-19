@@ -12,6 +12,9 @@
 import type {
   AttributionFinding,
   AttributionReport,
+  AuditConfirmation,
+  AuditFinding,
+  AuditResult,
   ConnectorHealth,
   ConnectorInfo,
   FleaIncome,
@@ -26,8 +29,10 @@ import type {
   PositionPayload,
   QueueStat,
   RaidHighlights,
+  SensitivityReadout,
   SessionRhythm,
   SettingDiff,
+  SettingValue,
   SourceQuota,
   SourceStatusRow,
   StoryResponse,
@@ -328,6 +333,60 @@ export function readSettingsDiffs(raw: unknown): Record<string, SettingDiff[]> {
     if (isDiffArray(value)) out[key] = value;
   }
   return out;
+}
+
+// ---------- Config Audit (GET /api/environment/settings → .audit) ----------
+
+function settingValue(v: unknown): SettingValue | undefined {
+  return typeof v === "string" || typeof v === "number" || typeof v === "boolean" ? v : undefined;
+}
+
+/**
+ * Reads the Coach Config Audit block. Accepts either the full settings response
+ * `{ audit: {...} }` or a bare audit object. Always returns well-formed empty
+ * arrays so a missing/partial payload renders an empty state, never a crash.
+ */
+export function readAudit(raw: unknown): AuditResult {
+  const root = rec(raw) ?? {};
+  const a = rec(root["audit"]) ?? root;
+
+  const findings: AuditFinding[] = [];
+  for (const row of arr(a["findings"]) ?? []) {
+    const r = rec(row);
+    const key = str(r?.["key"]);
+    if (!r || key === undefined || !("recommended" in r)) continue;
+    const sev = str(r["severity"]);
+    findings.push({
+      key,
+      current: settingValue(r["current"]),
+      recommended: settingValue(r["recommended"]) ?? "",
+      why: str(r["why"]) ?? "",
+      severity: sev === "high" || sev === "medium" || sev === "low" ? sev : "low",
+    });
+  }
+
+  const confirmations: AuditConfirmation[] = [];
+  for (const row of arr(a["confirmations"]) ?? []) {
+    const r = rec(row);
+    const key = str(r?.["key"]);
+    const label = str(r?.["label"]);
+    if (!r || key === undefined || label === undefined) continue;
+    confirmations.push({
+      key,
+      label,
+      current: settingValue(r["current"]) ?? "",
+      why: str(r["why"]) ?? "",
+    });
+  }
+
+  const sRec = rec(a["sensitivity"]) ?? {};
+  const sensitivity: SensitivityReadout = { matchesOneToOne: sRec["matchesOneToOne"] === true };
+  for (const k of ["hipfire", "ads", "optic", "oneToOneTarget", "ratio"] as const) {
+    const v = num(sRec[k]);
+    if (v !== undefined) sensitivity[k] = v;
+  }
+
+  return { findings, confirmations, sensitivity };
 }
 
 // ---------- /api/environment/perf ----------
