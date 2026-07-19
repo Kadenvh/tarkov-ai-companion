@@ -55,7 +55,7 @@ async function executeTool(
   rawArgs: unknown,
   toolCalls: ToolCallRecord[],
 ): Promise<{ ok: boolean; result: string }> {
-  toolCalls.push({ tool: tool.name, argsSummary: summarizeArgs(rawArgs) });
+  toolCalls.push({ tool: tool.name, argsSummary: summarizeArgs(rawArgs), detail: tool.endpoint });
   const parsed = tool.input.safeParse(rawArgs ?? {});
   if (!parsed.success) {
     return { ok: false, result: `Invalid input for ${tool.name}: ${parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ")}. Fix the arguments and call the tool again.` };
@@ -332,7 +332,23 @@ interface QmLike {
   totalRubles?: number;
 }
 interface ForesightLike {
-  warnings?: { completing?: { name?: string }; fails?: { name?: string }[]; severity?: string }[];
+  warnings?: {
+    kind?: string;
+    completing?: { name?: string };
+    fails?: { name?: string }[];
+    severity?: string;
+    /** XP-gate stalls carry a preformatted message + the gated task. */
+    message?: string;
+    task?: { name?: string };
+  }[];
+}
+interface SourceStatusLike {
+  id: string;
+  up: boolean;
+}
+interface ConnectorLike {
+  id: string;
+  health?: string;
 }
 
 /** GET /api/plan returns the Plan wrapped in {hash, plan} (live service) or flat. */
@@ -400,6 +416,60 @@ export class MockClient implements ModelClient {
         text += ` ${"The map rotation favours patient play and the copilot pads this sentence deliberately to overflow the word budget for testing purposes only." .split(" ").join(" ")}`.repeat(20);
       }
       return { text, toolCalls };
+    }
+
+    // Scenario: multi-tool session plan — the headline grounded answer that
+    // fuses plan + foresight + source health into one cited reply.
+    if (/prioriti|session|focus|what should i|game ?plan|do tonight/i.test(lastUser)) {
+      const plan = unwrapPlan(await call("get_plan"));
+      const foresight = (await call("get_foresight")) as ForesightLike;
+      const sources = (await call("get_sources_status")) as SourceStatusLike[];
+      const first = plan.raids?.[0];
+      const gate = (foresight.warnings ?? []).find((w) => w.kind === "xp-gate");
+      const down = sources.filter((s) => !s.up).map((s) => s.id);
+      const parts = [
+        first
+          ? `Start on ${first.map} with ${first.tasks?.length ?? 0} tasks (get_plan).`
+          : "No raids planned (get_plan).",
+        gate?.message
+          ? `Heads up (get_foresight): ${gate.message}`
+          : "No XP-gate stalls pending (get_foresight).",
+        down.length
+          ? `Data caveat (get_sources_status): ${down.join(", ")} is down, so some numbers may be stale.`
+          : "All data sources are up (get_sources_status).",
+      ];
+      return { text: parts.join(" "), toolCalls };
+    }
+
+    // Scenario: source / connector health (grounding-surface status)
+    if (/source|connector|integration|data ?feed|tracker|offline|stale|status/i.test(lastUser)) {
+      const sources = (await call("get_sources_status")) as SourceStatusLike[];
+      const connectors = (await call("get_connectors")) as ConnectorLike[];
+      const up = sources.filter((s) => s.up).map((s) => s.id);
+      const down = sources.filter((s) => !s.up).map((s) => s.id);
+      const conn = connectors.map((c) => `${c.id}: ${c.health ?? "unknown"}`).join(", ");
+      return {
+        text:
+          `Sources up: ${up.join(", ") || "none"}` +
+          `${down.length ? `; down: ${down.join(", ")}` : ""} (get_sources_status). ` +
+          `Connectors (get_connectors): ${conn || "none"}.`,
+        toolCalls,
+      };
+    }
+
+    // Scenario: irreversibility / gating question (task-exclusivity + XP gates)
+    if (/gate|lock|foresight|irreversib|miss out|about to|conflict/i.test(lastUser)) {
+      const foresight = (await call("get_foresight")) as ForesightLike;
+      const warnings = foresight.warnings ?? [];
+      if (warnings.length === 0) {
+        return { text: "Nothing is about to gate or lock you right now (get_foresight).", toolCalls };
+      }
+      const lines = warnings.slice(0, 3).map((w) =>
+        w.kind === "xp-gate"
+          ? (w.message ?? `Level gate on ${w.task?.name ?? "a task"}.`)
+          : `Completing ${w.completing?.name ?? "a task"} would fail ${w.fails?.map((f) => f.name).join(", ") ?? "another task"}.`,
+      );
+      return { text: `Watch out (get_foresight): ${lines.join(" ")}`, toolCalls };
     }
 
     // Scenario: unreleased-content refusal
@@ -471,7 +541,11 @@ function composeMockBriefing(raidIndex: number, plan: PlanLike, qm: QmLike, fore
     .join(", ");
   const warnings = (foresight.warnings ?? [])
     .slice(0, 2)
-    .map((w) => `completing ${w.completing?.name ?? "a task"} fails ${w.fails?.map((f) => f.name).join(", ") ?? "another task"}`)
+    .map((w) =>
+      w.kind === "xp-gate"
+        ? (w.message ?? `level gate on ${w.task?.name ?? "a task"}`)
+        : `completing ${w.completing?.name ?? "a task"} fails ${w.fails?.map((f) => f.name).join(", ") ?? "another task"}`,
+    )
     .join("; ");
   const parts = [
     `Raid ${raid.index} (get_plan): ${raid.map}.`,

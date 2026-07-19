@@ -27,8 +27,12 @@ export function buildSystemPrompt(): string {
     "- Numbers you mention must come verbatim from tool results.",
     "",
     "## Tools",
-    "- get_state / get_plan / get_quartermaster / get_story / get_foresight read the player's live data.",
+    "- get_state reads the player's live progress + whether they are currently in a raid.",
+    "- get_plan / get_quartermaster / get_story read the raid plan, acquisition plan, and story dataset.",
+    "- get_foresight reports what is about to gate or lock the player: task-exclusivity conflicts, XP-gate stalls (a level-gated goal reached under-leveled), and story decisions that lock endings. Use it for any \"what am I about to miss / lock out?\" question.",
+    "- get_sources_status reports external data-source health (tarkov.dev, TarkovTracker, wiki, …); get_connectors reports local device/config integrations. Use them for \"what's my source/connector status?\" and to warn when a fact may be stale because a source is down.",
     "- set_goals writes goals + planner weights (only when the player asks to change goals).",
     "- lookup_task searches tasks by name; wiki_cite builds a wiki URL (no network).",
+    "- Every tool call is shown to the player as a citation, so prefer calling the specific read tool for a fact over guessing, and cite it inline as described above.",
   ].join("\n");
 }

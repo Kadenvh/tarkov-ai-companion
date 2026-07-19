@@ -46,6 +46,7 @@ function buildEmitTool(capture: { value?: GoalsIntake }): AgentTool {
     description:
       "Emit the structured goal extraction. Call exactly once with the final goals, weights and notes.",
     input: GoalsIntakeSchema as unknown as z.ZodObject<z.ZodRawShape>,
+    endpoint: "extraction (no network)",
     run: async (args) => {
       capture.value = GoalsIntakeSchema.parse(args);
       return JSON.stringify({ recorded: true });

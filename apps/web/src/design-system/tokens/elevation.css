@@ -1,0 +1,22 @@
+/* TarkovTracker — Elevation, borders & interaction-state tokens (from the
+   TarkovTracker Design System project). Depth is subtle: borders + surface
+   contrast do most of the work; shadows are restrained; decorative
+   gradients/glows are avoided. */
+:root {
+  /* State overlays (layered over surfaces via color-mix) */
+  --state-hover: rgba(255, 255, 255, 0.05);
+  --state-pressed: rgba(255, 255, 255, 0.08);
+  --state-selected: rgba(198, 145, 89, 0.12);
+
+  /* Hairline borders — mostly translucent white over dark surfaces */
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-default: rgba(255, 255, 255, 0.1);
+  --border-strong: rgba(255, 255, 255, 0.15);
+
+  /* Shadow scale */
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.25), 0 1px 3px rgba(0, 0, 0, 0.15);
+  --shadow-elevated: 0 8px 24px rgba(0, 0, 0, 0.35), 0 4px 8px rgba(0, 0, 0, 0.2);
+  --shadow-hairline: 0 1px 0 rgba(0, 0, 0, 0.4);
+  --shadow-nav-drawer: inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.6), 1px 0 0 rgba(0, 0, 0, 0.55);
+}

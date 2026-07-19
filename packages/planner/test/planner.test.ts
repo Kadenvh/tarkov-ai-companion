@@ -5,7 +5,14 @@ import { PlayerState, toSim } from "../src/state.js";
 import { resolveGoalTasks } from "../src/goals.js";
 import { buildPlan, DEFAULT_WEIGHTS } from "../src/director.js";
 import { availableTasks } from "../src/availability.js";
-import { taskExclusivityWarnings, endingReachability } from "../src/foresight.js";
+import {
+  taskExclusivityWarnings,
+  endingReachability,
+  xpGateStalls,
+  planXpGateStalls,
+} from "../src/foresight.js";
+import type { Plan } from "../src/director.js";
+import type { TaskGraph } from "@tac/data-core";
 
 let world: LoadedWorld;
 let curve: LevelCurve;
@@ -86,6 +93,106 @@ describe("Foresight Guard", () => {
     const warnings = taskExclusivityWarnings(world.graph, [failer!]);
     expect(warnings.length).toBeGreaterThan(0);
     expect(warnings[0]!.fails.length).toBeGreaterThan(0);
+  });
+
+  it("emits an xp-gate stall when the projection arrives under-leveled", () => {
+    const xpForLevel = (l: number): number => (l - 1) * 1000;
+    const stalls = xpGateStalls({
+      gatedTasks: [{ id: "collector", name: "Collector", requiredLevel: 45, critical: true }],
+      projectedLevel: 42,
+      projectedXp: xpForLevel(42),
+      xpPerRaid: 1000,
+      xpForLevel,
+    });
+    expect(stalls).toHaveLength(1);
+    const s = stalls[0]!;
+    expect(s.kind).toBe("xp-gate");
+    expect(s.requiredLevel).toBe(45);
+    expect(s.projectedLevel).toBe(42);
+    expect(s.levelsShort).toBe(3);
+    // (44000 − 41000) / 1000 XP-per-raid = 3 raids short
+    expect(s.raidsShort).toBe(3);
+    expect(s.severity).toBe("critical");
+    expect(s.message).toContain("Collector L45 gate");
+    expect(s.message).toContain("projected L42");
+  });
+
+  it("emits nothing when the projected level clears every gate", () => {
+    const xpForLevel = (l: number): number => (l - 1) * 1000;
+    const cleared = xpGateStalls({
+      gatedTasks: [
+        { id: "a", name: "Task A", requiredLevel: 20 },
+        { id: "b", name: "Task B", requiredLevel: 30, critical: true },
+      ],
+      projectedLevel: 40,
+      projectedXp: xpForLevel(40),
+      xpPerRaid: 1000,
+      xpForLevel,
+    });
+    expect(cleared).toEqual([]);
+  });
+
+  it("derives gate stalls from a plan's level trajectory (raids-short from XP/raid)", () => {
+    const graph = { tasks: { collector: { kappaRequired: true } } } as unknown as TaskGraph;
+    const plan = {
+      raids: [{ levelBefore: 38 }, {}, {}, {}], // 4 planned raids, started at L38
+      levelStalls: [{ taskId: "collector", name: "Collector", requiredLevel: 45 }],
+      reachedLevel: 42,
+    } as unknown as Plan;
+    const curve = new LevelCurve(
+      Array.from({ length: 50 }, (_, i) => ({ level: i + 1, exp: i * 1000 })),
+    );
+    const stalls = planXpGateStalls(graph, plan, curve);
+    expect(stalls).toHaveLength(1);
+    const s = stalls[0]!;
+    expect(s.projectedLevel).toBe(42); // == plan.reachedLevel
+    expect(s.requiredLevel).toBe(45);
+    expect(s.levelsShort).toBe(3);
+    // XP climbed 38→42 over 4 raids = 1000 XP/raid; 3000 XP to the gate ⇒ 3 raids
+    expect(s.raidsShort).toBe(3);
+    expect(s.severity).toBe("critical"); // Collector is Kappa-required
+  });
+
+  it("derives no gate stalls from a plan that clears every gate", () => {
+    const graph = { tasks: {} } as unknown as TaskGraph;
+    const plan = {
+      raids: [{ levelBefore: 40 }, {}],
+      levelStalls: [],
+      reachedLevel: 50,
+    } as unknown as Plan;
+    const curve = new LevelCurve(
+      Array.from({ length: 60 }, (_, i) => ({ level: i + 1, exp: i * 1000 })),
+    );
+    expect(planXpGateStalls(graph, plan, curve)).toEqual([]);
+  });
+
+  it("finds a real XP-gate stall in a plan that reaches a gate under-leveled (integration)", () => {
+    // A real goal task whose gate the plan reaches (no unmet complete-prereqs,
+    // Any-faction) but whose minPlayerLevel a fresh account can't reach in the
+    // horizon — the honest "arrives at the gate under-leveled" scenario.
+    const gated = Object.values(world.graph.tasks)
+      .filter(
+        (t) =>
+          (t.minPlayerLevel ?? 0) >= 20 &&
+          (!t.factionName || t.factionName === "Any") &&
+          !(world.graph.requires.get(t.id) ?? []).some((r) => r.status.includes("complete")),
+      )
+      .sort((a, b) => (a.minPlayerLevel ?? 0) - (b.minPlayerLevel ?? 0))[0];
+    expect(gated).toBeDefined();
+
+    const sim = freshSim();
+    const goal = resolveGoalTasks(world.graph, [{ type: "tasks", ids: [gated!.id] }]);
+    const plan = buildPlan(world.graph, sim, goal, curve, { horizon: 3 });
+    const stalls = planXpGateStalls(world.graph, plan, curve);
+
+    expect(stalls.length).toBeGreaterThan(0);
+    const s = stalls.find((x) => x.task.id === gated!.id)!;
+    expect(s).toBeDefined();
+    expect(s.kind).toBe("xp-gate");
+    expect(s.projectedLevel).toBe(plan.reachedLevel);
+    expect(s.requiredLevel).toBe(gated!.minPlayerLevel);
+    expect(s.requiredLevel).toBeGreaterThan(s.projectedLevel);
+    expect(s.levelsShort).toBe(s.requiredLevel - s.projectedLevel);
   });
 
   it("computes ending reachability from story decisions", () => {

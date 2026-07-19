@@ -3,9 +3,12 @@ import { z } from "zod";
 import {
   buildAcquisitionPlan,
   endingReachability,
+  planXpGateStalls,
   resolveGoalTasks,
   taskExclusivityWarnings,
+  LevelCurve,
   PlayerState,
+  type ForesightFinding,
   type QuartermasterOptions,
 } from "@tac/planner";
 import { DEFAULT_HORIZON, MAX_HORIZON, GoalSchema, WeightsSchema, goalsOf, weightsOf } from "../plan.js";
@@ -68,7 +71,18 @@ export function registerPlanningRoutes(app: FastifyInstance, rt: ServiceRuntime)
     const state = rt.store.toPlayerState();
     const done = new Set([...state.completedTasks, ...state.failedTasks]);
     const pending = [...goalSet].filter((id) => !done.has(id));
-    const warnings = taskExclusivityWarnings(world.graph, pending, goalSet);
+
+    // XP-gate stalls (M3.4b): project the level curve over the planned horizon
+    // and warn where a level-gated goal is reached under-leveled. Reuses the
+    // cached plan bundle so this route stays cheap and consistent with /api/plan.
+    const bundle = rt.planner.get(DEFAULT_HORIZON);
+    const curve = new LevelCurve(world.playerLevels);
+    const gateStalls = planXpGateStalls(world.graph, bundle.plan, curve);
+
+    const warnings: ForesightFinding[] = [
+      ...taskExclusivityWarnings(world.graph, pending, goalSet),
+      ...gateStalls,
+    ];
 
     const dataset = rt.story();
     const progress = storyProgressOf(rt.store);

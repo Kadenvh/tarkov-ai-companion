@@ -116,13 +116,25 @@ function StatusBar(): ReactNode {
       ? `±${Math.max(0, Math.round((player.xp.high - player.xp.low) / 2)).toLocaleString("en-US")} xp`
       : "";
 
+  // Game-mode chip accent: PvE → blue tokens, everything else (regular/PvP) → tan tokens.
+  const modeClass = health?.gameMode
+    ? health.gameMode.toLowerCase().includes("pve")
+      ? "pve"
+      : "pvp"
+    : "";
+
   return (
-    <div className="statusbar hud">
+    <div className="statusbar hud" data-mode={modeClass || undefined}>
       <div className="stat">
         <span className="k">Profile</span>
         <span className="v">
           <strong>{health?.profileKey ?? "no profile"}</strong>
-          {health?.gameMode ? ` · ${health.gameMode}` : ""}
+          {health?.gameMode ? (
+            <>
+              {" "}
+              <span className={`modechip ${modeClass}`}>{health.gameMode}</span>
+            </>
+          ) : null}
         </span>
       </div>
       <div className="stat">

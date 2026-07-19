@@ -4,7 +4,13 @@ import { buildToolBelt, wikiCiteUrl } from "../src/tools.js";
 import { zodToJsonSchema } from "../src/model.js";
 import { ServiceClient } from "../src/service.js";
 import { GoalSchema } from "../src/types.js";
-import { startStubService, STUB_STATE, type StubService } from "./stub-service.js";
+import {
+  startStubService,
+  STUB_STATE,
+  STUB_SOURCES_STATUS,
+  STUB_CONNECTORS,
+  type StubService,
+} from "./stub-service.js";
 
 let stub: StubService;
 let service: ServiceClient;
@@ -45,10 +51,37 @@ describe("tool belt against the stub service", () => {
       "get_quartermaster",
       "get_story",
       "get_foresight",
+      "get_sources_status",
+      "get_connectors",
       "set_goals",
       "lookup_task",
       "wiki_cite",
     ]);
+  });
+
+  it("every tool declares an endpoint (citation provenance)", () => {
+    for (const tool of buildToolBelt(service)) {
+      expect(typeof tool.endpoint).toBe("string");
+      expect(tool.endpoint.length).toBeGreaterThan(0);
+    }
+  });
+
+  it("get_sources_status passes the service source health through verbatim", async () => {
+    const tool = buildToolBelt(service).find((t) => t.name === "get_sources_status")!;
+    expect(tool.endpoint).toBe("GET /api/sources/status");
+    expect(JSON.parse(await tool.run({}))).toEqual(STUB_SOURCES_STATUS);
+  });
+
+  it("get_connectors passes the service connector list through verbatim", async () => {
+    const tool = buildToolBelt(service).find((t) => t.name === "get_connectors")!;
+    expect(tool.endpoint).toBe("GET /api/connectors");
+    expect(JSON.parse(await tool.run({}))).toEqual(STUB_CONNECTORS);
+  });
+
+  it("get_foresight surfaces the XP-gate stall findings from the service", async () => {
+    const tool = buildToolBelt(service).find((t) => t.name === "get_foresight")!;
+    const res = JSON.parse(await tool.run({})) as { warnings: { kind: string }[] };
+    expect(res.warnings.some((w) => w.kind === "xp-gate")).toBe(true);
   });
 
   it("get_state passes the real service JSON through verbatim", async () => {

@@ -1,0 +1,38 @@
+/* TarkovTracker — Typography tokens (from the TarkovTracker Design System,
+   claude.ai/design project "TarkovTracker Design System", 2026-07-19).
+   The app deliberately uses a MONOSPACE stack for both UI and display text —
+   it gives the interface a tactical, terminal / mil-spec readout feel. There is
+   no bundled webfont; the system monospace ladder is used everywhere. */
+:root {
+  --font-sans: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+  --font-display: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+
+  /* Type scale (px) — compact; the app favors density over marketing spacing */
+  --text-xs: 11px;
+  --text-sm: 13px;
+  --text-base: 14px;
+  --text-lg: 16px;
+  --text-xl: 20px;
+  --text-2xl: 24px;
+  --text-3xl: 30px;
+
+  /* Weights — 400 body, 600 semibold labels, 700 headings/values */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Line heights */
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+
+  /* Body / heading composite tokens (from DESIGN.md) */
+  --text-body-size: 14px;
+  --text-body-line: 1.5;
+  --text-heading-size: 20px;
+  --text-heading-line: 1.25;
+}
