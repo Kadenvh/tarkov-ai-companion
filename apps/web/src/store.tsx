@@ -40,6 +40,8 @@ import {
   type NormalizedPlayerState,
 } from "./lib/normalize";
 import type { DecisionsMade, StageProgress } from "./lib/story";
+import { fireAlert } from "./lib/alerts";
+import { mapDisplayName } from "./lib/maps";
 
 // ---------- toasts ----------
 
@@ -296,8 +298,12 @@ export function AppProvider({ children }: { children: ReactNode }): ReactNode {
       void refreshPlan();
     },
     onRaid: (kind, payload) => {
+      const mapName = payload.map ? mapDisplayName(payload.map) : null;
       if (kind === "started") {
         setRaidBanner({ kind: "started", at: Date.now(), ...(payload.map ? { map: payload.map } : {}) });
+        fireAlert(`Raid started${mapName ? ` on ${mapName}` : ""}.`, {
+          spoken: mapName ? `Raid started on ${mapName}` : "Raid started",
+        });
       } else if (kind === "ended") {
         setRaidBanner({
           kind: "ended",
@@ -307,6 +313,9 @@ export function AppProvider({ children }: { children: ReactNode }): ReactNode {
         });
         setPlanStale(true); // until plan.updated arrives
         void refreshState();
+        fireAlert(`Raid over${payload.outcome ? ` — ${payload.outcome}` : ""}.`, {
+          spoken: payload.outcome ? `Raid over. You ${payload.outcome}.` : "Raid over",
+        });
       }
     },
     onQuestChanged: () => {
@@ -320,10 +329,14 @@ export function AppProvider({ children }: { children: ReactNode }): ReactNode {
     },
     onNotice: (payload) => {
       const msg = payload.message ?? "";
-      if (msg) pushToast(payload.level ?? "info", msg, payload.title);
+      if (msg) {
+        pushToast(payload.level ?? "info", msg, payload.title);
+        fireAlert(payload.title ?? msg, { spoken: payload.title ?? msg });
+      }
     },
     onPatchDetected: (payload) => {
       pushToast("warning", `New game version detected${payload.version ? `: ${payload.version}` : ""} — snapshot refresh needed.`, "Patch detected");
+      fireAlert("New game version detected — snapshot refresh needed.", { spoken: "New game version detected" });
     },
     onSourceStatus: (payload) => {
       const row = readSourceStatusRow(payload);

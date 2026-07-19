@@ -10,7 +10,7 @@
  * view just shows less.
  */
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useApp } from "../store";
 import { mapDisplayName, mapDeepLink, resolveMap } from "../lib/maps";
 import { timeAgo } from "../lib/format";
@@ -22,6 +22,14 @@ import {
   DEFAULT_SCAV_COOLDOWN_SEC,
   type IntelLevel,
 } from "../lib/raidClock";
+import {
+  fireAlert,
+  playChime,
+  unlockAudio,
+  getAlertPrefs,
+  setAlertPrefs,
+  type AlertPrefs,
+} from "../lib/alerts";
 import { readHighlights } from "../lib/normalize";
 import { Badge, Empty } from "../components/common";
 import { HighlightTimeline } from "../components/HighlightTimeline";
@@ -49,6 +57,63 @@ function objectivesForMap(
     if (target && resolveMap(raid.map)?.id === target) return raid;
   }
   return null;
+}
+
+/**
+ * Alerts control — arms the glanceable audio/voice layer (see lib/alerts.ts).
+ * Prefs are global (localStorage), so this toggle governs alerts on every view.
+ * Enabling is a user gesture → unlocks the AudioContext + plays a confirming
+ * chime so you immediately know audio is working (or blocked).
+ */
+function AlertsControl(): ReactNode {
+  const [prefs, setPrefs] = useState<AlertPrefs>(() => getAlertPrefs());
+
+  const update = (next: AlertPrefs): void => {
+    setPrefs(next);
+    setAlertPrefs(next);
+  };
+
+  const toggle = (): void => {
+    const next = { ...prefs, enabled: !prefs.enabled };
+    if (next.enabled) unlockAudio();
+    update(next);
+    if (next.enabled) playChime(); // immediate feedback that audio is live
+  };
+
+  return (
+    <div className="card alerts-control">
+      <div className="scav-head">
+        <h3 style={{ margin: 0 }}>Alerts</h3>
+        <button className={prefs.enabled ? "primary" : ""} onClick={toggle}>
+          {prefs.enabled ? "🔔 On" : "🔕 Off"}
+        </button>
+      </div>
+      <p className="sub" style={{ margin: "6px 0 0" }}>
+        A chime{prefs.voice ? " + voice" : ""} on raid start/end, run-through cleared, scav ready,
+        and coach nudges — glanceable on your second monitor while you're tabbed into the game.
+      </p>
+      {prefs.enabled ? (
+        <div className="scav-controls" style={{ marginTop: 10 }}>
+          <label className="scav-intel">
+            <input
+              type="checkbox"
+              checked={prefs.voice}
+              onChange={(e) => update({ ...prefs, voice: e.target.checked })}
+            />{" "}
+            Spoken voice
+          </label>
+          <button
+            onClick={() => {
+              unlockAudio();
+              fireAlert("Alerts test.", { spoken: "Alerts armed." });
+            }}
+          >
+            Test
+          </button>
+        </div>
+      ) : null}
+    </div>
+  );
 }
 
 interface ScavPrefs {
@@ -102,6 +167,18 @@ function ScavTimer(): ReactNode {
 
   const cooldown = intelCenterCooldown(DEFAULT_SCAV_COOLDOWN_SEC, prefs.intel);
   const status = prefs.startedAt !== null ? scavStatus((Date.now() - prefs.startedAt) / 1000, cooldown) : null;
+
+  // Fire the "scav ready" alert exactly once per cooldown (reset on restart).
+  const readyFiredRef = useRef(false);
+  useEffect(() => {
+    readyFiredRef.current = false;
+  }, [prefs.startedAt]);
+  useEffect(() => {
+    if (status?.ready && !readyFiredRef.current) {
+      readyFiredRef.current = true;
+      fireAlert("Your scav is off cooldown.", { spoken: "Your scav is off cooldown." });
+    }
+  });
 
   return (
     <div className={`card scav-card ${status?.ready ? "cleared" : ""}`}>
@@ -186,6 +263,23 @@ export function ThisRaidView(): ReactNode {
       .catch(() => undefined);
   }, [api, active, raidBanner?.at]);
 
+  // Fire the "run-through cleared" alert once per raid (reset when a raid
+  // starts). Placed before the early return so the hook order stays stable;
+  // runs each tick while active and no-ops until the time criterion is met.
+  const rtFiredRef = useRef(false);
+  useEffect(() => {
+    rtFiredRef.current = false;
+  }, [raidBanner?.at]);
+  useEffect(() => {
+    if (!active || !raidBanner) return;
+    if (runthroughStatus((Date.now() - raidBanner.at) / 1000).met && !rtFiredRef.current) {
+      rtFiredRef.current = true;
+      fireAlert("Run-through cleared — your extract now counts as a survived raid.", {
+        spoken: "Run-through cleared. Your extract will count as survived.",
+      });
+    }
+  });
+
   const history: PositionPayload[] = positions.length > 0 ? positions : player.positions;
   const latest = history[0] ?? null;
 
@@ -226,6 +320,7 @@ export function ThisRaidView(): ReactNode {
           </Empty>
         )}
 
+        <AlertsControl />
         <ScavTimer />
 
         {lastHighlights && lastHighlights.markers.length > 1 ? (
@@ -330,6 +425,7 @@ export function ThisRaidView(): ReactNode {
         )}
       </div>
 
+      <AlertsControl />
       <ScavTimer />
 
       <div className="sectionlabel">
