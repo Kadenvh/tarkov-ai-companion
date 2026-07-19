@@ -14,8 +14,10 @@ import { useEffect, useState, type ReactNode } from "react";
 import { useApp } from "../store";
 import { mapDisplayName, mapDeepLink, resolveMap } from "../lib/maps";
 import { timeAgo } from "../lib/format";
+import { readHighlights } from "../lib/normalize";
 import { Badge, Empty } from "../components/common";
-import type { PlannedRaid, PositionPayload } from "../api/types";
+import { HighlightTimeline } from "../components/HighlightTimeline";
+import type { HighlightsResponse, PlannedRaid, PositionPayload, RaidHighlights } from "../api/types";
 
 /** hh:mm:ss (drops the hours segment under an hour). */
 function fmtElapsed(ms: number): string {
@@ -42,8 +44,9 @@ function objectivesForMap(
 }
 
 export function ThisRaidView(): ReactNode {
-  const { raidBanner, plan, positions, player, health } = useApp();
+  const { api, raidBanner, plan, positions, player, health } = useApp();
   const [, force] = useState(0);
+  const [lastHighlights, setLastHighlights] = useState<RaidHighlights | null>(null);
 
   // tick the elapsed clock every second while a raid is live
   const active = raidBanner?.kind === "started";
@@ -52,6 +55,16 @@ export function ThisRaidView(): ReactNode {
     const timer = setInterval(() => force((x) => x + 1), 1000);
     return () => clearInterval(timer);
   }, [active]);
+
+  // Post-raid: pull the most recent raid's highlight timeline (clip guide).
+  // Refetches when a raid ends (raidBanner flips) so the debrief is fresh.
+  useEffect(() => {
+    if (active) return;
+    void api
+      .get<HighlightsResponse>("/api/insights/highlights?limit=1")
+      .then((res) => setLastHighlights(readHighlights(res)[0] ?? null))
+      .catch(() => undefined);
+  }, [api, active, raidBanner?.at]);
 
   const history: PositionPayload[] = positions.length > 0 ? positions : player.positions;
   const latest = history[0] ?? null;
@@ -92,6 +105,17 @@ export function ThisRaidView(): ReactNode {
             your objectives for that map. Take an in-game screenshot to drop a position marker.
           </Empty>
         )}
+
+        {lastHighlights && lastHighlights.markers.length > 1 ? (
+          <div className="card">
+            <h3 style={{ marginTop: 0 }}>Highlight reel — last raid</h3>
+            <p className="sub">
+              Offsets from raid start — scrub straight to these moments in your ShadowPlay / instant
+              replay capture.
+            </p>
+            <HighlightTimeline raid={lastHighlights} />
+          </div>
+        ) : null}
       </div>
     );
   }

@@ -36,3 +36,23 @@ CREATE TABLE IF NOT EXISTS perf_samples (
   id INTEGER PRIMARY KEY AUTOINCREMENT, raid_id INTEGER, map TEXT, ts TEXT NOT NULL,
   fps_avg REAL, fps_p1 REAL, frametime_p50 REAL, frametime_p95 REAL, frametime_p99 REAL,
   source TEXT NOT NULL DEFAULT 'presentmon');
+-- M9 connectors provenance store; the environment↔outcome join key for M6.3 attribution.
+CREATE TABLE IF NOT EXISTS connector_reading (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  connector_id TEXT NOT NULL,
+  capability TEXT NOT NULL,
+  captured_at TEXT NOT NULL,
+  game_version TEXT,
+  settings_hash TEXT,                  -- stable content hash; the environment↔outcome join key
+  raid_id INTEGER,
+  data TEXT NOT NULL,
+  source TEXT NOT NULL DEFAULT 'connector');
+CREATE INDEX IF NOT EXISTS idx_connector_reading_cap ON connector_reading(capability, captured_at);
+CREATE INDEX IF NOT EXISTS idx_connector_reading_hash ON connector_reading(settings_hash);
+-- M10 sources quota ledger; persists the shared external-API budget across restarts.
+CREATE TABLE IF NOT EXISTS source_quota (
+  source_id TEXT PRIMARY KEY,
+  reads_remaining INTEGER,
+  writes_remaining INTEGER,
+  resets_at TEXT,
+  updated_at TEXT NOT NULL);

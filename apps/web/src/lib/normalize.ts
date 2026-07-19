@@ -10,16 +10,22 @@
  */
 
 import type {
+  AttributionFinding,
+  AttributionReport,
   ConnectorHealth,
   ConnectorInfo,
   FleaIncome,
   ForesightWarning,
+  GoalProjection,
+  HighlightMarker,
   NetWorthEstimate,
+  NetWorthGoalReport,
   PerfMapRow,
   Plan,
   PlanResponse,
   PositionPayload,
   QueueStat,
+  RaidHighlights,
   SessionRhythm,
   SettingDiff,
   SourceQuota,
@@ -410,6 +416,118 @@ export function readInsightsEconomy(raw: unknown): NormalizedEconomy {
   const netWorth =
     netRec && Array.isArray(netRec["points"]) ? (netRec as unknown as NetWorthEstimate) : null;
   return { income, netWorth };
+}
+
+// ---------- /api/insights/networth (M7.4) ----------
+
+export interface NormalizedNetWorthGoal {
+  series: { day: string; estimatedNetWorth: number }[];
+  currentEstimate: number;
+  netWorth: NetWorthEstimate | null;
+  goal: GoalProjection | null;
+  lowConfidence: boolean;
+}
+
+export function readNetWorthGoal(raw: unknown): NormalizedNetWorthGoal {
+  const root = rec(raw) ?? {};
+  const seriesRaw = arr(pick(root, "series")) ?? [];
+  const series: { day: string; estimatedNetWorth: number }[] = [];
+  for (const row of seriesRaw) {
+    const r = rec(row);
+    if (!r) continue;
+    const day = str(r["day"]);
+    const value = num(r["estimatedNetWorth"]) ?? num(r["fleaCumulative"]);
+    if (day !== undefined && value !== undefined) series.push({ day, estimatedNetWorth: value });
+  }
+  const netRec = rec(pick(root, "netWorth"));
+  const netWorth = netRec && Array.isArray(netRec["points"]) ? (netRec as unknown as NetWorthEstimate) : null;
+  const goalRec = rec(pick(root, "goal"));
+  const goal =
+    goalRec && typeof goalRec["kind"] === "string" ? (goalRec as unknown as GoalProjection) : null;
+  return {
+    series,
+    currentEstimate: num(pick(root, "currentEstimate")) ?? 0,
+    netWorth,
+    goal,
+    lowConfidence: root["lowConfidence"] === true,
+  };
+}
+
+// ---------- /api/insights/attribution (M6.3) ----------
+
+export function readAttribution(raw: unknown): AttributionReport {
+  const root = rec(raw) ?? {};
+  const findings: AttributionFinding[] = [];
+  for (const row of arr(pick(root, "findings")) ?? []) {
+    const r = rec(row);
+    const metric = str(r?.["metric"]);
+    const label = str(r?.["label"]);
+    if (!r || (metric !== "survival" && metric !== "fps") || label === undefined) continue;
+    findings.push(r as unknown as AttributionFinding);
+  }
+  const changesRaw = arr(pick(root, "changes")) ?? [];
+  const countsRec = rec(pick(root, "counts")) ?? {};
+  return {
+    changes: changesRaw.filter((c): c is AttributionReport["changes"][number] => rec(c) !== null) as AttributionReport["changes"],
+    findings,
+    counts: {
+      readings: num(countsRec["readings"]) ?? 0,
+      withHash: num(countsRec["withHash"]) ?? 0,
+      raids: num(countsRec["raids"]) ?? 0,
+      perfSamples: num(countsRec["perfSamples"]) ?? 0,
+    },
+    lowConfidence: root["lowConfidence"] === true,
+    note: str(pick(root, "note")) ?? "",
+  };
+}
+
+// ---------- /api/insights/highlights (M7.5) ----------
+
+function readMarker(raw: unknown): HighlightMarker | null {
+  const r = rec(raw);
+  const kind = str(r?.["kind"]);
+  const tOffsetSec = num(r?.["tOffsetSec"]);
+  const label = str(r?.["label"]);
+  if (!r || kind === undefined || tOffsetSec === undefined || label === undefined) return null;
+  return { kind: kind as HighlightMarker["kind"], tOffsetSec, label, clock: str(r["clock"]) ?? "" };
+}
+
+export function readRaidHighlights(raw: unknown): RaidHighlights | null {
+  const r = rec(raw);
+  const raidId = num(r?.["raidId"]);
+  if (!r || raidId === undefined) return null;
+  const markers: HighlightMarker[] = [];
+  for (const m of arr(r["markers"]) ?? []) {
+    const marker = readMarker(m);
+    if (marker) markers.push(marker);
+  }
+  const outcomeRaw = str(r["outcome"]);
+  const outcome =
+    outcomeRaw === "survived" || outcomeRaw === "died" ? outcomeRaw : "unknown";
+  return {
+    raidId,
+    sid: str(r["sid"]) ?? null,
+    map: str(r["map"]) ?? null,
+    startedAt: str(r["startedAt"]) ?? "",
+    endedAt: str(r["endedAt"]) ?? null,
+    durationSec: num(r["durationSec"]) ?? null,
+    outcome,
+    markers,
+  };
+}
+
+/** Accepts `{ raids: [...] }`, a bare array, or `{ raid }` (single). */
+export function readHighlights(raw: unknown): RaidHighlights[] {
+  const root = rec(raw);
+  const single = root ? readRaidHighlights(root["raid"]) : null;
+  if (single) return [single];
+  const list = arr(raw) ?? arr(root?.["raids"]) ?? [];
+  const out: RaidHighlights[] = [];
+  for (const row of list) {
+    const h = readRaidHighlights(row);
+    if (h) out.push(h);
+  }
+  return out;
 }
 
 // ---------- /api/sources/status (§5.7) ----------

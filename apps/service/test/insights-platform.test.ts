@@ -58,6 +58,73 @@ describe("insights routes (M7) + platform extensions", () => {
     expect(body.sampleSizes.raids).toBe(1);
   });
 
+  it("GET /api/insights/networth returns a trajectory and a goal ETA (M7.4)", async () => {
+    const app = await testApp();
+    app.tac.store.recordFleaSale({ itemId: "GP coin", amount: 10_000, ts: "2026-07-01T20:00:00.000" }, false);
+    app.tac.store.recordFleaSale({ itemId: "GP coin", amount: 50_000, ts: "2026-07-06T20:00:00.000" }, false);
+    const withGoal = (await app.inject({ method: "GET", url: "/api/insights/networth?goal=rubles:100000" })).json();
+    expect(withGoal.currentEstimate).toBe(60_000);
+    expect(withGoal.series.length).toBeGreaterThan(0);
+    expect(withGoal.goal.kind).toBe("rubles");
+    expect(withGoal.goal.remaining).toBe(40_000);
+    expect(withGoal.goal.etaDays).toBeGreaterThan(0);
+    // No / bad goal query -> trajectory only, goal null, no crash.
+    const noGoal = (await app.inject({ method: "GET", url: "/api/insights/networth" })).json();
+    expect(noGoal.goal).toBeNull();
+    const badGoal = (await app.inject({ method: "GET", url: "/api/insights/networth?goal=bananas" })).json();
+    expect(badGoal.goal).toBeNull();
+  });
+
+  it("GET /api/insights/attribution flags a survival shift around a config change (M6.3)", async () => {
+    const app = await testApp();
+    const store = app.tac.store;
+    store.insertConnectorReading({ connectorId: "eft-config", capability: "graphics", capturedAt: "2026-07-01T10:00:00.000", settingsHash: "A", data: {} });
+    store.insertConnectorReading({ connectorId: "eft-config", capability: "graphics", capturedAt: "2026-07-04T10:00:00.000", settingsHash: "B", data: {} });
+    const seed = (day: string, outcome: "survived" | "died", n: number): void => {
+      seedRaid(app, {
+        map: "streets",
+        outcome,
+        startedAt: `${day}T20:${String(n).padStart(2, "0")}:00.000`,
+        endedAt: `${day}T20:${String(n + 20).padStart(2, "0")}:00.000`,
+      });
+    };
+    for (let i = 0; i < 5; i++) seed("2026-07-02", "survived", i);
+    seed("2026-07-02", "died", 5);
+    for (let i = 0; i < 5; i++) seed("2026-07-05", "died", i);
+    seed("2026-07-05", "survived", 5);
+
+    const body = (await app.inject({ method: "GET", url: "/api/insights/attribution" })).json();
+    expect(body.changes).toHaveLength(1);
+    const finding = body.findings.find((f: { metric: string; scope: string }) => f.metric === "survival" && f.scope === "streets");
+    expect(finding).toBeDefined();
+    expect(finding.direction).toBe("down");
+    expect(finding.label).toContain("Survival on streets");
+  });
+
+  it("GET /api/insights/highlights builds per-raid marker timelines (M7.5)", async () => {
+    const app = await testApp();
+    seedRaid(app, {
+      map: "customs",
+      outcome: "died",
+      startedAt: "2026-07-01T20:00:00.000",
+      endedAt: "2026-07-01T20:30:00.000",
+      durationSec: 1800,
+    });
+    app.tac.store.applyQuestEvent({ taskId: "t1", status: "completed", ts: "2026-07-01T20:14:00.000" }, "live", false);
+
+    const list = (await app.inject({ method: "GET", url: "/api/insights/highlights" })).json();
+    expect(list.raids).toHaveLength(1);
+    const first = list.raids[0];
+    expect(first.markers[0]).toMatchObject({ kind: "raid-start", tOffsetSec: 0 });
+    expect(first.markers.at(-1)).toMatchObject({ kind: "raid-end", tOffsetSec: 1800 });
+
+    const one = (await app.inject({ method: "GET", url: `/api/insights/highlights?raidId=${first.raidId}` })).json();
+    expect(one.raid.raidId).toBe(first.raidId);
+    // Unknown raid id degrades to null, not a crash.
+    const missing = (await app.inject({ method: "GET", url: "/api/insights/highlights?raidId=99999" })).json();
+    expect(missing.raid).toBeNull();
+  });
+
   it("GET /api/metrics counts requests in-session and persists lifetime totals (M5.6)", async () => {
     const app = await testApp();
     await app.inject({ method: "GET", url: "/api/health" });

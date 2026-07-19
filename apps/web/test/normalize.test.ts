@@ -4,9 +4,12 @@ import {
   LIGHTKEEPER_TOTAL_FALLBACK,
   normalizePlanResponse,
   normalizeStoryResponse,
+  readAttribution,
   readGraphSummary,
+  readHighlights,
   readInsightsEconomy,
   readInsightsRaids,
+  readNetWorthGoal,
   readPerfRows,
   readPlayerState,
   readSettingsDiffs,
@@ -206,5 +209,69 @@ describe("readPerfRows / insights readers", () => {
     expect(readInsightsEconomy({ income: { bucket: "weekly", points: [] } }).income).not.toBeNull();
     expect(readInsightsEconomy({ income: { bucket: "weekly" } }).income).toBeNull();
     expect(readInsightsEconomy(undefined).netWorth).toBeNull();
+  });
+
+  it("net-worth goal reader parses series + goal and degrades to empties (M7.4)", () => {
+    const empty = readNetWorthGoal(undefined);
+    expect(empty.series).toEqual([]);
+    expect(empty.currentEstimate).toBe(0);
+    expect(empty.goal).toBeNull();
+    const filled = readNetWorthGoal({
+      series: [{ day: "2026-07-01", fleaCumulative: 10, estimatedNetWorth: 60000 }],
+      currentEstimate: 60000,
+      netWorth: { points: [] },
+      goal: { kind: "rubles", target: 100000, current: 60000, remaining: 40000, reached: false, etaDays: 4, etaRaids: 4, lowConfidence: false },
+      lowConfidence: false,
+    });
+    expect(filled.series).toHaveLength(1);
+    expect(filled.currentEstimate).toBe(60000);
+    expect(filled.goal?.kind).toBe("rubles");
+    expect(filled.goal?.etaDays).toBe(4);
+  });
+
+  it("attribution reader keeps only well-formed findings (M6.3)", () => {
+    const report = readAttribution({
+      changes: [{ at: "2026-07-04T10:00:00", connectorId: "eft-config", capability: "graphics", fromHash: "A", toHash: "B" }],
+      findings: [
+        { metric: "survival", scope: "streets", label: "Survival on streets dropped 67 pts", direction: "down", nBefore: 6, nAfter: 6, confidence: "ok" },
+        { metric: "bogus", label: "junk" },
+        { metric: "fps" }, // no label -> dropped
+      ],
+      counts: { readings: 2, withHash: 2, raids: 12, perfSamples: 0 },
+      lowConfidence: false,
+      note: "correlation not causation",
+    });
+    expect(report.findings).toHaveLength(1);
+    expect(report.findings[0]!.scope).toBe("streets");
+    expect(report.changes).toHaveLength(1);
+    expect(report.counts.raids).toBe(12);
+  });
+
+  it("highlights reader accepts {raids}, bare arrays, and {raid} (M7.5)", () => {
+    const list = readHighlights({
+      raids: [
+        {
+          raidId: 1,
+          map: "customs",
+          startedAt: "2026-07-01T20:00:00",
+          outcome: "died",
+          markers: [
+            { kind: "raid-start", tOffsetSec: 0, label: "Raid start", clock: "00:00" },
+            { kind: "raid-end", tOffsetSec: 1800, label: "Died", clock: "30:00" },
+            { tOffsetSec: 5 }, // malformed -> dropped
+          ],
+        },
+      ],
+    });
+    expect(list).toHaveLength(1);
+    expect(list[0]!.markers).toHaveLength(2);
+    expect(list[0]!.outcome).toBe("died");
+
+    const single = readHighlights({ raid: { raidId: 9, markers: [] } });
+    expect(single).toHaveLength(1);
+    expect(single[0]!.raidId).toBe(9);
+
+    expect(readHighlights({ raid: null })).toEqual([]);
+    expect(readHighlights(undefined)).toEqual([]);
   });
 });

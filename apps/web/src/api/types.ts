@@ -392,6 +392,97 @@ export interface NetWorthEstimate {
 /** Tolerant — normalized via readInsightsEconomy(). */
 export type InsightsEconomyResponse = Record<string, unknown>;
 
+// M7.4 net-worth trajectory + goal ETA (GET /api/insights/networth?goal=…)
+
+export interface GoalProjection {
+  kind: "rubles" | "level" | "tasks";
+  target: number;
+  current: number;
+  remaining: number;
+  reached: boolean;
+  pace: { perDay: number | null; perRaid: number | null; windowDays: number; raidsInWindow: number; n: number; source: string };
+  etaDays: number | null;
+  etaRaids: number | null;
+  n: number;
+  lowConfidence: boolean;
+  note: string;
+}
+
+export interface NetWorthGoalReport {
+  series: { day: string; fleaCumulative: number; estimatedNetWorth: number }[];
+  currentEstimate: number;
+  netWorth: NetWorthEstimate;
+  goal: GoalProjection | null;
+  lowConfidence: boolean;
+}
+
+/** Tolerant — normalized via readNetWorthGoal(). */
+export type NetWorthGoalResponse = Record<string, unknown>;
+
+// M6.3 config↔outcome attribution (GET /api/insights/attribution)
+
+export interface AttributionFinding {
+  metric: "survival" | "fps";
+  scope: string;
+  changeAt: string;
+  connectorId: string;
+  capability: string;
+  fromHash: string | null;
+  toHash: string;
+  before: number;
+  after: number;
+  deltaAbs: number;
+  deltaPct: number | null;
+  nBefore: number;
+  nAfter: number;
+  direction: "up" | "down";
+  confidence: "ok" | "low";
+  label: string;
+}
+
+export interface AttributionReport {
+  changes: { at: string; connectorId: string; capability: string; fromHash: string | null; toHash: string }[];
+  findings: AttributionFinding[];
+  counts: { readings: number; withHash: number; raids: number; perfSamples: number };
+  lowConfidence: boolean;
+  note: string;
+}
+
+/** Tolerant — normalized via readAttribution(). */
+export type AttributionResponse = Record<string, unknown>;
+
+// M7.5 highlight-index (GET /api/insights/highlights)
+
+export type HighlightMarkerKind =
+  | "raid-start"
+  | "raid-end"
+  | "quest-completed"
+  | "quest-failed"
+  | "quest-started"
+  | "flea-sale"
+  | "position";
+
+export interface HighlightMarker {
+  tOffsetSec: number;
+  kind: HighlightMarkerKind;
+  label: string;
+  clock: string;
+}
+
+export interface RaidHighlights {
+  raidId: number;
+  sid: string | null;
+  map: string | null;
+  startedAt: string;
+  endedAt: string | null;
+  durationSec: number | null;
+  outcome: "survived" | "died" | "unknown";
+  markers: HighlightMarker[];
+}
+
+/** Tolerant — normalized via readHighlights() / readRaidHighlights(). */
+export type HighlightsResponse = Record<string, unknown>;
+
 export interface FingerprintResponse {
   features: Record<string, number>;
   explanations: Record<string, string>;

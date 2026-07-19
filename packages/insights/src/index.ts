@@ -54,3 +54,31 @@ export {
   type FingerprintOptions,
   type PlaystyleFingerprint,
 } from "./fingerprint.js";
+export {
+  parseGoal,
+  netWorthGoal,
+  KAPPA_TASK_TARGET,
+  DEFAULT_PACE_WINDOW_DAYS,
+  type GoalKind,
+  type GoalSpec,
+  type GoalPace,
+  type GoalProjection,
+  type NetWorthGoalReport,
+  type NetWorthGoalOptions,
+} from "./goals.js";
+export {
+  attribution,
+  ATTRIBUTION_MIN_SIDE,
+  SURVIVAL_MATERIALITY,
+  FPS_MATERIALITY,
+  type SettingsChange,
+  type AttributionFinding,
+  type AttributionReport,
+} from "./attribution.js";
+export {
+  raidHighlights,
+  recentHighlights,
+  type MarkerKind,
+  type HighlightMarker,
+  type RaidHighlights,
+} from "./highlights.js";
