@@ -44,6 +44,14 @@ export const ServiceConfig = z.object({
   eftPath: z.string().optional(),
   agentUrl: z.string().optional(),
   /**
+   * Override for the EFT **Logs** directory. In the two-PC pull model the
+   * Companion runs on the streaming PC and points this at the gaming PC's
+   * Tailscale/SMB-shared Logs (e.g. `\\hero\c\Users\...\Escape from Tarkov\Logs`
+   * or a mapped drive). Combined with the continuous watcher OFF (TAC_NO_WATCH),
+   * logs are ingested only on-demand via `POST /api/sync`. `TAC_LOGS_DIR` wins.
+   */
+  logsDir: z.string().optional(),
+  /**
    * Two-PC / LAN exposure (opt-in). OFF by default → the service binds loopback
    * only and rejects any non-local Host header (DNS-rebinding guard). When
    * `enabled`, it binds the LAN (0.0.0.0) and the Host allowlist is widened to
@@ -131,6 +139,11 @@ export function resolveAgentUrl(config?: ServiceConfig): string {
 
 export function watchDisabled(): boolean {
   return process.env["TAC_NO_WATCH"] === "1";
+}
+
+/** EFT Logs dir override: TAC_LOGS_DIR > config.logsDir > undefined (auto-detect). */
+export function resolveLogsDir(config?: ServiceConfig): string | undefined {
+  return process.env["TAC_LOGS_DIR"] || config?.logsDir || undefined;
 }
 
 /** This machine's non-internal IPv4 addresses (the ones a second PC would use). */

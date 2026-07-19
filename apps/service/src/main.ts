@@ -1,5 +1,5 @@
 import { buildApp } from "./app.js";
-import { defaultDataDir, loadConfig, resolveNetwork, servicePort, watchDisabled, LOCAL_HOSTS } from "./config.js";
+import { defaultDataDir, loadConfig, resolveLogsDir, resolveNetwork, servicePort, watchDisabled, LOCAL_HOSTS } from "./config.js";
 import { DEFAULT_HORIZON } from "./plan.js";
 
 /**
@@ -14,7 +14,8 @@ async function main(): Promise<void> {
   const config = loadConfig(dataDir);
   const watch = !watchDisabled();
 
-  const app = await buildApp({ dataDir, config, watch, logger: false });
+  const logsDir = resolveLogsDir(config);
+  const app = await buildApp({ dataDir, config, watch, logger: false, ...(logsDir ? { logsDir } : {}) });
   const rt = app.tac;
 
   console.log(`[config]      ${dataDir} — active profile ${config.activeProfile}`);
@@ -25,7 +26,10 @@ async function main(): Promise<void> {
     console.log(`[patch]       WARNING: installed game ${gameVersion} != snapshot ${rt.snapshotVersion()} — run \`pnpm snapshot\``);
   }
   console.log(`[story]       ${rt.story() ? `dataset v${rt.story()!.gameVersion} loaded` : "no dataset (data/story/story.json missing)"}`);
-  console.log(`[watchers]    ${watch ? `log + screenshot watchers running (logs: ${rt.logsDir() ?? "not found"})` : "disabled (TAC_NO_WATCH=1)"}`);
+  console.log(`[watchers]    ${watch ? `log + screenshot watchers running (logs: ${rt.logsDir() ?? "not found"})` : "continuous watch OFF"}`);
+  if (!watch) {
+    console.log(`[sync]        on-demand pull mode — POST /api/sync reads ${rt.logsDir() ?? "(no logs dir configured — set TAC_LOGS_DIR / config.logsDir)"} once per call`);
+  }
   console.log(`[agent-proxy] ${rt.agentUrl}`);
 
   // M3.2 acceptance: measure one cold plan build at boot; must stay < 2 s.

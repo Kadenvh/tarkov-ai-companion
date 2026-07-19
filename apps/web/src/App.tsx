@@ -8,6 +8,7 @@
 import { Component, useEffect, useState, type ReactNode } from "react";
 import { useApp } from "./store";
 import { mapDisplayName } from "./lib/maps";
+import type { SyncResponse } from "./api/types";
 import { TonightsPlan } from "./views/TonightsPlan";
 import { ThisRaidView } from "./views/ThisRaid";
 import { GoalsView } from "./views/Goals";
@@ -97,6 +98,41 @@ const NAV_SECTIONS: { label: string; items: NavItem[] }[] = [
   },
 ];
 
+function SyncLogsButton(): ReactNode {
+  const { api, pushToast, refreshAll } = useApp();
+  const [syncing, setSyncing] = useState(false);
+
+  const sync = async (): Promise<void> => {
+    setSyncing(true);
+    try {
+      const res = await api.post<SyncResponse>("/api/sync");
+      const bits = [
+        `${res.parsedEvents} event${res.parsedEvents === 1 ? "" : "s"}`,
+        ...(res.raidsEnded ? [`${res.raidsEnded} raid${res.raidsEnded === 1 ? "" : "s"}`] : []),
+        ...(res.quests ? [`${res.quests} quest`] : []),
+      ];
+      pushToast(
+        "info",
+        res.parsedEvents === 0
+          ? "Logs already up to date — nothing new."
+          : `Synced ${bits.join(" · ")} from the gaming PC.`,
+        "Sync logs",
+      );
+      if (res.parsedEvents > 0) await refreshAll();
+    } catch {
+      /* client already toasts the error (e.g. share unreachable) */
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  return (
+    <button onClick={() => void sync()} disabled={syncing} title="Pull new EFT logs from the gaming PC (on demand — no background polling)">
+      {syncing ? "Syncing…" : "⟲ Sync logs"}
+    </button>
+  );
+}
+
 function StatusBar(): ReactNode {
   const { health, player, wsStatus, goals, refreshAll } = useApp();
   const goalLabels = (goals?.goals ?? []).map((g) => {
@@ -177,6 +213,7 @@ function StatusBar(): ReactNode {
         <span className="dot" />
         {wsStatus === "open" ? "LIVE" : wsStatus === "connecting" ? "CONNECTING" : "OFFLINE"}
       </span>
+      <SyncLogsButton />
       <button onClick={() => void refreshAll()}>Refresh</button>
     </div>
   );

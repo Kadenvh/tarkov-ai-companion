@@ -560,6 +560,18 @@ export interface FingerprintResponse {
   lowConfidence: boolean;
 }
 
+/** POST /api/sync — one on-demand log pull (two-PC pull model). */
+export interface SyncResponse {
+  ok: boolean;
+  lastSyncAt: string | null;
+  logsDir: string | null;
+  session: string | null;
+  parsedEvents: number;
+  quests: number;
+  fleaSales: number;
+  raidsEnded: number;
+}
+
 /** GET /api/environment/hardware — detected specs + hardware-dependent perf advice. */
 export interface HardwareFacts {
   logicalCores: number;

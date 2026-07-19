@@ -238,6 +238,15 @@ export function registerCoreRoutes(app: FastifyInstance, rt: ServiceRuntime): vo
     };
   });
 
+  // On-demand log pull (two-PC pull model). Drives ONE watcher cycle over the
+  // configured logs dir (e.g. hero's Tailscale-shared Logs) — cursor-based, so
+  // only new lines are ingested, and nothing polls in the background. Wired to
+  // the UI "Sync logs" button and a Stream Deck key.
+  app.post("/api/sync", async () => {
+    const summary = rt.syncOnce();
+    return { ok: true, lastSyncAt: rt.lastSyncAt, logsDir: rt.logsDir(), ...summary };
+  });
+
   app.get("/api/story", async (_req, reply) => {
     const dataset = rt.story();
     if (!dataset) return reply.status(404).send({ error: "story dataset not found (data/story/story.json)" });
