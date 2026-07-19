@@ -1447,6 +1447,45 @@ table.data code {
   stroke: none;
 }
 
+/* ---------- tabs (Settings & Perf sub-views) ---------- */
+.tabbar {
+  display: flex;
+  gap: 2px;
+  margin: 14px 0;
+  border-bottom: 1px solid var(--border-default);
+}
+.tabbar .tab {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  padding: 8px 16px;
+  cursor: pointer;
+  margin-bottom: -1px;
+}
+.tabbar .tab:hover {
+  color: var(--color-text-secondary);
+}
+.tabbar .tab.active {
+  color: var(--color-secondary-400);
+  border-bottom-color: var(--color-secondary-500);
+}
+.tabbar .tab:focus-visible {
+  outline: 2px solid var(--color-primary-400);
+  outline-offset: -2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ---------- StatTile grid ---------- */
+.tile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
 .controls-row {
   display: flex;
   gap: 14px;

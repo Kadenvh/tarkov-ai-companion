@@ -37,6 +37,7 @@ import { Metrics } from "./metrics.js";
 import { WsHub } from "./ws.js";
 import { PlanPipeline } from "./plan.js";
 import { TrackerSyncScheduler } from "./tracker-sync.js";
+import { TelemetryScheduler, TelemetrySampler } from "./telemetry.js";
 import { buildConnectorRegistry, buildSourceRegistry, type SourceQuotaSeed } from "./registries.js";
 
 /** Default minutes between scheduled TarkovTracker read syncs (config override wins). */
@@ -120,6 +121,10 @@ export interface RuntimeOptions {
   trackerSyncIntervalMs?: number;
   /** Run a sync on startup when a token is configured (default true). */
   trackerSyncOnStart?: boolean;
+  /** Override the live-telemetry poll period (ms). Absent → 2000. */
+  telemetryIntervalMs?: number;
+  /** Override the telemetry idle-stop delay (ms). Absent → 30000. */
+  telemetryIdleTimeoutMs?: number;
 }
 
 export class ServiceRuntime {
@@ -131,6 +136,12 @@ export class ServiceRuntime {
   readonly planner: PlanPipeline;
   /** M9 capability-first connector registry (EFT config / Wootility / manual-capture). */
   readonly connectors: ConnectorRegistry;
+  /**
+   * Live system/GPU telemetry poller (Coach observability). Demand-gated: it
+   * only samples while a WS client is subscribed or a `/api/telemetry/*` route
+   * recently touched it, so nvidia-smi is never spawned in an idle background.
+   */
+  readonly telemetry: TelemetryScheduler;
   /**
    * M10 remote-source registry (tarkov.dev JSON / TarkovTracker progress-read).
    * Mutable: rebuilt when the TarkovTracker token changes so the read feed uses
@@ -221,6 +232,15 @@ export class ServiceRuntime {
         }),
     });
     this.planner.bind();
+    const telemetrySampler = new TelemetrySampler(
+      this.nvidiaRunner ? { smiRunner: this.nvidiaRunner } : {},
+    );
+    this.telemetry = new TelemetryScheduler({
+      sample: () => telemetrySampler.sample(),
+      onSample: (sample) => this.hub.broadcast("telemetry.sample", sample),
+      ...(opts.telemetryIntervalMs !== undefined ? { intervalMs: opts.telemetryIntervalMs } : {}),
+      ...(opts.telemetryIdleTimeoutMs !== undefined ? { idleTimeoutMs: opts.telemetryIdleTimeoutMs } : {}),
+    });
     this.bindPatchSentinel();
     this.restartMirror();
     this.restartTrackerSync();
@@ -494,6 +514,7 @@ export class ServiceRuntime {
 
   async close(): Promise<void> {
     await this.stopWatchers();
+    this.telemetry.stop();
     this.trackerScheduler?.stop();
     this.trackerScheduler = null;
     await this.mirror?.flush(); // drain queued tracker writes before shutdown
