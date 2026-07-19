@@ -61,6 +61,62 @@ export function insertQuestEvent(db: DatabaseSync, taskId: string, status: strin
   db.prepare(`INSERT INTO quest_events (task_id, status, ts) VALUES (?, ?, ?)`).run(taskId, status, ts);
 }
 
+export function insertPosition(
+  db: DatabaseSync,
+  pos: { raidId?: number | null; map?: string | null; x: number; y: number; z: number; filename?: string | null; ts: string },
+): void {
+  db.prepare(
+    `INSERT INTO positions (raid_id, map, x, y, z, filename, ts) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+  ).run(pos.raidId ?? null, pos.map ?? null, pos.x, pos.y, pos.z, pos.filename ?? null, pos.ts);
+}
+
+export function insertCalibration(db: DatabaseSync, kind: "level" | "xp", value: number, ts: string): void {
+  db.prepare(`INSERT INTO calibrations (kind, value, ts) VALUES (?, ?, ?)`).run(kind, value, ts);
+}
+
+export function insertPerfSample(
+  db: DatabaseSync,
+  s: { raidId?: number | null; map?: string | null; ts: string; fpsAvg?: number | null },
+): void {
+  db.prepare(
+    `INSERT INTO perf_samples (raid_id, map, ts, fps_avg) VALUES (?, ?, ?, ?)`,
+  ).run(s.raidId ?? null, s.map ?? null, s.ts, s.fpsAvg ?? null);
+}
+
+export function insertConnectorReading(
+  db: DatabaseSync,
+  r: {
+    connectorId: string;
+    capability: string;
+    capturedAt: string;
+    settingsHash?: string | null;
+    gameVersion?: string | null;
+    raidId?: number | null;
+    data?: unknown;
+    source?: string;
+  },
+): void {
+  db.prepare(
+    `INSERT INTO connector_reading
+       (connector_id, capability, captured_at, game_version, settings_hash, raid_id, data, source)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+  ).run(
+    r.connectorId,
+    r.capability,
+    r.capturedAt,
+    r.gameVersion ?? null,
+    r.settingsHash ?? null,
+    r.raidId ?? null,
+    JSON.stringify(r.data ?? null),
+    r.source ?? "connector",
+  );
+}
+
+export function setMeta(db: DatabaseSync, key: string, value: string): void {
+  db.prepare(`INSERT INTO meta (key, value) VALUES (?, ?)
+              ON CONFLICT(key) DO UPDATE SET value = excluded.value`).run(key, value);
+}
+
 /** minutes -> "HH:MM:SS" clock fragment offset from a base "HH:MM:SS". */
 function clock(hour: number, minute: number): string {
   return `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}:00`;

@@ -8,19 +8,70 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import { useApp } from "../store";
-import { readInsightsEconomy, readInsightsRaids } from "../lib/normalize";
+import {
+  readAttribution,
+  readHighlights,
+  readInsightsEconomy,
+  readInsightsRaids,
+  readNetWorthGoal,
+} from "../lib/normalize";
 import { fmtHour, fmtMinutes, fmtNumber, fmtPct, fmtRubles } from "../lib/format";
 import { mapDisplayName } from "../lib/maps";
 import { Badge, Empty } from "../components/common";
 import { Sparkline } from "../components/Sparkline";
+import { HighlightTimeline } from "../components/HighlightTimeline";
 import type {
+  AttributionResponse,
   FingerprintResponse,
+  HighlightsResponse,
   InsightsEconomyResponse,
   InsightsRaidsResponse,
+  NetWorthGoalResponse,
 } from "../api/types";
 
 function LowN({ low }: { low?: boolean }): ReactNode {
   return low ? <Badge kind="warn">low n</Badge> : null;
+}
+
+type GoalProjection = NonNullable<ReturnType<typeof readNetWorthGoal>["goal"]>;
+
+function goalNoun(kind: GoalProjection["kind"]): string {
+  return kind === "rubles" ? "roubles" : kind === "level" ? "level" : "tasks";
+}
+
+function goalValue(kind: GoalProjection["kind"], v: number): string {
+  return kind === "rubles" ? fmtRubles(v) : fmtNumber(v);
+}
+
+function GoalEta({ goal }: { goal: GoalProjection }): ReactNode {
+  return (
+    <div className="kv" style={{ marginTop: 10 }}>
+      <span className="k">Goal</span>
+      <span>
+        {goalValue(goal.kind, goal.target)} {goalNoun(goal.kind)} <LowN low={goal.lowConfidence} />
+      </span>
+      <span className="k">Progress</span>
+      <span>
+        {goalValue(goal.kind, goal.current)} now ·{" "}
+        {goal.reached ? "reached ✓" : `${goalValue(goal.kind, goal.remaining)} to go`}
+      </span>
+      {!goal.reached ? (
+        <>
+          <span className="k">At current pace</span>
+          <span>
+            {goal.etaDays == null ? (
+              <span className="dim">not enough recent pace to project</span>
+            ) : (
+              <>
+                ~{fmtNumber(goal.etaDays)} day{goal.etaDays === 1 ? "" : "s"}
+                {goal.etaRaids != null ? ` · ~${fmtNumber(goal.etaRaids)} raids` : ""}
+              </>
+            )}
+          </span>
+        </>
+      ) : null}
+    </div>
+  );
 }
 
 export function DebriefView(): ReactNode {
@@ -28,6 +79,9 @@ export function DebriefView(): ReactNode {
   const [raids, setRaids] = useState<ReturnType<typeof readInsightsRaids> | null>(null);
   const [economy, setEconomy] = useState<ReturnType<typeof readInsightsEconomy> | null>(null);
   const [fingerprint, setFingerprint] = useState<FingerprintResponse | null>(null);
+  const [networth, setNetworth] = useState<ReturnType<typeof readNetWorthGoal> | null>(null);
+  const [attribution, setAttribution] = useState<ReturnType<typeof readAttribution> | null>(null);
+  const [highlights, setHighlights] = useState<ReturnType<typeof readHighlights> | null>(null);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -44,6 +98,19 @@ export function DebriefView(): ReactNode {
         api
           .get<FingerprintResponse>("/api/insights/fingerprint")
           .then(setFingerprint)
+          .catch(() => undefined),
+        // Kappa is this profile's north-star goal — surface its ETA by default.
+        api
+          .get<NetWorthGoalResponse>("/api/insights/networth?goal=kappa")
+          .then((res) => setNetworth(readNetWorthGoal(res)))
+          .catch(() => undefined),
+        api
+          .get<AttributionResponse>("/api/insights/attribution")
+          .then((res) => setAttribution(readAttribution(res)))
+          .catch(() => undefined),
+        api
+          .get<HighlightsResponse>("/api/insights/highlights?limit=6")
+          .then((res) => setHighlights(readHighlights(res)))
           .catch(() => undefined),
       ];
       await Promise.all(jobs);
@@ -251,6 +318,76 @@ export function DebriefView(): ReactNode {
               {economy.netWorth.caveats.join("; ")}
             </p>
           ) : null}
+        </div>
+      ) : null}
+
+      {networth && (networth.series.length > 0 || networth.goal) ? (
+        <div className="card">
+          <h3 style={{ marginTop: 0 }}>
+            Net worth &amp; goal ETA <LowN low={networth.lowConfidence} />
+          </h3>
+          {networth.series.length > 0 ? (
+            <Sparkline
+              title="net-worth estimate"
+              points={networth.series.map((p) => ({ label: p.day, value: p.estimatedNetWorth }))}
+            />
+          ) : null}
+          <div className="kv" style={{ marginTop: 10 }}>
+            <span className="k">Current estimate</span>
+            <span>{fmtRubles(networth.currentEstimate)}</span>
+          </div>
+          {networth.goal ? <GoalEta goal={networth.goal} /> : null}
+        </div>
+      ) : null}
+
+      {attribution && (attribution.findings.length > 0 || attribution.changes.length > 0) ? (
+        <div className="card">
+          <h3 style={{ marginTop: 0 }}>
+            Config → outcome{" "}
+            {attribution.findings.length > 0 ? (
+              <Badge kind="warn">
+                {attribution.findings.length} finding{attribution.findings.length === 1 ? "" : "s"}
+              </Badge>
+            ) : null}
+          </h3>
+          {attribution.findings.length > 0 ? (
+            <ul className="objective-list">
+              {attribution.findings.map((f, i) => (
+                <li key={`${f.changeAt}-${f.metric}-${f.scope}-${i}`}>
+                  <span className="tick">{f.direction === "down" ? "▼" : "▲"}</span>
+                  <span>
+                    {f.label}{" "}
+                    {f.confidence === "low" ? <Badge kind="warn">low confidence</Badge> : null}
+                    <div className="note">
+                      n before {f.nBefore} · after {f.nAfter}
+                    </div>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="sub">
+              No material survival/FPS shifts around your {attribution.changes.length} recorded
+              config change{attribution.changes.length === 1 ? "" : "s"} — either nothing moved or
+              there aren't enough raids on both sides of a change yet.
+            </p>
+          )}
+          <p className="sub" style={{ marginTop: 10 }}>
+            {attribution.note}
+          </p>
+        </div>
+      ) : null}
+
+      {highlights && highlights.length > 0 ? (
+        <div className="card">
+          <h3 style={{ marginTop: 0 }}>Highlight reel</h3>
+          <p className="sub">
+            A clip guide for your recent raids — offsets from raid start, ready to scrub to in
+            ShadowPlay / instant replay. Kill markers arrive with the kills log-parser.
+          </p>
+          {highlights.map((h) => (
+            <HighlightTimeline key={h.raidId} raid={h} />
+          ))}
         </div>
       ) : null}
 
