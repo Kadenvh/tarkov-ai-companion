@@ -14,6 +14,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { useApp } from "../store";
 import { mapDisplayName, mapDeepLink, resolveMap } from "../lib/maps";
 import { timeAgo } from "../lib/format";
+import { runthroughStatus, fmtClock } from "../lib/raidClock";
 import { readHighlights } from "../lib/normalize";
 import { Badge, Empty } from "../components/common";
 import { HighlightTimeline } from "../components/HighlightTimeline";
@@ -123,6 +124,7 @@ export function ThisRaidView(): ReactNode {
   const mapKey = raidBanner?.map;
   const objectiveRaid = objectivesForMap(plan?.raids, mapKey);
   const elapsed = raidBanner ? Date.now() - raidBanner.at : 0;
+  const runthrough = runthroughStatus(elapsed / 1000);
   const link = latest ? mapDeepLink(latest.map ?? mapKey ?? null) : mapDeepLink(mapKey ?? null);
 
   return (
@@ -169,6 +171,42 @@ export function ThisRaidView(): ReactNode {
             </div>
           ) : null}
         </div>
+      </div>
+
+      <div className={`card runthrough-card ${runthrough.met ? "cleared" : ""}`}>
+        {runthrough.met ? (
+          <>
+            <div className="rt-head">
+              <span className="pill live">
+                <span className="dot" /> SURVIVAL-ELIGIBLE
+              </span>
+              <span className="rt-note">
+                Past the ~{Math.round(runthrough.thresholdSec / 60)}-min window — extract now and it
+                counts as a <strong>survived</strong> raid.
+              </span>
+            </div>
+          </>
+        ) : (
+          <div className="progress" style={{ margin: 0 }}>
+            <div className="p-head">
+              <span>
+                <span className="pill warn">
+                  <span className="dot" /> RUN-THROUGH RISK
+                </span>{" "}
+                Extract before this counts as a <strong>Run Through</strong> — cut rewards &amp; rep,
+                not a survival.
+              </span>
+              <span className="pct">{fmtClock(runthrough.remainingSec)} left</span>
+            </div>
+            <div className="track">
+              <div className="fill info" style={{ width: `${Math.round(runthrough.progress * 100)}%` }} />
+            </div>
+            <p className="sub" style={{ margin: "8px 0 0" }}>
+              Time criterion only — earning ~200+ in-raid XP also clears it, but that needs the game
+              process, which this app never touches.
+            </p>
+          </div>
+        )}
       </div>
 
       <div className="sectionlabel">

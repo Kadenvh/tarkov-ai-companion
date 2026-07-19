@@ -976,6 +976,22 @@ table.data code {
   background: var(--color-secondary-500);
 }
 
+/* ---------- run-through status (This Raid) ---------- */
+
+.runthrough-card.cleared {
+  border-color: var(--color-success-500);
+}
+.runthrough-card .rt-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+.runthrough-card .rt-note {
+  color: var(--color-text-secondary);
+  font-size: var(--text-base);
+}
+
 /* ---------- story tracker ---------- */
 
 .ending-card {
