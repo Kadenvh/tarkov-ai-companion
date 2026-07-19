@@ -1,0 +1,46 @@
+# CI — typecheck + test the workspace on every push / PR.
+# Node 26 matches the dev environment (the state-engine uses the built-in
+# `node:sqlite`, which needs a recent Node). pnpm is pinned to 10.34.5 (11.x
+# deadlocks resolving electron-builder — see README / SPEC.md §0). The Electron
+# binary download is skipped: CI never builds the desktop app, and the download
+# otherwise stalls the install.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: typecheck + test
+    runs-on: ubuntu-latest
+    env:
+      ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "26"
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck (all workspaces)
+        run: pnpm -r typecheck
+
+      - name: Test (all workspaces)
+        run: pnpm -r test

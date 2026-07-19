@@ -9,6 +9,7 @@
   },
   "scripts": {
     "snapshot": "tsx src/cli/snapshot.ts",
+    "diff": "tsx src/cli/diff.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },

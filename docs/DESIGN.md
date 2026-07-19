@@ -14,7 +14,7 @@ Every Tarkov tool answers **"what exists?"** (tarkov.dev), **"what have I done?"
 
 The verified gap (see [gap analysis](research/04-competitive-gap-analysis.md)): every shipped "optimizer" is a filtered topological sort. No per-raid task batching, no XP/level simulation, no irreversibility foresight, no plan-tied acquisition lists, no adaptive replanning. The one AI product (tarkov.ai) is metered chat with zero grounding in player state. The data to build all of this exists, free, in one API. **The solver and the AI layer are simply unbuilt. We build them.**
 
-Sherpa = **a local-first companion service** that (a) passively reconstructs your player state from game logs, (b) runs a real optimizer over the full task/hideout/story graph, and (c) puts an AI copilot on top that briefs, explains, and replans — raid by raid.
+Tarkov AI Companion = **a local-first companion service** that (a) passively reconstructs your player state from game logs, (b) runs a real optimizer over the full task/hideout/story graph, and (c) puts an AI copilot on top that briefs, explains, and replans — raid by raid.
 
 ## 2. Product pillars (the five unserved capabilities)
 

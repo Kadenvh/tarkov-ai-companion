@@ -5,8 +5,8 @@ import type { ServiceRuntime } from "../runtime.js";
 
 /**
  * Documented extensions (SPEC-6): historical backfill (M2.3 surface),
- * notifications (agent M4.4 -> WS "notice"), and the M5.6 time-in-app
- * counter-metric.
+ * notifications (agent M4.4 -> WS "notice"), the M5.6 time-in-app
+ * counter-metric, and the M8.2 patch-drift readiness surface.
  */
 
 const BackfillBody = z
@@ -43,4 +43,10 @@ export function registerPlatformRoutes(app: FastifyInstance, rt: ServiceRuntime)
   });
 
   app.get("/api/metrics", async () => rt.metrics.snapshot());
+
+  // M8.2 patch-drift sentinel: readiness state for the next patch. Surfaces the
+  // active snapshot vs the installed game version, the structural invariants of
+  // the loaded world, and — when a snapshot for a newer detected version is on
+  // disk — the reviewable diff. Never pulls a snapshot (that's operator-driven).
+  app.get("/api/patch/status", async () => rt.patchStatus());
 }
