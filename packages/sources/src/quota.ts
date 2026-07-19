@@ -46,15 +46,17 @@ function parseInt0(value: string | null): number | undefined {
 }
 
 /**
- * Interpret `X-RateLimit-Reset`. Standard usage is a unix epoch in seconds;
- * some servers send seconds-until-reset. Heuristic: values that look like an
- * epoch (>= 1e9) are treated as absolute seconds, otherwise as a delta from now.
- * Returns epoch ms.
+ * Interpret `X-RateLimit-Reset`. Standard usage is a unix epoch in seconds; some
+ * servers send seconds-until-reset, and a few send epoch milliseconds. Heuristic
+ * by magnitude: `>= 1e12` → already epoch ms; `>= 1e9` → epoch seconds (×1000);
+ * otherwise a delta-seconds from now. Returns epoch ms.
  */
 function parseReset(value: string, nowMs: number): number | undefined {
   const n = Number.parseInt(value.trim(), 10);
   if (!Number.isFinite(n)) return undefined;
-  return n >= 1_000_000_000 ? n * 1000 : nowMs + n * 1000;
+  if (n >= 1_000_000_000_000) return n; // epoch milliseconds
+  if (n >= 1_000_000_000) return n * 1000; // epoch seconds
+  return nowMs + n * 1000; // delta seconds from now
 }
 
 /**

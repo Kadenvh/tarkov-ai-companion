@@ -192,8 +192,12 @@ export async function httpGet(opts: HttpGetOptions): Promise<HttpGetResult> {
 
     if (isRetryableStatus(res.status)) {
       lastError = new HttpError(res.status, opts.url);
+      const retryAfterMs = parseRetryAfterMs(res.headers.get("Retry-After"));
+      // A server-mandated wait longer than our per-attempt cap means retrying
+      // soon is pointless and would just burn a SHARED budget (e.g. TarkovTracker
+      // says "reset in an hour"). Surface the error now instead of hammering.
+      if (retryAfterMs !== undefined && retryAfterMs > maxDelayMs) throw lastError;
       if (attempt < maxRetries) {
-        const retryAfterMs = parseRetryAfterMs(res.headers.get("Retry-After"));
         await sleep(backoffDelay(attempt, baseDelayMs, maxDelayMs, rng, retryAfterMs));
         continue;
       }
