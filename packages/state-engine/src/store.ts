@@ -2,7 +2,7 @@ import { join } from "node:path";
 import type { DatabaseSync } from "node:sqlite";
 import { z } from "zod";
 import { GameMode } from "@tac/shared";
-import { REPO_ROOT } from "@tac/data-core";
+import { dataLocalDir } from "@tac/data-core";
 import { openDatabase } from "./db.js";
 import { EngineEmitter, type RaidOutcome } from "./events.js";
 import type { RaidDraft } from "./logs/raids.js";
@@ -45,6 +45,56 @@ export interface TraderStateRow {
   level: number;
   rep: number;
   ts: string | null;
+}
+
+/** A `connector_reading` insert (CONTRACTS §4). `data` is any JSON-serializable payload. */
+export interface ConnectorReadingInput {
+  connectorId: string;
+  capability: string;
+  capturedAt: string;
+  gameVersion?: string | null;
+  settingsHash?: string | null;
+  raidId?: number | null;
+  data: unknown;
+  /** Provenance: a live connector read vs. a manual capture. */
+  source?: "connector" | "manual";
+}
+
+/** A `connector_reading` row read back (data re-parsed from JSON). */
+export interface ConnectorReadingRow {
+  id: number;
+  connectorId: string;
+  capability: string;
+  capturedAt: string;
+  gameVersion: string | null;
+  settingsHash: string | null;
+  raidId: number | null;
+  data: unknown;
+  source: string;
+}
+
+/** Filters for {@link ProfileStore.listConnectorReadings}. */
+export interface ConnectorReadingQuery {
+  capability?: string;
+  /** ISO-8601 lower bound on `captured_at` (inclusive). */
+  sinceIso?: string;
+  limit?: number;
+}
+
+/** The remaining external-API budget persisted for one source (CONTRACTS §4). */
+export interface SourceQuotaRow {
+  sourceId: string;
+  readsRemaining: number | null;
+  writesRemaining: number | null;
+  resetsAt: string | null;
+  updatedAt: string;
+}
+
+/** A `source_quota` upsert patch — fields left `undefined` preserve the stored value. */
+export interface SourceQuotaPatch {
+  readsRemaining?: number;
+  writesRemaining?: number;
+  resetsAt?: string;
 }
 
 /** Structurally satisfies @tac/planner's PlayerState input (planner is not a dependency). */
@@ -94,9 +144,39 @@ export const TarkovTrackerProgress = z
     pmcFaction: z.string().optional(),
     displayName: z.string().optional(),
     userId: z.union([z.string(), z.number()]).optional(),
+    /**
+     * Trader standings — NOT returned by the public `/progress` API today
+     * (research/02 §1: hideout modules, traders, skills are read-only / absent),
+     * but tolerated "if present" so a future gateway that exposes the Supabase
+     * `traders{level,reputation}` blob syncs without a schema change.
+     */
+    traders: z
+      .record(
+        z.string(),
+        z.object({ level: z.number().optional(), reputation: z.number().optional() }).passthrough(),
+      )
+      .optional(),
   })
   .passthrough();
 export type TarkovTrackerProgress = z.infer<typeof TarkovTrackerProgress>;
+
+/** Per-field counts of what a `/progress` sync actually mutated (unchanged rows are skipped). */
+export interface TarkovTrackerApplyCounts {
+  tasks: number;
+  objectives: number;
+  hideout: number;
+  traders: number;
+  level: boolean;
+  faction: boolean;
+}
+
+/** Result of {@link ProfileStore.importTarkovTracker} — the parsed payload + a change summary. */
+export interface TarkovTrackerImportResult {
+  progress: TarkovTrackerProgress;
+  applied: TarkovTrackerApplyCounts;
+  /** True iff at least one row/field was mutated (drives "emit only when changed"). */
+  changed: boolean;
+}
 
 /** hideout module ids in the 1.0.6 snapshot are `<stationId>-<level>` */
 const MODULE_ID = /^([0-9a-f]{24})-(\d+)$/;
@@ -133,6 +213,16 @@ export class ProfileStore {
         .prepare("INSERT INTO meta (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value")
         .run(key, value);
     this.changed(reason);
+  }
+
+  /**
+   * Write `value` only when it differs from what's stored (so a no-op sync emits
+   * no `state.changed`). Returns whether it actually wrote.
+   */
+  private setMetaIfChanged(key: string, value: string, reason = `meta.${key}`): boolean {
+    if (this.getMeta(key) === value) return false;
+    this.setMeta(key, value, reason);
+    return true;
   }
 
   private metaNumber(key: string, fallback: number): number {
@@ -424,23 +514,56 @@ export class ProfileStore {
   // -- TarkovTracker import/export (M2.1 / M2.7) ------------------------------
 
   /**
-   * Seed the store from a TarkovTracker `GET /progress` payload (either the
-   * bare progress object or the `{ data: ... }` wrapper). Lossless: fields the
-   * local schema has no table for (hideout parts, edition, display name, raw
-   * module list) are kept in meta so `exportTarkovTracker()` round-trips.
+   * Apply a TarkovTracker `GET /progress` payload to the store (either the bare
+   * progress object or the `{ data: ... }` wrapper). This is the SINGLE mapper —
+   * the M2.7 one-shot seed, the on-demand sync route, and the scheduled read
+   * feed (SPEC-8) all funnel through here so field coverage never forks.
+   *
+   * Change-aware: every field is compared to what's stored and a setter fires
+   * ONLY on a real difference, so a no-op sync mutates nothing and emits no
+   * `state.changed`. Returns per-field counts of what was applied.
+   *
+   * Field coverage: tasksProgress → task_state, taskObjectivesProgress (with
+   * counts) → objective_state, hideoutModulesProgress → hideout_state (station =
+   * max completed level), playerLevel → level, pmcFaction → faction, and
+   * `traders` (level/rep) if the payload ever carries them. Lossless: fields the
+   * local schema has no table for (raw module list, hideout parts, edition,
+   * display name) are kept in meta so `exportTarkovTracker()` round-trips.
    */
-  importTarkovTracker(progressJson: unknown): TarkovTrackerProgress {
+  importTarkovTracker(progressJson: unknown): TarkovTrackerImportResult {
     const wrapped = progressJson as { data?: unknown } | null;
     const body = wrapped && typeof wrapped === "object" && "data" in wrapped ? wrapped.data : progressJson;
     const progress = TarkovTrackerProgress.parse(body);
 
+    const applied: TarkovTrackerApplyCounts = {
+      tasks: 0,
+      objectives: 0,
+      hideout: 0,
+      traders: 0,
+      level: false,
+      faction: false,
+    };
+
     for (const t of progress.tasksProgress) {
       if (t.invalid) continue;
-      this.setTaskState(t.id, { complete: t.complete ?? false, failed: t.failed ?? false, ts: null }, "import");
+      const complete = t.complete ?? false;
+      const failed = t.failed ?? false;
+      const existing = this.getTask(t.id);
+      if (existing && existing.complete === complete && existing.failed === failed) continue;
+      this.setTaskState(t.id, { complete, failed, ts: null }, "import");
+      applied.tasks++;
     }
+
     for (const o of progress.taskObjectivesProgress) {
       if (o.invalid) continue;
-      this.setObjectiveState(o.id, { count: o.count ?? 0, complete: o.complete ?? false, ts: null }, "import");
+      const count = o.count ?? 0;
+      const complete = o.complete ?? false;
+      const existing = this.db
+        .prepare("SELECT count, complete FROM objective_state WHERE objective_id = ?")
+        .get(o.id) as { count: number; complete: number } | undefined;
+      if (existing && existing.count === count && !!existing.complete === complete) continue;
+      this.setObjectiveState(o.id, { count, complete, ts: null }, "import");
+      applied.objectives++;
     }
 
     // hideout module ids are `<stationId>-<level>` in current tarkov.dev data
@@ -453,18 +576,52 @@ export class ProfileStore {
       const level = Number(levelRaw);
       if (stationId && level > (stationLevels.get(stationId) ?? 0)) stationLevels.set(stationId, level);
     }
-    for (const [stationId, level] of stationLevels) this.setHideoutLevel(stationId, level, null);
+    const existingHideout = new Map(this.getHideout().map((h) => [h.stationId, h.level]));
+    for (const [stationId, level] of stationLevels) {
+      if (existingHideout.get(stationId) === level) continue;
+      this.setHideoutLevel(stationId, level, null);
+      applied.hideout++;
+    }
 
-    if (progress.playerLevel !== undefined) this.setLevel(progress.playerLevel);
-    if (progress.pmcFaction === "USEC" || progress.pmcFaction === "BEAR") this.setFaction(progress.pmcFaction);
+    // traders (if the payload carries them — see the schema note; normally absent)
+    if (progress.traders) {
+      const existingTraders = new Map(this.getTraders().map((t) => [t.traderId, t]));
+      for (const [traderId, t] of Object.entries(progress.traders)) {
+        const existing = existingTraders.get(traderId);
+        const levelDiffers = t.level !== undefined && t.level !== existing?.level;
+        const repDiffers = t.reputation !== undefined && t.reputation !== existing?.rep;
+        if (!levelDiffers && !repDiffers) continue;
+        this.setTraderState(traderId, {
+          ...(t.level !== undefined ? { level: t.level } : {}),
+          ...(t.reputation !== undefined ? { rep: t.reputation } : {}),
+        });
+        applied.traders++;
+      }
+    }
 
-    this.setMeta("trackerHideoutModules", JSON.stringify(progress.hideoutModulesProgress), "import");
-    this.setMeta("trackerHideoutParts", JSON.stringify(progress.hideoutPartsProgress), "import");
-    if (progress.gameEdition !== undefined) this.setMeta("gameEdition", String(progress.gameEdition), "import");
-    if (progress.displayName !== undefined) this.setMeta("displayName", progress.displayName, "import");
+    if (progress.playerLevel !== undefined && progress.playerLevel !== this.level) {
+      this.setLevel(progress.playerLevel);
+      applied.level = true;
+    }
+    if ((progress.pmcFaction === "USEC" || progress.pmcFaction === "BEAR") && progress.pmcFaction !== this.faction) {
+      this.setFaction(progress.pmcFaction);
+      applied.faction = true;
+    }
 
-    this.changed("tarkovtracker.import");
-    return progress;
+    let metaChanged = this.setMetaIfChanged("trackerHideoutModules", JSON.stringify(progress.hideoutModulesProgress), "import");
+    metaChanged = this.setMetaIfChanged("trackerHideoutParts", JSON.stringify(progress.hideoutPartsProgress), "import") || metaChanged;
+    if (progress.gameEdition !== undefined)
+      metaChanged = this.setMetaIfChanged("gameEdition", String(progress.gameEdition), "import") || metaChanged;
+    if (progress.displayName !== undefined)
+      metaChanged = this.setMetaIfChanged("displayName", progress.displayName, "import") || metaChanged;
+
+    const changed =
+      applied.tasks + applied.objectives + applied.hideout + applied.traders > 0 ||
+      applied.level ||
+      applied.faction ||
+      metaChanged;
+    if (changed) this.changed("tarkovtracker.import");
+    return { progress, applied, changed };
   }
 
   /** Rebuild a TarkovTracker-progress-shaped object from local state (round-trip counterpart). */
@@ -508,6 +665,161 @@ export class ProfileStore {
     return state;
   }
 
+  // -- connector readings (M9 provenance store, M10 persistence) --------------
+
+  /**
+   * Persist a provenance-tagged connector/manual reading (CONTRACTS §4). `data`
+   * is stored as JSON. Returns the row id. Bookkeeping (the service already
+   * broadcasts `connector.reading` on the wire), so no `state.changed` emit.
+   */
+  insertConnectorReading(r: ConnectorReadingInput): number {
+    const res = this.db
+      .prepare(
+        `INSERT INTO connector_reading
+           (connector_id, capability, captured_at, game_version, settings_hash, raid_id, data, source)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      )
+      .run(
+        r.connectorId,
+        r.capability,
+        r.capturedAt,
+        r.gameVersion ?? null,
+        r.settingsHash ?? null,
+        r.raidId ?? null,
+        JSON.stringify(r.data ?? null),
+        r.source ?? "connector",
+      );
+    return Number(res.lastInsertRowid);
+  }
+
+  /** Read connector readings back, most-recent first, with optional filters. */
+  listConnectorReadings(query: ConnectorReadingQuery = {}): ConnectorReadingRow[] {
+    const clauses: string[] = [];
+    const params: string[] = [];
+    if (query.capability !== undefined) {
+      clauses.push("capability = ?");
+      params.push(query.capability);
+    }
+    if (query.sinceIso !== undefined) {
+      clauses.push("captured_at >= ?");
+      params.push(query.sinceIso);
+    }
+    const where = clauses.length > 0 ? `WHERE ${clauses.join(" AND ")}` : "";
+    const limit =
+      query.limit !== undefined ? ` LIMIT ${Math.max(0, Math.floor(query.limit))}` : "";
+    const rows = this.db
+      .prepare(
+        `SELECT id, connector_id, capability, captured_at, game_version, settings_hash, raid_id, data, source
+         FROM connector_reading ${where} ORDER BY captured_at DESC, id DESC${limit}`,
+      )
+      .all(...params) as {
+      id: number;
+      connector_id: string;
+      capability: string;
+      captured_at: string;
+      game_version: string | null;
+      settings_hash: string | null;
+      raid_id: number | null;
+      data: string;
+      source: string;
+    }[];
+    return rows.map((row) => {
+      let data: unknown = null;
+      try {
+        data = JSON.parse(row.data);
+      } catch {
+        data = row.data;
+      }
+      return {
+        id: row.id,
+        connectorId: row.connector_id,
+        capability: row.capability,
+        capturedAt: row.captured_at,
+        gameVersion: row.game_version,
+        settingsHash: row.settings_hash,
+        raidId: row.raid_id,
+        data,
+        source: row.source,
+      };
+    });
+  }
+
+  // -- source quota (M10 shared external-API budget, restore-across-restarts) --
+
+  /**
+   * Fold a source's remaining budget into the persisted ledger (CONTRACTS §4).
+   * Merge semantics: fields absent from `patch` keep their stored value, so a
+   * fold that only reports reads never clobbers a known write budget. Pure
+   * bookkeeping shared with the user's other tools → no `state.changed` emit.
+   */
+  upsertSourceQuota(sourceId: string, patch: SourceQuotaPatch): void {
+    const existing = this.getSourceQuota(sourceId);
+    const readsRemaining =
+      patch.readsRemaining !== undefined ? patch.readsRemaining : (existing?.readsRemaining ?? null);
+    const writesRemaining =
+      patch.writesRemaining !== undefined ? patch.writesRemaining : (existing?.writesRemaining ?? null);
+    const resetsAt = patch.resetsAt !== undefined ? patch.resetsAt : (existing?.resetsAt ?? null);
+    this.db
+      .prepare(
+        `INSERT INTO source_quota (source_id, reads_remaining, writes_remaining, resets_at, updated_at)
+         VALUES (?, ?, ?, ?, ?)
+         ON CONFLICT(source_id) DO UPDATE SET
+           reads_remaining = excluded.reads_remaining,
+           writes_remaining = excluded.writes_remaining,
+           resets_at = excluded.resets_at,
+           updated_at = excluded.updated_at`,
+      )
+      .run(sourceId, readsRemaining, writesRemaining, resetsAt, nowIso());
+  }
+
+  /** The persisted quota for one source, or `null` if none recorded yet. */
+  getSourceQuota(sourceId: string): SourceQuotaRow | null {
+    const row = this.db
+      .prepare(
+        "SELECT source_id, reads_remaining, writes_remaining, resets_at, updated_at FROM source_quota WHERE source_id = ?",
+      )
+      .get(sourceId) as
+      | {
+          source_id: string;
+          reads_remaining: number | null;
+          writes_remaining: number | null;
+          resets_at: string | null;
+          updated_at: string;
+        }
+      | undefined;
+    return row
+      ? {
+          sourceId: row.source_id,
+          readsRemaining: row.reads_remaining,
+          writesRemaining: row.writes_remaining,
+          resetsAt: row.resets_at,
+          updatedAt: row.updated_at,
+        }
+      : null;
+  }
+
+  /** Every persisted source quota row (for restore-on-startup seeding). */
+  getAllSourceQuota(): SourceQuotaRow[] {
+    const rows = this.db
+      .prepare(
+        "SELECT source_id, reads_remaining, writes_remaining, resets_at, updated_at FROM source_quota",
+      )
+      .all() as {
+      source_id: string;
+      reads_remaining: number | null;
+      writes_remaining: number | null;
+      resets_at: string | null;
+      updated_at: string;
+    }[];
+    return rows.map((row) => ({
+      sourceId: row.source_id,
+      readsRemaining: row.reads_remaining,
+      writesRemaining: row.writes_remaining,
+      resetsAt: row.resets_at,
+      updatedAt: row.updated_at,
+    }));
+  }
+
   // -- internals --------------------------------------------------------------
 
   private changed(reason: string): void {
@@ -515,9 +827,9 @@ export class ProfileStore {
   }
 }
 
-/** Default on-disk location for profile databases (CONTRACTS §2). */
+/** Default on-disk location for profile databases (CONTRACTS §2; honours TAC_DATA_DIR). */
 export function defaultProfileDir(): string {
-  return join(REPO_ROOT, "data", "local", "profiles");
+  return join(dataLocalDir(), "profiles");
 }
 
 /**

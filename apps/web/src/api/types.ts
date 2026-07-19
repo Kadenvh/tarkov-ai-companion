@@ -389,6 +389,50 @@ export interface FingerprintResponse {
   lowConfidence: boolean;
 }
 
+// ---------- §5.6 connectors & §5.7 sources ----------
+
+export type ConnectorHealth = "connected" | "stale" | "missing" | "error";
+
+/** GET /api/connectors row (registry.list + healthAll). */
+export interface ConnectorInfo {
+  id: string;
+  vendor: string;
+  capabilities: string[];
+  riskTier: string;
+  health: ConnectorHealth;
+}
+
+/** Read/write budget remaining for a quota-metered source (TarkovTracker). */
+export interface SourceQuota {
+  readsRemaining?: number;
+  writesRemaining?: number;
+  resetsAt?: string;
+}
+
+/** GET /api/sources/status row (the M10.3 status-view data). */
+export interface SourceStatusRow {
+  id: string;
+  up: boolean;
+  apiVersion?: string;
+  lastFetch?: string;
+  cacheAgeSec?: number;
+  quota?: SourceQuota;
+  lastError?: string;
+}
+
+/** GET /api/sources row (registry.list). */
+export interface SourceInfo {
+  id: string;
+  kind: string;
+  baseUrl: string;
+  capabilities: string[];
+}
+
+/** Tolerant — normalized via readConnectors(). */
+export type ConnectorsResponse = ConnectorInfo[] | { connectors?: ConnectorInfo[] };
+/** Tolerant — normalized via readSourceStatuses(). */
+export type SourceStatusResponse = SourceStatusRow[] | { sources?: SourceStatusRow[] };
+
 // ---------- §3 / §5.3 WS events ----------
 
 export interface WsFrame {

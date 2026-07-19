@@ -147,6 +147,68 @@ describe("TarkovTracker import (M2.1 acceptance: lossless round-trip)", () => {
   });
 });
 
+describe("TarkovTracker sync (SPEC-8: change-aware, read-mostly feed)", () => {
+  it("reports per-field applied counts on the first import of a fixture", () => {
+    const store = mem();
+    const result = store.importTarkovTracker(progressFixture());
+
+    expect(result.changed).toBe(true);
+    // fixture: 5 tasks, 2 objectives, 2 stations built, level + faction set
+    expect(result.applied.tasks).toBe(5);
+    expect(result.applied.objectives).toBe(2);
+    expect(result.applied.hideout).toBe(2);
+    expect(result.applied.level).toBe(true);
+    expect(result.applied.faction).toBe(true);
+    expect(result.progress.playerLevel).toBe(42);
+  });
+
+  it("re-applying identical progress is a no-op: nothing changes, no state.changed emit", () => {
+    const store = mem();
+    store.importTarkovTracker(progressFixture());
+
+    let emits = 0;
+    store.events.on("state.changed", () => emits++);
+    const again = store.importTarkovTracker(progressFixture());
+
+    expect(again.changed).toBe(false);
+    expect(again.applied).toEqual({ tasks: 0, objectives: 0, hideout: 0, traders: 0, level: false, faction: false });
+    expect(emits).toBe(0); // truly silent — the scheduler won't spam refreshes
+  });
+
+  it("applies only the fields that actually differ on a delta sync", () => {
+    const store = mem();
+    store.importTarkovTracker(progressFixture());
+
+    // Bump one task to complete + change level; everything else identical.
+    const payload = structuredClone(progressFixture()) as { data: Record<string, unknown> };
+    (payload.data["tasksProgress"] as { id: string; complete: boolean }[])[4]!.complete = true;
+    payload.data["playerLevel"] = 43;
+
+    let emits = 0;
+    store.events.on("state.changed", () => emits++);
+    const delta = store.importTarkovTracker(payload);
+
+    expect(delta.applied.tasks).toBe(1);
+    expect(delta.applied.level).toBe(true);
+    expect(delta.applied.objectives).toBe(0);
+    expect(delta.applied.hideout).toBe(0);
+    expect(delta.changed).toBe(true);
+    expect(store.level).toBe(43);
+    expect(emits).toBeGreaterThan(0);
+  });
+
+  it("applies trader standings when the payload carries them (tolerant 'if present')", () => {
+    const store = mem();
+    const payload = {
+      playerLevel: 10,
+      traders: { "54cb50c76803fa8b248b4571": { level: 3, reputation: 0.42 } },
+    };
+    const result = store.importTarkovTracker(payload);
+    expect(result.applied.traders).toBe(1);
+    expect(store.getTraders()[0]).toMatchObject({ traderId: "54cb50c76803fa8b248b4571", level: 3, rep: 0.42 });
+  });
+});
+
 describe("toPlayerState (planner handoff)", () => {
   it("produces the PlayerState shape the planner consumes", () => {
     const store = mem();

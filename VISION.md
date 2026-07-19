@@ -7,7 +7,7 @@
 
 Tarkov is the deepest progression game ever shipped, and its tooling ecosystem is a scatter of single-purpose reference sites: one for prices, one for checklists, one for maps, one for metas. The player is the integration layer — alt-tabbing, cross-referencing, holding the plan in their head. Post-1.0 the stakes rose: progression is permanent, story choices are irreversible, prestige is the only do-over. Nobody built the brain that sits above all of it.
 
-**Tarkov AI Companion is that brain.** Not another tracker. Not another wiki mirror. An agentic suite that ingests the entire game (data APIs + the wiki's full mechanical knowledge), reconstructs your personal state automatically, optimizes everything that can be optimized, and speaks to you like a veteran sherpa who has read every page and watched every one of your raids.
+**Tarkov AI Companion is that brain — "The Coach."** Not another tracker. Not another wiki mirror. A *proactive* agentic suite that ingests the entire game (data APIs + the wiki's full mechanical knowledge), reconstructs your personal state automatically, optimizes everything that can be optimized, and coaches you like a veteran sherpa who has read every page and watched every one of your raids — planning before, debriefing after, and speaking up the moment a choice matters. It doesn't wait to be asked.
 
 ## The dream (full scope)
 
@@ -28,15 +28,20 @@ Tarkov is the deepest progression game ever shipped, and its tooling ecosystem i
 - NVIDIA Control Panel / driver-profile optimization (fully outside the game — zero risk)
 - Performance monitoring: frame telemetry per map/settings combo, regression detection after patches
 
+**Your setup, connected** — the environment layer, generalized
+- Connectors: bring your *own* tools — Wootility, SteelSeries Sonar, the NVIDIA app — and the Coach reads (and, opt-in, orchestrates) them. Capability-first, so your alternatives work just as well. Account-safe and out-of-process, always.
+- Sources: every external data plane (tarkov.dev, TarkovTracker, the wiki) behind one disciplined client — cache-first, quota-aware, resilient to outages. We *read* TarkovTracker as your live progress (TarkovMonitor already feeds it) instead of fighting its write quota. Monitor everything, as efficiently as possible.
+
 **In-raid intelligence** (risk-gated, honest)
 - Automatic map loading and live position (screenshot-position, proven safe)
 - Spawn-aware pathing: from your spawn, the optimal route through tonight's objectives to extract
 - Vision/OCR local models where ToS-validated — always feature-flagged, always the player's choice
 
 **Platform**
+- **One application:** the whole suite ships as a single installable Windows app (`.exe`/`.msi`) — service, agent, UI, and the live monitor behind one launch, no terminal. It sits on your second monitor like it belongs there.
 - Auto-updating, patch-aware (data snapshots + wiki drift detection survive every BSG reshuffle)
 - Agentic to the core: Claude plans, narrates, replans, and answers — grounded in the solver and your state, never guessing
-- Squad-aware later; community-ready if we ever choose to ship it beyond us
+- Community-ready as a **local-first plugin + overlay + published guide/dataset** — shareable without becoming a hosted service; squad-aware later. Only ever if it stays true to the daily driver first.
 
 ## Doctrine (the identity)
 

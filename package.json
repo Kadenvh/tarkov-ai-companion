@@ -8,13 +8,16 @@
   "engines": {
     "node": ">=22"
   },
-  "packageManager": "pnpm@11.11.0",
+  "packageManager": "pnpm@10.34.5",
   "scripts": {
     "snapshot": "pnpm --filter @tac/data-core snapshot",
     "test": "pnpm -r test",
     "typecheck": "pnpm -r typecheck",
     "service": "pnpm --filter @tac/service start",
     "agent": "pnpm --filter @tac/agent start",
-    "build:web": "pnpm --filter @tac/web build"
+    "monitor": "pnpm --filter @tac/monitor start",
+    "build:web": "pnpm --filter @tac/web build",
+    "app:dev": "pnpm --filter @tac/desktop dev",
+    "app:dist": "pnpm --filter @tac/web build && pnpm --filter @tac/desktop dist"
   }
 }

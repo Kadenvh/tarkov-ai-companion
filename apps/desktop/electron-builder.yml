@@ -1,0 +1,106 @@
+# electron-builder config for @tac/desktop (SPEC-9 M11.2).
+#
+# Emits an NSIS installer (.exe) AND an MSI under apps/desktop/dist/. appId +
+# productName are fixed here; the version is taken from apps/desktop/package.json
+# (kept in lockstep with the root package.json — both 0.1.0). Code-signing is
+# deferred (personal/unsigned first); Windows SmartScreen will warn on first run
+# of an unsigned build (see README).
+#
+# STANDALONE PACKAGING (M11.2) — what's now wired vs. what the operator runs.
+#
+# DONE in code:
+#   - scripts/build-sidecars.mjs esbuild-bundles @tac/service + @tac/agent into
+#     standalone ESM at dist-electron/sidecars/{service,agent}.mjs (Node builtins
+#     external; @anthropic-ai/claude-agent-sdk external — see that script).
+#   - main.ts + lib/sidecar.ts spawn the BUNDLED node.exe on the BUNDLED .mjs
+#     when app.isPackaged, and keep `node --import tsx <src>` for `app:dev`.
+#   - `extraResources` below ships the bundles, the web build, and the Node 26
+#     runtime into <install>/resources/{sidecars,runtime}.
+#
+# OPERATOR STILL RUNS (handled outside this file, foreground):
+#   1. `node scripts/populate-runtime.mjs`  -> resources/runtime/node.exe
+#      (or `pnpm --filter @tac/desktop prepackage`, which also builds + bundles).
+#      node.exe is NOT committed (large, machine-specific) — it must be Node 26+.
+#   2. The Electron binary fetch (electron-builder's normal download step).
+#   3. `pnpm --filter @tac/desktop dist` to emit the NSIS .exe + MSI.
+#
+# DATA-DIR RESOLUTION (done): the sidecars resolve snapshots/story/data-local via
+# @tac/data-core, which now honours TAC_SNAPSHOT_DIR / TAC_STORY_DIR / TAC_DATA_DIR
+# (REPO_ROOT-based fallbacks when unset). main.ts injects these in packaged mode:
+# read-only snapshots+story from resources/data (staged below), and the writable
+# data-local root under the app's userData dir (never Program Files).
+
+appId: me.vhtech.tarkovaicompanion
+productName: Tarkov AI Companion
+copyright: Copyright © 2026 vhtech — GPL-3.0-only
+
+directories:
+  buildResources: resources
+  output: dist
+
+# The Electron app payload: just the compiled shell. Everything the sidecars
+# need is delivered via extraResources (below) so it lands outside the asar.
+files:
+  - dist-electron/**/*
+  - package.json
+
+asar: true
+
+# Bundled sidecar payload + Node runtime, copied verbatim into
+# <install>/resources/. These are the pieces the standalone build needs; the
+# `runtime/` node.exe is NOT committed — populate-runtime.mjs regenerates it.
+extraResources:
+  # esbuild-bundled sidecars (dist-electron/sidecars/{service,agent}.mjs, maps).
+  - from: dist-electron/sidecars
+    to: sidecars
+    filter:
+      - "**/*"
+  # The built web UI the service serves at /.
+  - from: ../../apps/web/dist
+    to: sidecars/web/dist
+    filter:
+      - "**/*"
+  # Read-only game data the sidecars load (snapshots + curated story dataset).
+  # main.ts points TAC_SNAPSHOT_DIR / TAC_STORY_DIR here in packaged mode. The
+  # writable data/local is NOT staged — it is created under the userData dir.
+  - from: ../../data/snapshots
+    to: data/snapshots
+    filter:
+      - "**/*"
+  - from: ../../data/story
+    to: data/story
+    filter:
+      - "**/*"
+  # Standalone Node 26 runtime (populate-runtime.mjs). Spawns the .mjs bundles.
+  - from: resources/runtime
+    to: runtime
+    filter:
+      - "**/*"
+
+icon: resources/icon.png
+
+# MSI target is DEFERRED: WiX needs a real .ico + Manufacturer and failed the
+# `light.exe` link on the default icon. NSIS (.exe) is the shipped installer;
+# re-enable `- target: msi` once a proper .ico is committed and `author` is set.
+win:
+  icon: resources/icon.png
+  target:
+    - target: nsis
+      arch:
+        - x64
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Tarkov AI Companion
+
+msi:
+  oneClick: false
+  perMachine: false
+
+# M11.3 auto-update is DEFERRED. Artifacts are still versioned so a future
+# electron-updater feed can be added without restructuring.
+artifactName: ${productName}-${version}-${arch}.${ext}

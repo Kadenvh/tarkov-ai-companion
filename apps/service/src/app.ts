@@ -13,6 +13,7 @@ import { registerEnvironmentRoutes } from "./routes/environment.js";
 import { registerInsightsRoutes } from "./routes/insights.js";
 import { registerAgentRoutes } from "./routes/agent.js";
 import { registerPlatformRoutes } from "./routes/platform.js";
+import { registerIntegrationRoutes } from "./routes/integrations.js";
 
 /**
  * Fastify app factory (M5.1) — builds the fully-registered app WITHOUT
@@ -34,8 +35,13 @@ export interface BuildAppOptions extends Partial<Omit<RuntimeOptions, "dataDir">
   logger?: boolean;
 }
 
-/** apps/web/dist relative to this file (apps/service/src). */
+/**
+ * SPA build dir served at `/`. Honors `TAC_WEB_DIR` (set by the packaged desktop
+ * app to `<resources>/sidecars/web/dist`); falls back to `apps/web/dist` relative
+ * to this file for dev/source runs.
+ */
 export function defaultWebDist(): string {
+  if (process.env.TAC_WEB_DIR) return process.env.TAC_WEB_DIR;
   return resolve(fileURLToPath(import.meta.url), "../../../web/dist");
 }
 
@@ -71,6 +77,7 @@ export async function buildApp(opts: BuildAppOptions = {}): Promise<FastifyInsta
   registerInsightsRoutes(app, rt);
   registerAgentRoutes(app, rt);
   registerPlatformRoutes(app, rt);
+  registerIntegrationRoutes(app, rt);
 
   // Serve the web build at / with SPA fallback (§6): non-/api GETs -> index.html.
   const staticDir = opts.staticDir ?? defaultWebDist();

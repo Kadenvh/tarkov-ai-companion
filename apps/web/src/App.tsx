@@ -1,21 +1,34 @@
 /**
- * App shell (CONTRACTS §6) — left nav, top status bar (profile / level / WS
- * badge / snapshot version), live raid banner, toasts, onboarding modal, and
- * the view switch. Dark, high-contrast, second-monitor glanceable.
+ * App shell (CONTRACTS §6) — verb-first left nav (Operate / Understand / Ask /
+ * Environment), HUD status strip (profile / level / goal / snapshot / WS LED),
+ * live raid banner, toasts, onboarding modal, and the view switch. Dark-
+ * committed tactical console, second-monitor glanceable.
  */
 
 import { Component, useEffect, useState, type ReactNode } from "react";
 import { useApp } from "./store";
 import { mapDisplayName } from "./lib/maps";
 import { TonightsPlan } from "./views/TonightsPlan";
+import { ThisRaidView } from "./views/ThisRaid";
 import { GoalsView } from "./views/Goals";
 import { QuartermasterView } from "./views/Quartermaster";
-import { InsightsView } from "./views/Insights";
+import { DebriefView } from "./views/Debrief";
+import { CopilotView } from "./views/Copilot";
 import { EnvironmentView } from "./views/Environment";
 import { MapView } from "./views/MapView";
+import { SourcesView } from "./views/Sources";
 import { OnboardingModal } from "./views/Onboarding";
 
-type ViewId = "plan" | "goals" | "quartermaster" | "insights" | "environment" | "map";
+type ViewId =
+  | "plan"
+  | "raid"
+  | "quartermaster"
+  | "goals"
+  | "debrief"
+  | "copilot"
+  | "environment"
+  | "map"
+  | "sources";
 
 /** One broken view must never white-screen the shell — render the error in place. */
 class ViewBoundary extends Component<
@@ -48,34 +61,107 @@ class ViewBoundary extends Component<
   }
 }
 
-const VIEWS: { id: ViewId; label: string }[] = [
-  { id: "plan", label: "Tonight's Plan" },
-  { id: "goals", label: "Goals" },
-  { id: "quartermaster", label: "Quartermaster" },
-  { id: "insights", label: "Insights" },
-  { id: "environment", label: "Environment" },
-  { id: "map", label: "Map" },
+interface NavItem {
+  id: ViewId;
+  label: string;
+  icon: string;
+}
+
+const NAV_SECTIONS: { label: string; items: NavItem[] }[] = [
+  {
+    label: "Operate",
+    items: [
+      { id: "plan", label: "Tonight's Plan", icon: "◈" },
+      { id: "raid", label: "This Raid", icon: "▸" },
+      { id: "quartermaster", label: "Quartermaster", icon: "▤" },
+    ],
+  },
+  {
+    label: "Understand",
+    items: [
+      { id: "goals", label: "Goals & Foresight", icon: "◇" },
+      { id: "debrief", label: "Debrief", icon: "◔" },
+    ],
+  },
+  {
+    label: "Ask",
+    items: [{ id: "copilot", label: "Copilot", icon: "✦" }],
+  },
+  {
+    label: "Environment",
+    items: [
+      { id: "environment", label: "Settings & Perf", icon: "⚙" },
+      { id: "map", label: "Map", icon: "◱" },
+      { id: "sources", label: "Sources & Connectors", icon: "⇄" },
+    ],
+  },
 ];
 
 function StatusBar(): ReactNode {
-  const { health, player, wsStatus, refreshAll } = useApp();
+  const { health, player, wsStatus, goals, refreshAll } = useApp();
+  const goalLabels = (goals?.goals ?? []).map((g) => {
+    switch (g.type) {
+      case "kappa":
+        return "Kappa";
+      case "lightkeeper":
+        return "Lightkeeper";
+      case "level":
+        return `Level ${g.level}`;
+      case "tasks":
+        return `${g.ids.length} custom`;
+    }
+  });
+  const xpSpread =
+    player.xp?.low !== undefined && player.xp?.high !== undefined
+      ? `±${Math.max(0, Math.round((player.xp.high - player.xp.low) / 2)).toLocaleString("en-US")} xp`
+      : "";
+
   return (
-    <div className="statusbar">
-      <span>
-        <strong>{health?.profileKey ?? "no profile"}</strong>
-        {health?.gameMode ? ` · ${health.gameMode}` : ""}
-      </span>
-      <span>
-        level <strong>{player.level}</strong>
-        {player.xp?.low !== undefined && player.xp?.high !== undefined
-          ? ` (±${Math.max(0, Math.round((player.xp.high - player.xp.low) / 2)).toLocaleString("en-US")} xp)`
-          : ""}
-      </span>
-      {player.faction ? <span>{player.faction}</span> : null}
-      {player.prestige > 0 ? <span>prestige {player.prestige}</span> : null}
+    <div className="statusbar hud">
+      <div className="stat">
+        <span className="k">Profile</span>
+        <span className="v">
+          <strong>{health?.profileKey ?? "no profile"}</strong>
+          {health?.gameMode ? ` · ${health.gameMode}` : ""}
+        </span>
+      </div>
+      <div className="stat">
+        <span className="k">Level</span>
+        <span className="v mono">
+          {player.level}
+          {xpSpread ? <span className="faint"> {xpSpread}</span> : null}
+        </span>
+      </div>
+      {goalLabels.length > 0 ? (
+        <div className="stat">
+          <span className="k">Goal</span>
+          <span className="v">{goalLabels.join(" · ")}</span>
+        </div>
+      ) : null}
+      {player.faction ? (
+        <div className="stat">
+          <span className="k">Faction</span>
+          <span className="v">{player.faction}</span>
+        </div>
+      ) : null}
+      {player.prestige > 0 ? (
+        <div className="stat">
+          <span className="k">Prestige</span>
+          <span className="v mono">{player.prestige}</span>
+        </div>
+      ) : null}
+
       <span className="grow" />
-      {health?.snapshotVersion ? <span>data {health.snapshotVersion}</span> : null}
-      <span className={`badge ${wsStatus === "open" ? "live" : wsStatus === "closed" ? "down" : "warn"}`}>
+
+      {health?.snapshotVersion ? (
+        <div className="stat">
+          <span className="k">Data</span>
+          <span className="v mono">{health.snapshotVersion}</span>
+        </div>
+      ) : null}
+      <span
+        className={`pill ${wsStatus === "open" ? "live" : wsStatus === "closed" ? "down" : "warn"}`}
+      >
         <span className="dot" />
         {wsStatus === "open" ? "LIVE" : wsStatus === "connecting" ? "CONNECTING" : "OFFLINE"}
       </span>
@@ -127,21 +213,40 @@ export function App(): ReactNode {
   return (
     <div className="shell">
       <nav className="nav">
-        <div className="brand">TARKOV AI</div>
-        {VIEWS.map((v) => (
-          <button
-            key={v.id}
-            className={view === v.id ? "active" : ""}
-            onClick={() => setView(v.id)}
-          >
-            {v.label}
-          </button>
+        <div className="brand">
+          <div className="mark">
+            TARKOV <b>AI</b>
+          </div>
+          <div className="tag">The Coach</div>
+        </div>
+
+        {NAV_SECTIONS.map((section) => (
+          <div key={section.label}>
+            <div className="navlabel">{section.label}</div>
+            {section.items.map((item) => (
+              <button
+                key={item.id}
+                className={view === item.id ? "active" : ""}
+                onClick={() => setView(item.id)}
+              >
+                <span className="ic">{item.icon}</span>
+                {item.label}
+              </button>
+            ))}
+          </div>
         ))}
+
         <div className="spacer" />
         <div className="foot">
-          {health ? `service v${health.version}` : "service offline"}
+          {health ? (
+            <>
+              service v{health.version} · <span className="mono">3141</span>
+            </>
+          ) : (
+            "service offline"
+          )}
           <br />
-          T0/T1 only — never touches the game.
+          <span className="safe">T0/T1 only</span> — never touches the game.
         </div>
       </nav>
 
@@ -151,11 +256,14 @@ export function App(): ReactNode {
         <div className="content">
           <ViewBoundary viewId={view}>
             {view === "plan" ? <TonightsPlan /> : null}
-            {view === "goals" ? <GoalsView /> : null}
+            {view === "raid" ? <ThisRaidView /> : null}
             {view === "quartermaster" ? <QuartermasterView /> : null}
-            {view === "insights" ? <InsightsView /> : null}
+            {view === "goals" ? <GoalsView /> : null}
+            {view === "debrief" ? <DebriefView /> : null}
+            {view === "copilot" ? <CopilotView /> : null}
             {view === "environment" ? <EnvironmentView /> : null}
             {view === "map" ? <MapView /> : null}
+            {view === "sources" ? <SourcesView /> : null}
           </ViewBoundary>
         </div>
       </div>

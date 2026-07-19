@@ -10,6 +10,8 @@
  */
 
 import type {
+  ConnectorHealth,
+  ConnectorInfo,
   FleaIncome,
   ForesightWarning,
   NetWorthEstimate,
@@ -20,6 +22,8 @@ import type {
   QueueStat,
   SessionRhythm,
   SettingDiff,
+  SourceQuota,
+  SourceStatusRow,
   StoryResponse,
   SurvivalByDurationRow,
   SurvivalByHourRow,
@@ -406,4 +410,75 @@ export function readInsightsEconomy(raw: unknown): NormalizedEconomy {
   const netWorth =
     netRec && Array.isArray(netRec["points"]) ? (netRec as unknown as NetWorthEstimate) : null;
   return { income, netWorth };
+}
+
+// ---------- /api/sources/status (§5.7) ----------
+
+function readQuota(raw: unknown): SourceQuota | undefined {
+  const q = rec(raw);
+  if (!q) return undefined;
+  const quota: SourceQuota = {};
+  const reads = num(q["readsRemaining"]);
+  if (reads !== undefined) quota.readsRemaining = reads;
+  const writes = num(q["writesRemaining"]);
+  if (writes !== undefined) quota.writesRemaining = writes;
+  const resetsAt = str(q["resetsAt"]);
+  if (resetsAt !== undefined) quota.resetsAt = resetsAt;
+  return Object.keys(quota).length > 0 ? quota : undefined;
+}
+
+/** One status row (also used for the live WS `source.status` frame). Null when unusable. */
+export function readSourceStatusRow(raw: unknown): SourceStatusRow | null {
+  const r = rec(raw);
+  const id = str(r?.["id"]);
+  if (!r || !id) return null;
+  const entry: SourceStatusRow = { id, up: r["up"] === true };
+  const apiVersion = str(r["apiVersion"]);
+  if (apiVersion !== undefined) entry.apiVersion = apiVersion;
+  const lastFetch = str(r["lastFetch"]);
+  if (lastFetch !== undefined) entry.lastFetch = lastFetch;
+  const cacheAgeSec = num(r["cacheAgeSec"]);
+  if (cacheAgeSec !== undefined) entry.cacheAgeSec = cacheAgeSec;
+  const lastError = str(r["lastError"]);
+  if (lastError !== undefined) entry.lastError = lastError;
+  const quota = readQuota(r["quota"]);
+  if (quota !== undefined) entry.quota = quota;
+  return entry;
+}
+
+/** Accepts a bare array or `{ sources: [...] }`; drops rows without an id. */
+export function readSourceStatuses(raw: unknown): SourceStatusRow[] {
+  const list = arr(raw) ?? arr(rec(raw)?.["sources"]) ?? [];
+  const out: SourceStatusRow[] = [];
+  for (const row of list) {
+    const entry = readSourceStatusRow(row);
+    if (entry) out.push(entry);
+  }
+  return out;
+}
+
+// ---------- /api/connectors (§5.6) ----------
+
+function readHealth(raw: unknown): ConnectorHealth {
+  return raw === "connected" || raw === "stale" || raw === "missing" ? raw : "error";
+}
+
+/** Accepts a bare array or `{ connectors: [...] }`; drops rows without an id. */
+export function readConnectors(raw: unknown): ConnectorInfo[] {
+  const list = arr(raw) ?? arr(rec(raw)?.["connectors"]) ?? [];
+  const out: ConnectorInfo[] = [];
+  for (const row of list) {
+    const r = rec(row);
+    const id = str(r?.["id"]);
+    if (!r || !id) continue;
+    const capabilities = (arr(r["capabilities"]) ?? []).filter((x): x is string => typeof x === "string");
+    out.push({
+      id,
+      vendor: str(r["vendor"]) ?? "",
+      capabilities,
+      riskTier: str(r["riskTier"]) ?? "",
+      health: readHealth(r["health"]),
+    });
+  }
+  return out;
 }

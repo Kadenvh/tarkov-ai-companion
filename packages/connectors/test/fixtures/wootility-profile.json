@@ -1,0 +1,15 @@
+{
+  "name": "Tarkov",
+  "globalActuationPoint": 1.5,
+  "rapidTrigger": true,
+  "rapidTriggerSensitivity": 0.4,
+  "keys": [
+    { "key": "W", "actuationPoint": 1.2, "rapidTrigger": true, "rapidTriggerSensitivity": 0.3 },
+    { "key": "Space", "actuationPoint": 2.0, "rapidTrigger": false },
+    { "key": "LeftShift", "actuationPoint": 1.0, "rgb": { "r": 255, "g": 0, "b": 0 } }
+  ],
+  "layers": [{ "index": 0, "name": "base" }],
+  "fnLayer": { "enabled": false },
+  "firmwareVersion": "2.7.0",
+  "device": "Wooting 60HE"
+}

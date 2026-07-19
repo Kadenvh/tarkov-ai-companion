@@ -1,8 +1,10 @@
 # Tarkov AI Companion — Architecture & Course of Action
-### Design Document · v1.1 · 2026-07-11
+### Design Document · v1.2 · 2026-07-16
 
 > **Renamed:** product is now **tarkov-ai-companion** (was working-name "Sherpa"). This doc is the architecture deep-dive beneath the foundation trio: [VISION.md](../VISION.md) · [NORTH-STAR.md](../NORTH-STAR.md) · [SPEC.md](../SPEC.md) (the build contract — supersedes §6/§8 below where they differ).
-> Full research backing this doc: [`docs/research/`](research/) (5 verified reports, all live-checked 2026-07-11).
+> Full research backing this doc: [`docs/research/`](research/) (verified reports, live-checked 2026-07-11 / refreshed 2026-07-16).
+>
+> **v1.2 (2026-07-16):** product reframed as **"The Coach"** (proactive, not passive); three structural layers added — **Connectors (M9)**, **Sources (M10)**, **Desktop shell (M11)**. See §3.1. The five planes below still hold; §3.1 layers *front* and *package* them.
 
 ---
 
@@ -66,6 +68,16 @@ Sherpa = **a local-first companion service** that (a) passively reconstructs you
 ```
 
 **ToS stance (non-negotiable):** read-only on logs/screenshots/configs; no process access, no injection, no input automation, no game-file modification; overlays only as separate windows if ever; in-raid info gated behind the user's own screenshot keypress. This is the RatScanner/TarkovMonitor risk class — 5+ years, zero proven bans.
+
+## 3.1 Layers added in the Coach foundation (2026-07-16)
+
+Since v1.1 the product was reframed as **"The Coach"** — proactive, not passive — and three structural layers were added ([SPEC-8](spec/SPEC-8.md) / [SPEC-9](spec/SPEC-9.md) / [SPEC-10](spec/SPEC-10.md); wired per [CONTRACTS](spec/CONTRACTS.md) §5.6/§5.7). They *front* and *package* the five planes above rather than replace them.
+
+- **Sources (`@tac/sources`, M10)** — one disciplined client fronting the DATA PLANE: cache-first TTL + conditional 304s, a quota ledger, retry/backoff, and a live status surface (`GET /api/sources/status`, WS `source.status`). **TarkovTracker-read pivot:** since the user runs TarkovMonitor→TarkovTracker, TT is *read* as the live progress source (GP scope), not written — so the STATE PLANE's log watcher becomes enrichment (objective counts, perf, story) rather than a competing writer, and we never contend on TT's shared 100/day write quota.
+- **Connectors (`@tac/connectors`, M9)** — a sibling I/O layer for the user's *local* tools, capability-first (`game-config`, `keyboard-actuation`, `audio-mix`, `gpu-3d-profile`, `perf-telemetry`, `manual-capture`). Registration refuses anything above T1; reads default-on, writes opt-in + reversible (backup-first, game-closed). Generalizes the old hard-wired M6 environment adapters and is the plugin seam for the H3 community track. Provenance-tagged readings feed config↔outcome attribution (M6.3).
+- **Desktop shell (`apps/desktop`, M11)** — Electron packaging: one installable Windows app (`.exe`/`.msi`) whose main process spawns the existing service+agent as sidecars and renders the service's own web UI. The AI PLANE is now framed as *coaching* (plan → debrief → speak up when a choice matters), fed by connector/source provenance.
+
+Connectors and Sources share a provenance envelope + health/registry pattern (to be hoisted to `@tac/shared`). Everything here stays **T0/T1 — no game-process contact.**
 
 ## 4. What we do NOT build (leverage list)
 

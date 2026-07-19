@@ -20,3 +20,11 @@ data/local/
 
 # build artifacts
 apps/web/dist/
+
+# Local read-only reference checkouts of upstream projects (GPL-3.0). Studied,
+# never vendored — our code is reimplemented in our own idiom + attributed.
+/TarkovMonitor/
+/TarkovTracker/
+
+# Stray local profile dirs (canonical is /data/local, already ignored)
+**/data/local/

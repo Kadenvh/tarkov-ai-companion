@@ -1,7 +1,9 @@
 # SPEC — Tarkov AI Companion
-### v1.0 · 2026-07-11 · the build contract
+### v1.1 · 2026-07-16 · the build contract
 
 > Governs spec-driven development. [VISION.md](VISION.md) says why; [NORTH-STAR.md](NORTH-STAR.md) says how we decide; this says **what, exactly**. Architecture deep-dive: [docs/DESIGN.md](docs/DESIGN.md). Evidence: [docs/research/](docs/research/) (all claims live-verified 2026-07-11).
+>
+> **v1.1 (2026-07-16):** "The Coach" reframe; new modules **M9 Connectors** ([SPEC-8](docs/spec/SPEC-8.md)), **M10 Sources** ([SPEC-10](docs/spec/SPEC-10.md)), **M11 Desktop app shell** ([SPEC-9](docs/spec/SPEC-9.md)); new phase **P6 Coach & Distribution**. Toolchain pinned to **pnpm 10.34.5** (11.x deadlocks resolving electron-builder — do not upgrade until fixed upstream).
 
 ---
 
@@ -15,18 +17,25 @@
   │  ├─ data-core/      # M1 — ingestion, snapshots, wiki parser, story dataset, ID registry
   │  ├─ state-engine/   # M2 — SQLite store, watchers, estimators, mirrors
   │  ├─ planner/        # M3 — solver, XP sim, foresight, quartermaster
+  │  ├─ environment/    # M6 — EFT settings advisor, NVIDIA, PresentMon, ammo tiers
+  │  ├─ insights/       # M7 — raid analytics, economy, playstyle fingerprint
+  │  ├─ connectors/     # M9 — capability-first local-tool adapters (SPEC-8)
+  │  ├─ sources/        # M10 — remote-source monitoring: cache/quota/status (SPEC-10)
   │  └─ shared/         # types, zod schemas, utilities
   ├─ apps/
   │  ├─ service/        # Fastify daemon: watchers host, REST+WS API, agent endpoint
   │  ├─ web/            # React/Vite UI (served by service; second-monitor first)
-  │  └─ agent/          # M4 — Claude copilot service (Agent SDK)
+  │  ├─ agent/          # M4 — Claude copilot service (Agent SDK)
+  │  ├─ monitor/        # TarkovMonitor-style live WS consumer (T0)
+  │  └─ desktop/        # M11 — Electron shell: single installable app (SPEC-9)
   ├─ data/
   │  ├─ snapshots/      # per-patch json.tarkov.dev pulls (committed)
   │  ├─ story/          # curated chapters/endings/decisions (committed, versioned)
   │  └─ overlay/        # manual corrections layered over upstream data
   └─ docs/
   ```
-- **Key deps:** better-sqlite3, zod, fastify (+ @fastify/websocket), react, vite, vitest, @anthropic-ai/claude-agent-sdk (agent), chokidar (FS events) + polling tails (logs).
+- **Key deps:** **`node:sqlite`** (Node 26 builtin — supersedes better-sqlite3; see [CONTRACTS §2](docs/spec/CONTRACTS.md)), zod, fastify (+ @fastify/websocket), react, vite, vitest, @anthropic-ai/claude-agent-sdk (agent), chokidar (FS events) + polling tails (logs), electron + electron-builder (desktop shell, M11).
+- **Package manager:** pnpm **10.34.5**, pinned via `packageManager` (11.x deadlocks resolving electron-builder — do not upgrade until fixed upstream).
 - **Repo rename:** working dir stays `tarkov-aim-lab` until scaffold; scaffold under this repo root, rename repo to `tarkov-ai-companion` at first commit.
 
 ## 1. Risk-tier policy (governs every feature; see research/03)
@@ -142,6 +151,34 @@ Claude over ground truth. Grounded, never guessing.
 | M8.2 | Patch-drift sentinel: on new patch, run M1.4 wiki⟷API cross-validation + failing-invariant report | **Kord Breach readiness**: reshuffle surfaces as reviewable diff, not silent breakage |
 | M8.3 | Config, secrets (tokens), profiles (main + second account slot), logging | Fresh-machine setup < 10 min |
 
+### M9 — Connectors `packages/connectors` (SPEC-8)
+Capability-first pluggable adapters for the user's *local* tools; T0/T1 only (registration refuses > T1). The plugin seam for H3.
+| Req | Requirement | Acceptance |
+|---|---|---|
+| M9.1 | Registry + capability resolver + provenance envelope | ✅ built (32 tests) |
+| M9.2 | First-party connectors: `eft-config` (game-config), tracker read | ✅ eft-config built |
+| M9.3 | Vendor adapters: Wootility (keyboard-actuation), SteelSeries Sonar (audio-mix), NVIDIA (gpu-3d-profile/perf-telemetry) | 🚧 Wootility built; Sonar/NVIDIA open |
+| M9.4 | Assisted-capture fallback (manual-capture) | ✅ built |
+| M9.5 | Orchestration writes — opt-in, reversible, backup-first (unblocks M6.2 DRS write) | ⏳ open |
+| M9.6 | Plugin seam: out-of-tree connector loader (H3) | ⏳ open |
+
+### M10 — Sources `packages/sources` (SPEC-10)
+Efficient monitoring of *remote* data sources; sibling to M9. Cache + quota ledger + retry + status. **TarkovTracker read-pivot** (TM→TT is the live state source; we read, not write).
+| Req | Requirement | Acceptance |
+|---|---|---|
+| M10.1 | Registry + TTL/ETag cache + quota ledger + retry/backoff | 🚧 building |
+| M10.2 | First sources: tarkov-dev JSON (game-data/prices), TarkovTracker read (progress-read, GP) | 🚧 building |
+| M10.3 | Status surface: `/api/sources/status` + `source.status` WS + UI view | ⏳ open |
+| M10.4 | EFT wiki (MediaWiki, story) + tarkov.dev manager submit (opt-in, off) | ⏳ open |
+
+### M11 — Desktop App Shell `apps/desktop` (SPEC-9)
+Single installable Windows app (Electron): main spawns service+agent sidecars on bundled Node 26, renderer = the service's web UI.
+| Req | Requirement | Acceptance |
+|---|---|---|
+| M11.1 | Shell + sidecar lifecycle (health-gate, tray, single-instance, clean shutdown) | ✅ built (32 tests; bundled service boots to /api/health) |
+| M11.2 | Installer: `pnpm --filter @tac/desktop dist` → NSIS `.exe` (137MB, signed) | ✅ built (MSI deferred — WiX needs .ico + author) |
+| M11.3 | Auto-update channel (electron-updater; ties to M8.1) | ⏳ deferred |
+
 ## 3. Phase mapping (build order)
 
 | Phase | Modules | Exit criterion | Status |
@@ -152,6 +189,7 @@ Claude over ground truth. Grounded, never guessing.
 | **P3 Copilot** | M4.1–M4.4 | Raid-end → replan → briefing loop live | ✅ 2026-07-11 (live grounded briefing verified over agent-sdk) |
 | **P4 Environment** | M6, M7, M4.5, M5.5 | Settings/NVIDIA/perf + insights daily-driver | ✅ 2026-07-11 (M6.2 DRS *writes* deferred, recorded in SPEC-4) |
 | **P5 Edge** | T3 experiments (spawn vision — only after ToS re-validation), squad, seasonal, map route overlay, wiki⟷API drift automation (M1.4), snapshot `diff` CLI (M1.2) | Feature-flagged, individually approved | ⏳ open |
+| **P6 Coach & Distribution** | M9 connectors, M10 sources, M11 desktop shell/installer, "The Coach" data streams, UI elevation | Single installable app + efficient source layer + proactive coaching | 🚧 in progress (2026-07-16) |
 
 ## 4. Open questions (tracked, non-blocking)
 

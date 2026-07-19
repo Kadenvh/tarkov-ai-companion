@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { z } from "zod";
 import { GameMode } from "@tac/shared";
-import { REPO_ROOT } from "@tac/data-core";
+import { dataLocalDir } from "@tac/data-core";
 
 /**
  * Service configuration (M8.3) — `data/local/config.json`, created with
@@ -28,6 +28,18 @@ export const ServiceConfig = z.object({
   profiles: z.array(ProfileEntry).min(1),
   activeProfile: z.string(),
   tarkovTrackerToken: z.string().optional(),
+  /**
+   * Minutes between scheduled TarkovTracker read syncs (SPEC-8, read-mostly
+   * mirror). Default ~10 when absent; `0` disables the scheduled feed (an
+   * on-demand sync via the route still works).
+   */
+  tarkovTrackerSyncMinutes: z.number().min(0).optional(),
+  /**
+   * Opt-in outbound WRITE mirror (M2.7). OFF by default: the read-mostly stance
+   * treats TarkovMonitor as the owner of the write path so the shared 100/day
+   * write budget isn't double-spent. Only enable if TarkovMonitor is NOT running.
+   */
+  tarkovTrackerWrites: z.boolean().optional(),
   eftPath: z.string().optional(),
   agentUrl: z.string().optional(),
 });
@@ -45,7 +57,7 @@ export function defaultConfig(): ServiceConfig {
 
 /** data/local root — TAC_DATA_DIR override for tests and relocated installs. */
 export function defaultDataDir(): string {
-  return process.env["TAC_DATA_DIR"] ?? join(REPO_ROOT, "data", "local");
+  return dataLocalDir();
 }
 
 export function configPath(dataDir: string = defaultDataDir()): string {

@@ -8,7 +8,7 @@ import { gzipSync } from "node:zlib";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { ENDPOINTS, fetchJson } from "../api.js";
-import { SNAPSHOT_DIR, detectGameVersion } from "../paths.js";
+import { snapshotDir, detectGameVersion } from "../paths.js";
 
 const MODES = ["regular", "pve"] as const;
 const LANG = "en";
@@ -19,7 +19,7 @@ if (!version) {
   process.exit(1);
 }
 
-const outRoot = join(SNAPSHOT_DIR, version);
+const outRoot = join(snapshotDir(), version);
 const manifest: Record<string, unknown> = {
   version,
   source: "https://json.tarkov.dev",

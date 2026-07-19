@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { z } from "zod";
-import { REPO_ROOT } from "@tac/data-core";
+import { dataLocalDir } from "@tac/data-core";
 import type { ProfileStore } from "./store.js";
 
 /**
@@ -36,7 +36,7 @@ const ConfigFile = z
 /** Token lookup: per-profile entry in data/local/config.json, then top-level. */
 export function loadTrackerToken(
   profileKey: string,
-  configPath: string = join(REPO_ROOT, "data", "local", "config.json"),
+  configPath: string = join(dataLocalDir(), "config.json"),
 ): string | null {
   try {
     const parsed = ConfigFile.parse(JSON.parse(readFileSync(configPath, "utf8")));

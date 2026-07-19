@@ -60,7 +60,10 @@ export function QuartermasterView(): ReactNode {
 
   return (
     <div>
-      <h2>Quartermaster</h2>
+      <div className="pagehead">
+        <h2>Quartermaster</h2>
+        <span className="count">pre-session shopping run</span>
+      </div>
       <p className="sub">
         Everything to acquire before the next {totals.raids || horizon} raids — cheapest feasible
         route per item.

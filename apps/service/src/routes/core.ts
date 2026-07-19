@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { endingReachability } from "@tac/planner";
-import { addCalibration, estimateXp, estimateLevelBand, worldXpSource, TRACKER_BASE_URL } from "@tac/state-engine";
+import { addCalibration, estimateXp, estimateLevelBand, worldXpSource } from "@tac/state-engine";
 import type { StoryDataset } from "@tac/data-core";
 import type { ProfileStore } from "@tac/state-engine";
 import { saveConfig } from "../config.js";
@@ -178,33 +178,63 @@ export function registerCoreRoutes(app: FastifyInstance, rt: ServiceRuntime): vo
     return { ok: true, level: store.level, faction: store.faction, prestige: store.prestige };
   });
 
+  // Connect a token, then pull the first sync. Folds into the single sync path
+  // (M10 progress-read source → change-aware mapper) rather than fetching itself.
   app.post("/api/state/import/tarkovtracker", async (req, reply) => {
     const body = ImportBody.safeParse(req.body);
     if (!body.success) return reply.status(400).send({ error: body.error.issues[0]?.message ?? "invalid body" });
-    let res: Response;
-    try {
-      res = await rt.fetchImpl(`${TRACKER_BASE_URL}/progress`, {
-        headers: { Authorization: `Bearer ${body.data.token}` },
-        signal: AbortSignal.timeout(15_000),
-      });
-    } catch {
-      return reply.status(502).send({ error: "TarkovTracker API unreachable" });
-    }
-    if (!res.ok) {
-      return reply
-        .status(res.status === 401 ? 401 : 502)
-        .send({ error: `TarkovTracker returned ${res.status}` });
-    }
-    const progress = rt.store.importTarkovTracker(await res.json());
+
     rt.config.tarkovTrackerToken = body.data.token;
     saveConfig(rt.config, rt.dataDir);
-    rt.restartMirror(); // background push sync from now on (M2.7)
+    rt.rebuildSources(); // the read feed must authenticate with the NEW token
+    rt.restartMirror();
+    rt.restartTrackerSync(); // scheduled read feed from now on (SPEC-8)
+
+    const result = await rt.syncTarkovTracker();
+    if (!result.ok) {
+      if (result.reason === "unauthorized") {
+        return reply.status(401).send({ error: "TarkovTracker rejected the token (401)" });
+      }
+      if (result.reason === "quota-exhausted") {
+        return reply.status(429).send({ error: "TarkovTracker read quota exhausted", ...(result.quota ? { quota: result.quota } : {}) });
+      }
+      return reply.status(502).send({ error: result.error ?? "TarkovTracker API unreachable" });
+    }
+    const progress = result.progress;
     return {
       ok: true,
-      tasks: progress.tasksProgress.length,
-      objectives: progress.taskObjectivesProgress.length,
-      hideoutModules: progress.hideoutModulesProgress.length,
-      level: progress.playerLevel ?? null,
+      tasks: progress?.tasksProgress?.length ?? 0,
+      objectives: progress?.taskObjectivesProgress?.length ?? 0,
+      hideoutModules: progress?.hideoutModulesProgress?.length ?? 0,
+      level: progress?.playerLevel ?? null,
+      applied: result.applied,
+    };
+  });
+
+  // On-demand read sync (SPEC-8): pull the latest progress FROM TarkovTracker
+  // into the local store. Read-only; 409 when no token is connected.
+  app.post("/api/state/sync/tarkovtracker", async (_req, reply) => {
+    if (!rt.config.tarkovTrackerToken) {
+      return reply.status(409).send({ error: "TarkovTracker not connected — add a token in Settings" });
+    }
+    const result = await rt.syncTarkovTracker();
+    if (!result.ok) {
+      if (result.reason === "unauthorized") {
+        return reply.status(401).send({ error: "TarkovTracker rejected the token (401)" });
+      }
+      if (result.reason === "quota-exhausted" || result.reason === "quota-low") {
+        return reply
+          .status(429)
+          .send({ error: "TarkovTracker read quota exhausted", ...(result.quota ? { quota: result.quota } : {}) });
+      }
+      return reply.status(502).send({ error: result.error ?? "TarkovTracker sync failed" });
+    }
+    return {
+      ok: true,
+      applied: result.applied,
+      changed: result.changed,
+      fromCache: result.fromCache ?? false,
+      ...(result.quota ? { quota: result.quota } : {}),
     };
   });
 

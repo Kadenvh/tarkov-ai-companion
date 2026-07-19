@@ -181,14 +181,64 @@ export function GoalsView(): ReactNode {
     })();
   }, [api, stateRaw]);
 
+  // foresight warnings surfaced at the very top — irreversibility / trap flags
+  // (e.g. the Savior-vs-500M trap) rank above the goal editor by design.
+  const rank = (w: (typeof foresight)[number]): number =>
+    w.severity === "critical" ? 0 : w.severity === "warning" ? 1 : 2;
+  const topForesight = [...foresight].sort((a, b) => rank(a) - rank(b));
+
   return (
     <div>
-      <h2>Goals</h2>
+      <div className="pagehead">
+        <h2>Goals &amp; Foresight</h2>
+        <span className="count">what the planner optimizes for</span>
+      </div>
       <p className="sub">
-        What the planner optimizes for — level {player.level}
+        Level {player.level}
         {player.faction ? ` · ${player.faction}` : ""}
-        {player.prestige ? ` · prestige ${player.prestige}` : ""}
+        {player.prestige ? ` · prestige ${player.prestige}` : ""} — set the target, and watch the
+        irreversible traps before they cost you an ending.
       </p>
+
+      {topForesight.length > 0 ? (
+        <div className="foresight-banner">
+          <div className="sectionlabel">
+            <span className="eyebrow">⚠ Foresight · irreversible decisions ahead</span>
+            <span className="rule" />
+          </div>
+          {topForesight.map((warning, i) => {
+            const critical = warning.severity === "critical";
+            const consequence =
+              warning.consequence ??
+              warning.message ??
+              (warning.fails ?? [])
+                .map((f) => {
+                  const tags = [
+                    f.kappaRequired ? "Kappa" : null,
+                    f.lightkeeperRequired ? "Lightkeeper" : null,
+                  ]
+                    .filter(Boolean)
+                    .join(", ");
+                  return tags ? `${f.name} (${tags})` : f.name;
+                })
+                .join(", ");
+            return (
+              <div key={i} className={`warning-box${critical ? " critical" : ""}`}>
+                <div className="w-kind">
+                  {warning.kind || "foresight"}
+                  {warning.severity ? ` · ${warning.severity}` : ""}
+                </div>
+                {warning.completing?.name ? (
+                  <>
+                    Completing <b>{warning.completing.name}</b> is irreversible.{" "}
+                  </>
+                ) : null}
+                {consequence}
+              </div>
+            );
+          })}
+        </div>
+      ) : null}
 
       <div className="card-grid">
         <div className="card">
@@ -341,24 +391,6 @@ export function GoalsView(): ReactNode {
 
       <h3>TarkovTracker sync</h3>
       <TrackerSyncCard />
-
-      {foresight.length > 0 ? (
-        <>
-          <h3>Pending irreversibility warnings</h3>
-          {foresight.map((warning, i) => (
-            <div key={i} className="decision-warning">
-              <div className="q">{warning.completing?.name ?? warning.kind}</div>
-              <div className="opt">
-                <span className="consequence">
-                  {warning.consequence ??
-                    warning.message ??
-                    (warning.fails ?? []).map((f) => f.name).join(", ")}
-                </span>
-              </div>
-            </div>
-          ))}
-        </>
-      ) : null}
 
       <h3>Story &amp; endings</h3>
       <StoryTracker />
