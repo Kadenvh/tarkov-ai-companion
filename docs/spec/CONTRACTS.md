@@ -144,6 +144,10 @@ All routes JSON; zod-validated; errors `{ error: string }` with proper status.
 - `GET /api/environment/ammo?caliber=` → ammo tier table (from snapshot)
 - `GET /api/insights/raids` → survival by map/hour/duration, session rhythm
 - `GET /api/insights/economy` → flea income curve, net-worth estimates
+- `GET /api/insights/fingerprint` → playstyle fingerprint feature vector (M7.3; feeds agent M4.5)
+- `GET /api/insights/networth?goal=<rubles:5e7|level:40|kappa|tasks:150>` → net-worth trajectory + goal-ETA (M7.4)
+- `GET /api/insights/attribution` → config↔outcome attribution (settings-hash change vs survival/FPS), joined on `connector_reading` provenance (M7.6)
+- `GET /api/insights/highlights?raidId=<id>|?limit=<n>` → per-raid highlight index (M7.5)
 
 ### 5.5 Agent proxy
 - Service does **not** embed the LLM. `apps/agent` runs on 3142; service proxies `POST /api/agent/chat`, `POST /api/agent/briefing { raidIndex }`, `GET /api/agent/health` to it (503 with helpful message if agent down).
@@ -155,7 +159,7 @@ All routes JSON; zod-validated; errors `{ error: string }` with proper status.
 - `GET /api/connectors/read?capability=<cap>&prefer=<id?>` → `ConnectorReading` (resolve-then-read; 404 if unsatisfiable, 409 if `prefer` mismatch)
 - `POST /api/connectors/manual { capability, payload }` → wraps a user-supplied payload as a `ConnectorReading` (manual-capture)
 - WS `/ws` pushes `connector.detected` / `connector.reading` (§3)
-- *Deferred to M9.5 (writes), reserved not live:* `POST /api/connectors/write { capability, patch, prefer? }` — opt-in, backs up first, returns `WriteResult` with revert.
+- *Reserved, not live:* `POST /api/connectors/write { capability, patch, prefer? }` — opt-in, backs up first, returns `WriteResult` with revert. The `game-config` write path is implemented in `@tac/connectors` (M9.5: backup-first, game-closed) but stays gated off — the service exposes no write route in this slice.
 
 Capability enum (bind once — shared by DDL `capability`, the REST `capability` param, and the TS `Capability` union in `@tac/connectors`):
 `game-config | keyboard-actuation | audio-mix | gpu-3d-profile | display-config | perf-telemetry | tracker-sync | manual-capture`

@@ -140,9 +140,12 @@ Claude over ground truth. Grounded, never guessing.
 ### M7 — Personal Insights
 | Req | Requirement | Acceptance |
 |---|---|---|
-| M7.1 | Raid analytics: survival by map/time-of-day/duration; queue-time patterns; session rhythm | Dashboards over ≥30 journaled raids |
-| M7.2 | Economy tracking: flea sales (logs) + snapshot-based net-worth estimates | Weekly net-worth curve |
-| M7.3 | Playstyle fingerprint feeding M4.5 weights | Documented feature vector, inspectable |
+| M7.1 | Raid analytics: survival by map/time-of-day/duration; queue-time patterns; session rhythm | Dashboards over ≥30 journaled raids ✅ |
+| M7.2 | Economy tracking: flea sales (logs) + snapshot-based net-worth estimates | Weekly net-worth curve ✅ |
+| M7.3 | Playstyle fingerprint feeding M4.5 weights | Documented feature vector, inspectable ✅ |
+| M7.4 | Net-worth trajectory + **goal-ETA** (`GET /api/insights/networth?goal=`) | ✅ built |
+| M7.5 | Per-raid **highlight index** (`GET /api/insights/highlights`) | ✅ built |
+| M7.6 | **Config↔outcome attribution** — settings-hash change vs survival/FPS, joined on connector-reading provenance (`GET /api/insights/attribution`) | ✅ built |
 
 ### M8 — Platform
 | Req | Requirement | Acceptance |
@@ -155,21 +158,21 @@ Claude over ground truth. Grounded, never guessing.
 Capability-first pluggable adapters for the user's *local* tools; T0/T1 only (registration refuses > T1). The plugin seam for H3.
 | Req | Requirement | Acceptance |
 |---|---|---|
-| M9.1 | Registry + capability resolver + provenance envelope | ✅ built (32 tests) |
-| M9.2 | First-party connectors: `eft-config` (game-config), tracker read | ✅ eft-config built |
-| M9.3 | Vendor adapters: Wootility (keyboard-actuation), SteelSeries Sonar (audio-mix), NVIDIA (gpu-3d-profile/perf-telemetry) | 🚧 Wootility built; Sonar/NVIDIA open |
+| M9.1 | Registry + capability resolver + provenance envelope | ✅ built |
+| M9.2 | First-party connectors: `eft-config` (game-config); TarkovTracker read now via M10 Sources | ✅ eft-config built |
+| M9.3 | Vendor adapters: Wootility (keyboard-actuation), SteelSeries Sonar (audio-mix), NVIDIA (gpu-3d-profile/perf-telemetry) | ✅ Wootility + NVIDIA + Sonar reads built |
 | M9.4 | Assisted-capture fallback (manual-capture) | ✅ built |
-| M9.5 | Orchestration writes — opt-in, reversible, backup-first (unblocks M6.2 DRS write) | ⏳ open |
+| M9.5 | Orchestration writes — opt-in, reversible, backup-first (unblocks M6.2 DRS write) | 🚧 `game-config` write shipped (opt-in, backup-first, game-closed; gated off in the service — no write route live yet); DRS/audio writes open |
 | M9.6 | Plugin seam: out-of-tree connector loader (H3) | ⏳ open |
 
 ### M10 — Sources `packages/sources` (SPEC-10)
 Efficient monitoring of *remote* data sources; sibling to M9. Cache + quota ledger + retry + status. **TarkovTracker read-pivot** (TM→TT is the live state source; we read, not write).
 | Req | Requirement | Acceptance |
 |---|---|---|
-| M10.1 | Registry + TTL/ETag cache + quota ledger + retry/backoff | 🚧 building |
-| M10.2 | First sources: tarkov-dev JSON (game-data/prices), TarkovTracker read (progress-read, GP) | 🚧 building |
-| M10.3 | Status surface: `/api/sources/status` + `source.status` WS + UI view | ⏳ open |
-| M10.4 | EFT wiki (MediaWiki, story) + tarkov.dev manager submit (opt-in, off) | ⏳ open |
+| M10.1 | Registry + TTL/ETag cache + quota ledger + retry/backoff | ✅ built |
+| M10.2 | First sources: tarkov-dev JSON (game-data/prices), TarkovTracker read (progress-read, GP) | ✅ built |
+| M10.3 | Status surface: `/api/sources/status` + `source.status` WS + UI view | ✅ built |
+| M10.4 | EFT wiki (MediaWiki, story) + tarkov.dev manager submit (opt-in, off) | ✅ built (submit registered but disabled; no submit route exposed) |
 
 ### M11 — Desktop App Shell `apps/desktop` (SPEC-9)
 Single installable Windows app (Electron): main spawns service+agent sidecars on bundled Node 26, renderer = the service's web UI.
@@ -189,7 +192,7 @@ Single installable Windows app (Electron): main spawns service+agent sidecars on
 | **P3 Copilot** | M4.1–M4.4 | Raid-end → replan → briefing loop live | ✅ 2026-07-11 (live grounded briefing verified over agent-sdk) |
 | **P4 Environment** | M6, M7, M4.5, M5.5 | Settings/NVIDIA/perf + insights daily-driver | ✅ 2026-07-11 (M6.2 DRS *writes* deferred, recorded in SPEC-4) |
 | **P5 Edge** | T3 experiments (spawn vision — only after ToS re-validation), squad, seasonal, map route overlay, wiki⟷API drift automation (M1.4), snapshot `diff` CLI (M1.2) | Feature-flagged, individually approved | ⏳ open |
-| **P6 Coach & Distribution** | M9 connectors, M10 sources, M11 desktop shell/installer, "The Coach" data streams, UI elevation | Single installable app + efficient source layer + proactive coaching | 🚧 in progress (2026-07-16) |
+| **P6 Coach & Distribution** | M9 connectors, M10 sources, M11 desktop shell/installer, "The Coach" data streams, UI elevation | Single installable app + efficient source layer + proactive coaching | 🚧 largely shipped (2026-07-16): M10 sources complete; M9 connectors + `game-config` writes, verb-first "Coach" IA, and the M11 NSIS desktop app built. Remaining: M9.5 DRS/audio writes, M9.6 plugin loader, M11.3 auto-update |
 
 ## 4. Open questions (tracked, non-blocking)
 

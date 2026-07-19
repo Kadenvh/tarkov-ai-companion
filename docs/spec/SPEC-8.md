@@ -1,6 +1,6 @@
 # SPEC-8 — Connectors (M9)
 
-> Status: **M9.1–M9.4 implemented** (2026-07-16) — `packages/connectors` (`@tac/connectors`): registry + capability resolver + provenance envelope, and the `eft-config`, `wootility`, and `manual-capture` connectors. 32 tests green, typecheck clean, real-machine EFT read verified. Writes (M9.5) and the plugin loader (M9.6) remain. CONTRACTS.md §1/§3/§4/§5.6 now carry the connector surface. Derived from [SPEC.md](../../SPEC.md); where this and [CONTRACTS.md](CONTRACTS.md) disagree, CONTRACTS wins. New module **M9**; SPEC.md module registry still needs the M9 row added.
+> Status: **M9.1–M9.4 implemented + M9.3 vendor reads + M9.5 `game-config` write** (2026-07-16) — `packages/connectors` (`@tac/connectors`): registry + capability resolver + provenance envelope, and the `eft-config`, `wootility`, `nvidia`, `steelseries-sonar`, and `manual-capture` connectors (all five registered in the service). The M9.5 opt-in reversible write path is implemented for the `game-config` capability only (EFT Settings, backup-first, game-closed) and stays **gated off** — no `/api/connectors/write` route is exposed yet. NVIDIA-DRS and audio writes, plus the M9.6 out-of-tree plugin loader, remain. Typecheck clean, real-machine EFT read verified. CONTRACTS.md §1/§3/§4/§5.6 carry the connector surface, and the SPEC.md M9 module registry row is current. Derived from [SPEC.md](../../SPEC.md); where this and [CONTRACTS.md](CONTRACTS.md) disagree, CONTRACTS wins.
 
 ## Purpose
 

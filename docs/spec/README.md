@@ -12,8 +12,8 @@ Phase specs derived from the master [SPEC.md](../../SPEC.md). Each SPEC-n scopes
 | [SPEC-5](SPEC-5.md) | Insights (raid analytics, economy, fingerprint) | M7 | ✅ complete |
 | [SPEC-6](SPEC-6.md) | Service daemon (REST+WS host, watchers, patch sentinel) | M5.1, M5.6, M8 | ✅ complete |
 | [SPEC-7](SPEC-7.md) | Web UI (Tonight's Plan, Goals/story, Quartermaster, Insights, Environment, Map) | M5.2–M5.5 | ✅ complete (route overlay = P5 open question) |
-| [SPEC-8](SPEC-8.md) | Connectors (capability-based pluggable adapters; plugin seam for H3) | M9 (subsumes M6 adapters) | 🚧 M9.1–M9.4 built (32 tests green); M9.5 writes + M9.6 plugin loader open |
+| [SPEC-8](SPEC-8.md) | Connectors (capability-based pluggable adapters; plugin seam for H3) | M9 (subsumes M6 adapters) | 🚧 M9.1–M9.4 built + Wootility/NVIDIA/Sonar reads + `game-config` write (M9.5, opt-in/gated); DRS+audio writes + M9.6 plugin loader open |
 | [SPEC-9](SPEC-9.md) | Desktop app shell & packaging (Electron single-app + `.exe`/`.msi`; UI elevation) | M11 | ✅ M11.1+M11.2 shipped (NSIS .exe, 137MB, service boots); MSI + M11.3 deferred |
-| [SPEC-10](SPEC-10.md) | Sources: efficient external-data monitoring (registry, cache, quota, status; TT-read pivot) | M10 | 🚧 M10.1–M10.2 built (41 tests green); M10.3 status API + M10.4 wiki/submit open |
+| [SPEC-10](SPEC-10.md) | Sources: efficient external-data monitoring (registry, cache, quota, status; TT-read pivot) | M10 | ✅ M10.1–M10.4 built (tarkov-dev JSON, TarkovTracker read, EFT wiki, manager-submit disabled); status API + Sources view live |
 
-All eight units passed independent adversarial verification (2026-07-11); integration wave drove the full stack live against real logs, real snapshot, and a real Claude briefing. Remaining forward work is tracked in SPEC.md §4 (open questions) and the P5 row of the phase table.
+The P0–P5 units (SPEC-0…7) passed independent adversarial verification (2026-07-11); the integration wave drove the full stack live against real logs, a real snapshot, and a real Claude briefing. The P6 "Coach" units (SPEC-8…10) followed (2026-07-16). Remaining forward work is tracked in SPEC.md §4 (open questions) and the P5/P6 rows of the phase table.
