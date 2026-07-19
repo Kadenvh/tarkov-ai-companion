@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import type { ServiceConfig } from "../src/config.js";
-import { closeApps, jsonResponse, testApp } from "./helpers.js";
+import { closeApps, jsonResponse, testApp, tempDir } from "./helpers.js";
 
 const TWO_PROFILES: ServiceConfig = {
   profiles: [
@@ -56,6 +56,17 @@ describe("core routes (CONTRACTS §5.1)", () => {
     });
     expect(evil.statusCode).toBe(403);
     expect(evil.json().error).toMatch(/LAN allowlist/);
+  });
+
+  it("POST /api/sync drives one on-demand pull cycle and reports a summary", async () => {
+    // Point at an empty logs dir so the test never ingests a real local EFT install.
+    const app = await testApp({ logsDir: tempDir() });
+    const res = await app.inject({ method: "POST", url: "/api/sync" });
+    expect(res.statusCode).toBe(200);
+    const body = res.json();
+    expect(body.ok).toBe(true);
+    expect(body).toMatchObject({ parsedEvents: 0, quests: 0, fleaSales: 0, raidsEnded: 0 });
+    expect(typeof body.lastSyncAt).toBe("string");
   });
 
   it("GET /api/health reports version, snapshot, profile, and patch sentinel", async () => {

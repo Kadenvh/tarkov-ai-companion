@@ -22,6 +22,36 @@ afterAll(() => {
   for (const dir of tmpDirs) rmSync(dir, { recursive: true, force: true });
 });
 
+describe("pumpOnce summary (on-demand pull sync)", () => {
+  it("reports what it applied and re-syncs are incremental (cursor at EOF)", () => {
+    const store = openProfile("pull-summary-regular", { memory: true });
+    const watcher = new LogWatcher({
+      store,
+      logsDir: logsDirWith("log_2026.07.11_4-38-37_1.0.6.0.46010"),
+      snapshotVersion: "1.0.6.0.46010",
+    });
+
+    const first = watcher.pumpOnce();
+    expect(first.session).toContain("1.0.6.0.46010");
+    expect(first.parsedEvents).toBeGreaterThan(0);
+    expect(first.raidsEnded).toBeGreaterThanOrEqual(1);
+
+    // Cursor now sits at EOF — a second pull ingests nothing new.
+    const second = watcher.pumpOnce();
+    expect(second.parsedEvents).toBe(0);
+    expect(second.raidsEnded).toBe(0);
+    expect(second.quests).toBe(0);
+  });
+
+  it("returns an empty summary when the logs dir has no sessions", () => {
+    const store = openProfile("pull-empty-regular", { memory: true });
+    const empty = mkdtempSync(join(tmpdir(), "tac-empty-logs-"));
+    tmpDirs.push(empty);
+    const summary = new LogWatcher({ store, logsDir: empty }).pumpOnce();
+    expect(summary).toEqual({ session: null, parsedEvents: 0, quests: 0, fleaSales: 0, raidsEnded: 0 });
+  });
+});
+
 describe("live watcher replay (M2.2 acceptance: real 2026-05-25 session)", () => {
   it("detects the Ground Zero raid end-to-end from the real 1.0.5 session logs", () => {
     const store = openProfile("replay-may-regular", { memory: true });

@@ -23,6 +23,7 @@ import {
   TarkovTrackerMirror,
   findLogsDir,
   detectInstallDir,
+  type PumpSummary,
   type ProfileStore,
   type TrackerMirrorStatus,
   type TarkovTrackerApplyCounts,
@@ -200,6 +201,10 @@ export class ServiceRuntime {
   private readonly screenshotsDir: string | undefined;
   private logWatcher: LogWatcher | null = null;
   private screenshotWatcher: ScreenshotWatcher | null = null;
+  /** lazily-built, NEVER-started watcher used only for on-demand pull sync (Companion-on-Zoe). */
+  private pullWatcher: LogWatcher | null = null;
+  /** ISO timestamp of the last on-demand sync (for the UI's "last synced" readout). */
+  lastSyncAt: string | null = null;
   private unbindPatch: (() => void) | null = null;
   private mirror: TarkovTrackerMirror | null = null;
   private trackerScheduler: TrackerSyncScheduler | null = null;
@@ -488,6 +493,34 @@ export class ServiceRuntime {
     this.logWatcher = null;
     await this.screenshotWatcher?.stop();
     this.screenshotWatcher = null;
+    this.pullWatcher = null; // rebound to the new store on the next syncOnce()
+  }
+
+  /**
+   * On-demand log pull (CONTRACTS — two-PC pull model). Drives exactly ONE
+   * watcher cycle and returns a summary; no interval, so nothing polls the
+   * gaming PC in the background. Reuses the continuous watcher when running
+   * (dev / same-PC), else a lazily-built pull-only watcher pointed at the
+   * configured logs dir (e.g. hero's Tailscale-shared `Logs`). Cursor-based, so
+   * repeated syncs only ingest what's new since the last one.
+   */
+  syncOnce(): PumpSummary {
+    if (this.logWatcher) {
+      const summary = this.logWatcher.pumpOnce();
+      this.lastSyncAt = new Date().toISOString();
+      return summary;
+    }
+    if (!this.pullWatcher) {
+      const logsDir = this.logsDir();
+      this.pullWatcher = new LogWatcher({
+        store: this.store,
+        snapshotVersion: this.snapshotVersion(),
+        ...(logsDir ? { logsDir } : {}),
+      });
+    }
+    const summary = this.pullWatcher.pumpOnce();
+    this.lastSyncAt = new Date().toISOString();
+    return summary;
   }
 
   // -- patch sentinel (M8.2) ---------------------------------------------------

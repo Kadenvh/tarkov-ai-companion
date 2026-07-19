@@ -36,6 +36,15 @@ interface LogCursor {
   offsets: Record<string, number>;
 }
 
+/** What one pump cycle applied — returned by {@link LogWatcher.pumpOnce} for on-demand sync reporting. */
+export interface PumpSummary {
+  session: string | null;
+  parsedEvents: number;
+  quests: number;
+  fleaSales: number;
+  raidsEnded: number;
+}
+
 export class LogWatcher {
   private readonly store: ProfileStore;
   private readonly logsDir: string | null;
@@ -48,6 +57,8 @@ export class LogWatcher {
   private assembler: RaidAssembler | null = null;
   private timer: NodeJS.Timeout | null = null;
   private patchEmittedFor: string | null = null;
+  /** per-pump counters, reset at the top of each pumpOnce (drives PumpSummary). */
+  private pump = { quests: 0, fleaSales: 0, raidsEnded: 0 };
 
   /** last map seen loading (`scene preset path`) — pairs screenshots with a map */
   currentMap: string | null = null;
@@ -75,12 +86,18 @@ export class LogWatcher {
     this.timer = null;
   }
 
-  /** One discovery + tail-poll cycle. Public so tests replay without timers. */
-  pumpOnce(): void {
-    if (!this.logsDir) return;
+  /**
+   * One discovery + tail-poll cycle. Public so tests replay without timers AND
+   * so the on-demand pull-sync (Companion-on-Zoe, no continuous watcher) can
+   * drive a single cycle from `POST /api/sync`. Returns a summary of what it
+   * applied. No-op summary when no logs dir / no session exists yet.
+   */
+  pumpOnce(): PumpSummary {
+    this.pump = { quests: 0, fleaSales: 0, raidsEnded: 0 };
+    if (!this.logsDir) return { session: null, parsedEvents: 0, quests: 0, fleaSales: 0, raidsEnded: 0 };
     const folders = listSessionFolders(this.logsDir);
     const newest = folders.at(-1);
-    if (!newest) return;
+    if (!newest) return { session: null, parsedEvents: 0, quests: 0, fleaSales: 0, raidsEnded: 0 };
 
     if (this.session?.name !== newest.name) this.attachSession(newest);
     this.checkPatch(newest);
@@ -98,6 +115,13 @@ export class LogWatcher {
     events.sort((a, b) => a.ts.localeCompare(b.ts));
     for (const ev of events) this.handle(ev);
     this.persistCursor();
+    return {
+      session: this.session?.name ?? null,
+      parsedEvents: events.length,
+      quests: this.pump.quests,
+      fleaSales: this.pump.fleaSales,
+      raidsEnded: this.pump.raidsEnded,
+    };
   }
 
   private attachSession(next: SessionFolder): void {
@@ -160,9 +184,11 @@ export class LogWatcher {
         return;
       case "quest":
         this.store.applyQuestEvent({ taskId: ev.taskId, status: ev.status, ts: ev.ts }, "live");
+        this.pump.quests++;
         return;
       case "fleaSale":
         this.store.recordFleaSale({ itemId: ev.itemId, amount: ev.amount, ts: ev.ts });
+        this.pump.fleaSales++;
         return;
       default:
         this.forwardToAssembler(ev);
@@ -188,6 +214,7 @@ export class LogWatcher {
         return;
       case "ended":
         this.store.recordRaid(draft, "live", this.session?.version ?? null);
+        this.pump.raidsEnded++;
         this.store.events.emit("raid.ended", {
           sid: draft.sid,
           map: draft.map,
