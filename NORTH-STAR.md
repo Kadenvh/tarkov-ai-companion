@@ -53,3 +53,6 @@ When choosing what to build or how to build it, the first filter that discrimina
 | Product posture | **"The Coach"** — proactive agentic companion, not passive tracker; agentic loops + occasional assisted-capture prompts | 2026-07-16 |
 | Community strategy | **Plugin + OBS overlay + guide/dataset (local-first, no SaaS/cloud state)** — H3 promoted to a real track | 2026-07-16 |
 | Data-capture depth | **Maximal account-safe:** logs + end-of-raid results OCR + config↔outcome/perf attribution + net-worth/goal ETA | 2026-07-16 |
+| Product IA | **Verb-first** (Operate · Understand · Ask · Environment) — lead with *what to do*, not object lists. The deliberate delta vs TarkovTracker's noun-oriented nav (see [research/11](docs/research/11-tarkovtracker-product-recon.md)) | 2026-07-19 |
+| State feed | **Read-mostly mirror FROM TarkovTracker** — sync progress *in* (TarkovMonitor already feeds TT); **no writes back** (avoid the shared 100/day write quota + TM cascade conflicts); local log-watcher = enrichment, not a competing writer | 2026-07-19 |
+| Design language | **Tactical console** — brass on gunmetal, layered panels w/ inset highlight, monospace data readouts, hazard-stripe signature, **dark-committed** (second-monitor game companion) | 2026-07-19 |
