@@ -56,6 +56,50 @@ describe("agent HTTP surface (CONTRACTS §8)", () => {
     expect(typeof body.toolCalls[0]!.argsSummary).toBe("string");
   });
 
+  it("POST /chat fuses plan + foresight + sources into one answer with view-compatible citations", async () => {
+    const res = await app.inject({
+      method: "POST",
+      url: "/chat",
+      payload: { message: "what should I prioritize this session?" },
+    });
+    expect(res.statusCode).toBe(200);
+    const body = res.json() as {
+      reply: string;
+      toolCalls: { tool: string; argsSummary: string; detail?: string }[];
+    };
+    // grounded answer references each surface
+    expect(body.reply).toContain("get_plan");
+    expect(body.reply).toContain("get_foresight");
+    expect(body.reply).toContain("get_sources_status");
+    // the XP-gate stall from foresight bubbles into the answer
+    expect(body.reply).toContain("gate");
+    // the down source (tarkovtracker) is flagged as a staleness caveat
+    expect(body.reply).toContain("tarkovtracker");
+
+    const names = body.toolCalls.map((c) => c.tool);
+    expect(names).toEqual(["get_plan", "get_foresight", "get_sources_status"]);
+    // Every tool-call is view-renderable: Copilot.tsx reads the label from
+    // `tool` and the tooltip from `detail`. Assert both are present + shaped.
+    for (const call of body.toolCalls) {
+      expect(typeof call.tool).toBe("string");
+      expect(typeof call.detail).toBe("string");
+      expect(call.detail).toMatch(/^(GET|POST) \/api\//);
+    }
+  });
+
+  it("POST /chat answers source/connector health from get_sources_status + get_connectors", async () => {
+    const res = await app.inject({
+      method: "POST",
+      url: "/chat",
+      payload: { message: "what's my data source and connector status?" },
+    });
+    expect(res.statusCode).toBe(200);
+    const body = res.json() as { reply: string; toolCalls: { tool: string }[] };
+    expect(body.toolCalls.map((c) => c.tool)).toEqual(["get_sources_status", "get_connectors"]);
+    expect(body.reply).toContain("get_sources_status");
+    expect(body.reply).toContain("get_connectors");
+  });
+
   it("POST /chat rejects an empty message with 400", async () => {
     const res = await app.inject({ method: "POST", url: "/chat", payload: { message: "" } });
     expect(res.statusCode).toBe(400);

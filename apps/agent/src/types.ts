@@ -28,10 +28,17 @@ export type PlannerWeights = z.infer<typeof PlannerWeightsSchema>;
 
 export const DEFAULT_WEIGHTS: PlannerWeights = { task: 1, xp: 0.15, criticality: 0.4, mapCost: {} };
 
-/** One tool invocation as reported to API consumers (CONTRACTS §8 /chat). */
+/**
+ * One tool invocation as reported to API consumers (CONTRACTS §8 /chat).
+ * `detail` names the grounded source (usually the HTTP endpoint the tool hit),
+ * so the Copilot view can render each call as a citation: its tolerant reader
+ * takes the label from `tool` and the tooltip from `detail`.
+ */
 export interface ToolCallRecord {
   tool: string;
   argsSummary: string;
+  /** Human-readable provenance, e.g. "GET /api/state" — surfaced as the citation tooltip. */
+  detail?: string;
 }
 
 export type AgentBackend = "agent-sdk" | "api" | "mock";

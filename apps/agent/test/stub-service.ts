@@ -107,8 +107,34 @@ export const STUB_FORESIGHT = {
       fails: [{ id: "task-big-customer", name: "Big Customer", kappaRequired: false, lightkeeperRequired: false }],
       severity: "warning",
     },
+    {
+      // M3.4b XP-gate stall shape (packages/planner foresight.ts XpGateStall).
+      kind: "xp-gate",
+      task: { id: "task-gunsmith-3", name: "Gunsmith - Part 3" },
+      requiredLevel: 20,
+      projectedLevel: 17,
+      levelsShort: 3,
+      raidsShort: 4,
+      severity: "warning",
+      message:
+        "Route stalls at the Gunsmith - Part 3 L20 gate — projected L17 after the planned raids, ~3 levels / ~4 more raids short.",
+    },
   ],
 };
+
+/** Per-source health (packages/sources SourceStatus): one up, one down. */
+export const STUB_SOURCES_STATUS = [
+  { id: "tarkov-dev-json", up: true, apiVersion: "1.2.3", cacheAgeSec: 42 },
+  { id: "tarkovtracker", up: false, lastError: "no API token configured" },
+  { id: "eft-wiki", up: true, cacheAgeSec: 300 },
+];
+
+/** Registered local connectors (service /api/connectors shape). */
+export const STUB_CONNECTORS = [
+  { id: "eft-config", vendor: "BSG", capabilities: ["game-config"], riskTier: "T1", health: "connected" },
+  { id: "wootility", vendor: "Wooting", capabilities: ["game-config"], riskTier: "T2", health: "missing" },
+  { id: "manual-capture", vendor: "tac", capabilities: ["manual-capture"], riskTier: "T0", health: "connected" },
+];
 
 export const STUB_STORY = {
   chapters: [
@@ -194,6 +220,8 @@ export async function startStubService(opts: StubOptions = {}): Promise<StubServ
   });
   app.get("/api/quartermaster", async () => STUB_QM);
   app.get("/api/foresight", async () => STUB_FORESIGHT);
+  app.get("/api/sources/status", async () => STUB_SOURCES_STATUS);
+  app.get("/api/connectors", async () => STUB_CONNECTORS);
   app.get("/api/story", async () => STUB_STORY);
   app.get("/api/graph/summary", async () => STUB_GRAPH_SUMMARY);
   app.get("/api/goals", async () => goals);
