@@ -35,6 +35,18 @@ export {
 } from "./plan.js";
 export { Metrics, type MetricsSnapshot } from "./metrics.js";
 export {
+  TelemetrySampler,
+  TelemetryScheduler,
+  defaultOsReader,
+  DEFAULT_TELEMETRY_INTERVAL_MS,
+  DEFAULT_TELEMETRY_BUFFER_CAP,
+  DEFAULT_TELEMETRY_IDLE_MS,
+  type TelemetrySample,
+  type TelemetrySamplerOptions,
+  type TelemetrySchedulerOptions,
+  type OsReader,
+} from "./telemetry.js";
+export {
   buildConnectorRegistry,
   buildSourceRegistry,
   type SourceRegistryOptions,

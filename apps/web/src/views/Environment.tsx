@@ -1,23 +1,40 @@
 /**
- * Environment (M6 surface) — settings diff vs curated profiles with safe
- * apply (409 "game running" handled inline), NVIDIA advisor card, per-map
- * perf percentiles + regression badges, ammo tier lookup by caliber.
+ * Settings & Perf (M6 surface) restructured into three tabs:
+ *   • Live  — real-time system/GPU telemetry (StatTiles + live TimeSeries fed by
+ *             the store's rolling telemetry buffer / WS telemetry.sample).
+ *   • Perf  — per-map FPS percentile bars, frametime distribution, regression
+ *             callouts, and config→outcome attribution before/after bars.
+ *   • Settings — the existing advisor: settings diff vs curated profiles with
+ *             safe apply (409 handled inline), NVIDIA advisor, ammo tiers.
+ * Every panel degrades to an empty state; nothing crashes or flat-lines to zero.
  */
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useApp } from "../store";
 import { ApiError } from "../api/client";
-import { readPerfRows, readSettingsDiffs } from "../lib/normalize";
+import { readAttribution, readPerfRows, readSettingsDiffs } from "../lib/normalize";
 import { mapDisplayName } from "../lib/maps";
+import { pctDelta } from "../components/charts/geometry";
+import {
+  BarChart,
+  Histogram,
+  PercentileBars,
+  StatTile,
+  TimeSeries,
+  type BarDatum,
+  type TimeSeriesMetric,
+} from "../components/charts";
 import { Badge, Empty } from "../components/common";
 import type {
   AmmoEntry,
   AmmoResponse,
   ApplyResultResponse,
+  AttributionResponse,
   EnvironmentSettingsResponse,
   NvidiaReportResponse,
   PerfResponse,
   SettingDiff,
+  TelemetrySample,
 } from "../api/types";
 
 const COMMON_CALIBERS = [
@@ -36,112 +53,368 @@ const COMMON_CALIBERS = [
   "5.7x28",
 ];
 
+type Tab = "live" | "perf" | "settings";
+
 function fmtValue(v: SettingDiff["current"]): string {
   if (v === undefined || v === null) return "—";
   return String(v);
 }
 
-export function EnvironmentView(): ReactNode {
-  const { api, pushToast } = useApp();
+const int = (v: number): string => String(Math.round(v));
 
-  // ---------- settings diffs ----------
-  const [profiles, setProfiles] = useState<Record<string, SettingDiff[]>>({});
-  const [activeProfile, setActiveProfile] = useState<string>("");
-  const [applying, setApplying] = useState(false);
-  const [gameRunning, setGameRunning] = useState(false);
-  const [settingsLoaded, setSettingsLoaded] = useState(false);
+// ---------------------------------------------------------------- Live tab
 
-  const loadSettings = async (): Promise<void> => {
-    try {
-      const res = await api.get<EnvironmentSettingsResponse>("/api/environment/settings");
-      const diffs = readSettingsDiffs(res);
-      setProfiles(diffs);
-      const keys = Object.keys(diffs);
-      setActiveProfile((prev) => (prev && diffs[prev] ? prev : (keys[0] ?? "")));
-    } catch {
-      /* view shows empty state */
-    } finally {
-      setSettingsLoaded(true);
-    }
-  };
+/** Sample ~this many points back for the StatTile delta (context, not noise). */
+const DELTA_LOOKBACK = 15;
 
-  const applyProfile = async (): Promise<void> => {
-    if (!activeProfile) return;
-    setApplying(true);
-    setGameRunning(false);
-    try {
-      const res = await api.post<ApplyResultResponse>("/api/environment/settings/apply", {
-        profile: activeProfile,
-      });
-      pushToast(
-        "info",
-        `Applied "${activeProfile}"${res.backupId ? ` — backup ${res.backupId}` : ""}.`,
-        "Settings applied",
-      );
-      await loadSettings();
-    } catch (err) {
-      if (err instanceof ApiError && err.isConflict) {
-        setGameRunning(true); // handled inline, no toast
-      }
-      /* other errors already toasted by the client */
-    } finally {
-      setApplying(false);
-    }
-  };
+function LiveTab(): ReactNode {
+  const { telemetry, telemetryLoaded } = useApp();
 
-  // ---------- nvidia / perf ----------
-  const [nvidia, setNvidia] = useState<NvidiaReportResponse | null>(null);
-  const [perf, setPerf] = useState<ReturnType<typeof readPerfRows>>([]);
+  const times = useMemo(() => telemetry.map((s) => s.ts), [telemetry]);
+  const hasGpu = telemetry.some((s) => s.gpu);
+  const last: TelemetrySample | undefined = telemetry[telemetry.length - 1];
+  const prev = telemetry[Math.max(0, telemetry.length - 1 - DELTA_LOOKBACK)];
 
-  useEffect(() => {
-    void loadSettings();
-    void api
-      .get<NvidiaReportResponse>("/api/environment/nvidia")
-      .then(setNvidia)
-      .catch(() => undefined);
-    void api
-      .get<PerfResponse>("/api/environment/perf")
-      .then((res) => setPerf(readPerfRows(res)))
-      .catch(() => undefined);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [api]);
+  const systemMetrics: TimeSeriesMetric[] = useMemo(
+    () => [
+      {
+        key: "cpu",
+        label: "CPU",
+        unit: "%",
+        hue: "secondary",
+        domain: [0, 100],
+        values: telemetry.map((s) => s.system.cpuPct),
+        format: int,
+      },
+      {
+        key: "ram",
+        label: "RAM",
+        unit: "%",
+        hue: "secondary",
+        domain: [0, 100],
+        values: telemetry.map((s) =>
+          s.system.memTotalMiB > 0 ? (s.system.memUsedMiB / s.system.memTotalMiB) * 100 : null,
+        ),
+        format: int,
+      },
+    ],
+    [telemetry],
+  );
 
-  // ---------- ammo lookup ----------
-  const [caliber, setCaliber] = useState("");
-  const [ammo, setAmmo] = useState<AmmoEntry[]>([]);
-  const [ammoLoading, setAmmoLoading] = useState(false);
+  const gpuMetrics: TimeSeriesMetric[] = useMemo(
+    () =>
+      hasGpu
+        ? [
+            {
+              key: "util",
+              label: "GPU util",
+              unit: "%",
+              hue: "secondary",
+              domain: [0, 100],
+              values: telemetry.map((s) => s.gpu?.utilPct ?? null),
+              format: int,
+            },
+            {
+              key: "temp",
+              label: "GPU temp",
+              unit: "°C",
+              hue: "secondary",
+              values: telemetry.map((s) => s.gpu?.tempC ?? null),
+              format: int,
+            },
+            {
+              key: "power",
+              label: "GPU power",
+              unit: "W",
+              hue: "secondary",
+              values: telemetry.map((s) => s.gpu?.powerW ?? null),
+              format: int,
+            },
+          ]
+        : [],
+    [telemetry, hasGpu],
+  );
 
-  const lookupAmmo = async (cal: string): Promise<void> => {
-    setCaliber(cal);
-    if (!cal) {
-      setAmmo([]);
-      return;
-    }
-    setAmmoLoading(true);
-    try {
-      const res = await api.get<AmmoResponse>("/api/environment/ammo", { caliber: cal });
-      const list = Array.isArray(res) ? res : (res.table ?? res.ammo ?? []);
-      setAmmo(list);
-    } catch {
-      setAmmo([]);
-    } finally {
-      setAmmoLoading(false);
-    }
-  };
+  if (!telemetryLoaded && telemetry.length === 0) {
+    return <Empty>Connecting to telemetry…</Empty>;
+  }
+  if (telemetry.length === 0) {
+    return (
+      <Empty>
+        No telemetry stream. The observability backend (GET /api/telemetry/* + the telemetry.sample
+        WS event) isn&apos;t reporting yet — values land here live once it is.
+      </Empty>
+    );
+  }
 
-  const diffs = profiles[activeProfile] ?? [];
+  const ramPct =
+    last && last.system.memTotalMiB > 0
+      ? (last.system.memUsedMiB / last.system.memTotalMiB) * 100
+      : null;
+  const ramPrevPct =
+    prev && prev.system.memTotalMiB > 0
+      ? (prev.system.memUsedMiB / prev.system.memTotalMiB) * 100
+      : null;
+  const gib = (mib: number): string => (mib / 1024).toFixed(1);
 
   return (
-    <div>
-      <div className="pagehead">
-        <h2>Settings &amp; Perf</h2>
-        <span className="count">around the game · never in it</span>
+    <>
+      <div className="tile-grid">
+        <StatTile
+          label="CPU"
+          value={last ? int(last.system.cpuPct) : "—"}
+          unit="%"
+          {...(last && prev ? { delta: pctDelta(last.system.cpuPct, prev.system.cpuPct) } : {})}
+        />
+        <StatTile
+          label="RAM"
+          value={last ? gib(last.system.memUsedMiB) : "—"}
+          unit={last ? `/ ${gib(last.system.memTotalMiB)} GiB` : "GiB"}
+          {...(ramPct != null && ramPrevPct != null ? { delta: pctDelta(ramPct, ramPrevPct) } : {})}
+          sub={ramPct != null ? `${int(ramPct)}% used` : undefined}
+        />
+        {hasGpu && last?.gpu ? (
+          <>
+            <StatTile
+              label="GPU util"
+              value={int(last.gpu.utilPct)}
+              unit="%"
+              {...(prev?.gpu ? { delta: pctDelta(last.gpu.utilPct, prev.gpu.utilPct) } : {})}
+            />
+            <StatTile
+              label="GPU temp"
+              value={int(last.gpu.tempC)}
+              unit="°C"
+              {...(prev?.gpu ? { delta: pctDelta(last.gpu.tempC, prev.gpu.tempC) } : {})}
+            />
+            <StatTile
+              label="GPU power"
+              value={int(last.gpu.powerW)}
+              unit="W"
+              {...(prev?.gpu ? { delta: pctDelta(last.gpu.powerW, prev.gpu.powerW) } : {})}
+            />
+            <StatTile
+              label="VRAM"
+              value={gib(last.gpu.memUsedMiB)}
+              unit={`/ ${gib(last.gpu.memTotalMiB)} GiB`}
+              sub={`${last.gpu.coreClockMhz} MHz core`}
+            />
+          </>
+        ) : null}
       </div>
-      <p className="sub">
-        Settings, driver, and performance around the game — never touching the game process.
-        Settings writes only happen with the game closed, after a backup.
-      </p>
 
+      <div className="card">
+        <TimeSeries title="System" times={times} metrics={systemMetrics} />
+      </div>
+
+      {hasGpu ? (
+        <div className="card">
+          <TimeSeries title="GPU" times={times} metrics={gpuMetrics} />
+        </div>
+      ) : (
+        <p className="sub">
+          No GPU telemetry in this stream — showing CPU/RAM only. GPU util/temp/power appear here
+          when the backend reports a <code>gpu</code> block.
+        </p>
+      )}
+    </>
+  );
+}
+
+// ---------------------------------------------------------------- Perf tab
+
+function PerfTab({
+  perf,
+  attribution,
+}: {
+  perf: ReturnType<typeof readPerfRows>;
+  attribution: ReturnType<typeof readAttribution> | null;
+}): ReactNode {
+  const namedPerf = perf.filter((r) => r.map);
+  const [selMap, setSelMap] = useState<string>("");
+  const active = namedPerf.find((r) => r.map === selMap) ?? namedPerf[0];
+
+  const fpsBars: BarDatum[] = namedPerf
+    .filter((r) => r.fps_avg != null)
+    .map((r) => ({
+      label: mapDisplayName(r.map),
+      value: r.fps_avg as number,
+      tone: r.regressed ? "bad" : "default",
+      sub: `${r.n ?? "?"} samples${r.regressed ? " · regressed" : ""}`,
+    }));
+
+  const regressions = namedPerf.filter((r) => r.regressed);
+
+  return (
+    <>
+      {namedPerf.length === 0 ? (
+        <Empty>
+          No frame telemetry yet. Run PresentMon during a session and the service ingests the CSV —
+          percentiles land here per map.
+        </Empty>
+      ) : (
+        <>
+          <div className="card">
+            <BarChart title="Average FPS by map" unit="fps" data={fpsBars} hue="secondary" />
+          </div>
+
+          {regressions.length > 0 ? (
+            <div className="card">
+              <h3 style={{ marginTop: 0 }}>
+                Regressions <Badge kind="down">{regressions.length}</Badge>
+              </h3>
+              <ul className="objective-list">
+                {regressions.map((r) => (
+                  <li key={r.map}>
+                    <span className="tick">▼</span>
+                    <span>
+                      <strong>{mapDisplayName(r.map)}</strong>{" "}
+                      <Badge kind="warn">regressed</Badge>
+                      <div className="note">
+                        {(r.regression?.reasons ?? []).join("; ") || "below the rolling baseline"}
+                      </div>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+
+          {active ? (
+            <div className="card">
+              <div className="controls-row">
+                <label>
+                  Map{" "}
+                  <select value={active.map ?? ""} onChange={(e) => setSelMap(e.target.value)}>
+                    {namedPerf.map((r) => (
+                      <option key={r.map} value={r.map ?? ""}>
+                        {mapDisplayName(r.map)}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+              <div className="card-grid">
+                <PercentileBars
+                  title={`${mapDisplayName(active.map)} — framerate`}
+                  unit="fps"
+                  hue="secondary"
+                  data={[
+                    { label: "avg", value: active.fps_avg },
+                    { label: "1% low", value: active.fps_p1 },
+                  ]}
+                />
+                <PercentileBars
+                  title={`${mapDisplayName(active.map)} — frametime`}
+                  unit="ms"
+                  hue="secondary"
+                  format={(v) => v.toFixed(1)}
+                  data={[
+                    { label: "p50", value: active.frametime_p50 },
+                    { label: "p95", value: active.frametime_p95 },
+                    { label: "p99", value: active.frametime_p99 },
+                  ]}
+                />
+              </div>
+              {active.frametimes && active.frametimes.length > 0 ? (
+                <div style={{ marginTop: 14 }}>
+                  <Histogram
+                    title={`${mapDisplayName(active.map)} — frametime distribution`}
+                    unit="ms"
+                    hue="secondary"
+                    values={active.frametimes}
+                    format={(v) => v.toFixed(1)}
+                  />
+                </div>
+              ) : (
+                <p className="sub" style={{ marginTop: 10 }}>
+                  Raw frametime samples not exported for this map — showing percentiles only. The
+                  distribution histogram appears when the perf CSV includes per-frame times.
+                </p>
+              )}
+            </div>
+          ) : null}
+        </>
+      )}
+
+      {attribution && attribution.findings.length > 0 ? (
+        <div className="card">
+          <h3 style={{ marginTop: 0 }}>
+            Config → outcome <Badge kind="warn">{attribution.findings.length}</Badge>
+          </h3>
+          <p className="sub">
+            Before/after around a recorded config change. Bars are tinted good/bad by direction and
+            always labelled; small-n findings are flagged.
+          </p>
+          <div className="card-grid">
+            {attribution.findings.map((f, i) => {
+              const improved = f.direction === "up";
+              const unit = f.metric === "fps" ? "fps" : "%";
+              const scale = f.metric === "survival" ? 100 : 1;
+              return (
+                <BarChart
+                  key={`${f.changeAt}-${f.metric}-${i}`}
+                  title={
+                    <>
+                      {f.label}{" "}
+                      {f.confidence === "low" ? <Badge kind="warn">low n</Badge> : null}
+                    </>
+                  }
+                  unit={unit}
+                  hue="secondary"
+                  height={150}
+                  format={(v) => (f.metric === "survival" ? `${Math.round(v)}` : String(Math.round(v)))}
+                  data={[
+                    { label: "before", value: f.before * scale, sub: `n=${f.nBefore}` },
+                    {
+                      label: "after",
+                      value: f.after * scale,
+                      tone: improved ? "good" : "bad",
+                      sub: `n=${f.nAfter}`,
+                    },
+                  ]}
+                />
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
+    </>
+  );
+}
+
+// ---------------------------------------------------------------- Settings tab
+
+function SettingsTab({
+  profiles,
+  activeProfile,
+  setActiveProfile,
+  applying,
+  gameRunning,
+  settingsLoaded,
+  applyProfile,
+  nvidia,
+  caliber,
+  ammo,
+  ammoLoading,
+  lookupAmmo,
+}: {
+  profiles: Record<string, SettingDiff[]>;
+  activeProfile: string;
+  setActiveProfile: (p: string) => void;
+  applying: boolean;
+  gameRunning: boolean;
+  settingsLoaded: boolean;
+  applyProfile: () => void;
+  nvidia: NvidiaReportResponse | null;
+  caliber: string;
+  ammo: AmmoEntry[];
+  ammoLoading: boolean;
+  lookupAmmo: (cal: string) => void;
+}): ReactNode {
+  const diffs = profiles[activeProfile] ?? [];
+  return (
+    <>
       <div className="card">
         <h3 style={{ marginTop: 0 }}>EFT settings vs curated profiles</h3>
         {Object.keys(profiles).length === 0 ? (
@@ -163,11 +436,7 @@ export function EnvironmentView(): ReactNode {
                   ))}
                 </select>
               </label>
-              <button
-                className="primary"
-                disabled={applying || diffs.length === 0}
-                onClick={() => void applyProfile()}
-              >
+              <button className="primary" disabled={applying || diffs.length === 0} onClick={applyProfile}>
                 {applying
                   ? "Applying…"
                   : diffs.length === 0
@@ -178,8 +447,8 @@ export function EnvironmentView(): ReactNode {
             {gameRunning ? (
               <div className="warning-box">
                 <div className="w-kind">game running</div>
-                Escape from Tarkov is currently running — settings are only written while the game
-                is closed. Close the game and try again. Nothing was changed.
+                Escape from Tarkov is currently running — settings are only written while the game is
+                closed. Close the game and try again. Nothing was changed.
               </div>
             ) : null}
             {diffs.length === 0 ? (
@@ -216,96 +485,51 @@ export function EnvironmentView(): ReactNode {
         )}
       </div>
 
-      <div className="card-grid">
-        <div className="card">
-          <h3 style={{ marginTop: 0 }}>NVIDIA</h3>
-          {!nvidia ? (
-            <Empty>No NVIDIA report (nvidia-smi not detected or service unreachable).</Empty>
-          ) : (
-            <>
-              {nvidia.gpu ? (
-                <div className="kv" style={{ marginBottom: 10 }}>
-                  <span className="k">GPU</span>
-                  <span>{nvidia.gpu.name}</span>
-                  <span className="k">Driver</span>
-                  <span>{nvidia.gpu.driverVersion}</span>
-                  <span className="k">VRAM</span>
-                  <span>{Math.round(nvidia.gpu.vramMiB / 1024)} GiB</span>
-                </div>
-              ) : (
-                <p className="sub">No NVIDIA GPU detected — generic guidance below.</p>
-              )}
-              <div className="table-scroll">
-                <table className="data">
-                  <thead>
-                    <tr>
-                      <th>Where</th>
-                      <th>Setting</th>
-                      <th>Recommended</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {nvidia.recommendations.map((rec, i) => (
-                      <tr key={i} title={rec.why}>
-                        <td className="dim">{rec.surface}</td>
-                        <td>{rec.setting}</td>
-                        <td>
-                          <strong>{rec.recommended}</strong>
-                          <div className="dim" style={{ fontSize: 13 }}>
-                            {rec.why}
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+      <div className="card">
+        <h3 style={{ marginTop: 0 }}>NVIDIA</h3>
+        {!nvidia ? (
+          <Empty>No NVIDIA report (nvidia-smi not detected or service unreachable).</Empty>
+        ) : (
+          <>
+            {nvidia.gpu ? (
+              <div className="kv" style={{ marginBottom: 10 }}>
+                <span className="k">GPU</span>
+                <span>{nvidia.gpu.name}</span>
+                <span className="k">Driver</span>
+                <span>{nvidia.gpu.driverVersion}</span>
+                <span className="k">VRAM</span>
+                <span>{Math.round(nvidia.gpu.vramMiB / 1024)} GiB</span>
               </div>
-            </>
-          )}
-        </div>
-
-        <div className="card">
-          <h3 style={{ marginTop: 0 }}>Performance per map</h3>
-          {perf.length === 0 ? (
-            <Empty>
-              No frame telemetry yet. Run PresentMon during a session and the service ingests the
-              CSV — percentiles land here per map.
-            </Empty>
-          ) : (
+            ) : (
+              <p className="sub">No NVIDIA GPU detected — generic guidance below.</p>
+            )}
             <div className="table-scroll">
               <table className="data">
                 <thead>
                   <tr>
-                    <th>Map</th>
-                    <th className="num">FPS avg</th>
-                    <th className="num">1% low</th>
-                    <th className="num">p95 ft</th>
-                    <th className="num">p99 ft</th>
-                    <th />
+                    <th>Where</th>
+                    <th>Setting</th>
+                    <th>Recommended</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {perf.map((row, i) => (
-                    <tr key={row.map ?? i}>
-                      <td>{mapDisplayName(row.map)}</td>
-                      <td className="num">{row.fps_avg?.toFixed(0) ?? "—"}</td>
-                      <td className="num">{row.fps_p1?.toFixed(0) ?? "—"}</td>
-                      <td className="num">{row.frametime_p95?.toFixed(1) ?? "—"}</td>
-                      <td className="num">{row.frametime_p99?.toFixed(1) ?? "—"}</td>
+                  {nvidia.recommendations.map((rec, i) => (
+                    <tr key={i} title={rec.why}>
+                      <td className="dim">{rec.surface}</td>
+                      <td>{rec.setting}</td>
                       <td>
-                        {row.regressed ? (
-                          <span title={(row.regression?.reasons ?? []).join("; ")}>
-                            <Badge kind="down">regressed</Badge>
-                          </span>
-                        ) : null}
+                        <strong>{rec.recommended}</strong>
+                        <div className="dim" style={{ fontSize: 13 }}>
+                          {rec.why}
+                        </div>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-          )}
-        </div>
+          </>
+        )}
       </div>
 
       <div className="card">
@@ -317,7 +541,7 @@ export function EnvironmentView(): ReactNode {
               list="calibers"
               value={caliber}
               placeholder="e.g. 5.45x39"
-              onChange={(e) => void lookupAmmo(e.target.value)}
+              onChange={(e) => lookupAmmo(e.target.value)}
             />
           </label>
           <datalist id="calibers">
@@ -329,7 +553,7 @@ export function EnvironmentView(): ReactNode {
         </div>
         {ammo.length === 0 ? (
           caliber ? (
-            <Empty>No ammo found for "{caliber}".</Empty>
+            <Empty>No ammo found for &quot;{caliber}&quot;.</Empty>
           ) : (
             <p className="sub">Pick a caliber to see the current-patch tier table.</p>
           )
@@ -374,6 +598,150 @@ export function EnvironmentView(): ReactNode {
           </div>
         )}
       </div>
+    </>
+  );
+}
+
+// ---------------------------------------------------------------- shell
+
+export function EnvironmentView(): ReactNode {
+  const { api, pushToast, wsStatus } = useApp();
+  const [tab, setTab] = useState<Tab>("live");
+
+  // ---------- settings diffs ----------
+  const [profiles, setProfiles] = useState<Record<string, SettingDiff[]>>({});
+  const [activeProfile, setActiveProfile] = useState<string>("");
+  const [applying, setApplying] = useState(false);
+  const [gameRunning, setGameRunning] = useState(false);
+  const [settingsLoaded, setSettingsLoaded] = useState(false);
+
+  const loadSettings = async (): Promise<void> => {
+    try {
+      const res = await api.get<EnvironmentSettingsResponse>("/api/environment/settings");
+      const diffs = readSettingsDiffs(res);
+      setProfiles(diffs);
+      const keys = Object.keys(diffs);
+      setActiveProfile((prev) => (prev && diffs[prev] ? prev : (keys[0] ?? "")));
+    } catch {
+      /* view shows empty state */
+    } finally {
+      setSettingsLoaded(true);
+    }
+  };
+
+  const applyProfile = async (): Promise<void> => {
+    if (!activeProfile) return;
+    setApplying(true);
+    setGameRunning(false);
+    try {
+      const res = await api.post<ApplyResultResponse>("/api/environment/settings/apply", {
+        profile: activeProfile,
+      });
+      pushToast(
+        "info",
+        `Applied "${activeProfile}"${res.backupId ? ` — backup ${res.backupId}` : ""}.`,
+        "Settings applied",
+      );
+      await loadSettings();
+    } catch (err) {
+      if (err instanceof ApiError && err.isConflict) setGameRunning(true);
+    } finally {
+      setApplying(false);
+    }
+  };
+
+  // ---------- nvidia / perf / attribution ----------
+  const [nvidia, setNvidia] = useState<NvidiaReportResponse | null>(null);
+  const [perf, setPerf] = useState<ReturnType<typeof readPerfRows>>([]);
+  const [attribution, setAttribution] = useState<ReturnType<typeof readAttribution> | null>(null);
+
+  useEffect(() => {
+    void loadSettings();
+    void api
+      .get<NvidiaReportResponse>("/api/environment/nvidia")
+      .then(setNvidia)
+      .catch(() => undefined);
+    void api
+      .get<PerfResponse>("/api/environment/perf")
+      .then((res) => setPerf(readPerfRows(res)))
+      .catch(() => undefined);
+    void api
+      .get<AttributionResponse>("/api/insights/attribution")
+      .then((res) => setAttribution(readAttribution(res)))
+      .catch(() => undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [api]);
+
+  // ---------- ammo lookup ----------
+  const [caliber, setCaliber] = useState("");
+  const [ammo, setAmmo] = useState<AmmoEntry[]>([]);
+  const [ammoLoading, setAmmoLoading] = useState(false);
+
+  const lookupAmmo = (cal: string): void => {
+    setCaliber(cal);
+    if (!cal) {
+      setAmmo([]);
+      return;
+    }
+    setAmmoLoading(true);
+    void api
+      .get<AmmoResponse>("/api/environment/ammo", { caliber: cal })
+      .then((res) => setAmmo(Array.isArray(res) ? res : (res.table ?? res.ammo ?? [])))
+      .catch(() => setAmmo([]))
+      .finally(() => setAmmoLoading(false));
+  };
+
+  const TABS: { id: Tab; label: string }[] = [
+    { id: "live", label: "Live" },
+    { id: "perf", label: "Perf" },
+    { id: "settings", label: "Settings" },
+  ];
+
+  return (
+    <div>
+      <div className="pagehead">
+        <h2>Settings &amp; Perf</h2>
+        <span className="count">
+          around the game · never in it {wsStatus === "open" ? "· live" : ""}
+        </span>
+      </div>
+      <p className="sub">
+        Settings, driver, and performance around the game — never touching the game process.
+        Settings writes only happen with the game closed, after a backup.
+      </p>
+
+      <div className="tabbar" role="tablist" aria-label="Settings & Perf sections">
+        {TABS.map((t) => (
+          <button
+            key={t.id}
+            role="tab"
+            aria-selected={tab === t.id}
+            className={`tab${tab === t.id ? " active" : ""}`}
+            onClick={() => setTab(t.id)}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {tab === "live" ? <LiveTab /> : null}
+      {tab === "perf" ? <PerfTab perf={perf} attribution={attribution} /> : null}
+      {tab === "settings" ? (
+        <SettingsTab
+          profiles={profiles}
+          activeProfile={activeProfile}
+          setActiveProfile={setActiveProfile}
+          applying={applying}
+          gameRunning={gameRunning}
+          settingsLoaded={settingsLoaded}
+          applyProfile={() => void applyProfile()}
+          nvidia={nvidia}
+          caliber={caliber}
+          ammo={ammo}
+          ammoLoading={ammoLoading}
+          lookupAmmo={lookupAmmo}
+        />
+      ) : null}
     </div>
   );
 }

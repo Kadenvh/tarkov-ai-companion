@@ -11,6 +11,7 @@ import { registerCoreRoutes } from "./routes/core.js";
 import { registerPlanningRoutes } from "./routes/planning.js";
 import { registerEnvironmentRoutes } from "./routes/environment.js";
 import { registerInsightsRoutes } from "./routes/insights.js";
+import { registerTelemetryRoutes } from "./routes/telemetry.js";
 import { registerAgentRoutes } from "./routes/agent.js";
 import { registerPlatformRoutes } from "./routes/platform.js";
 import { registerIntegrationRoutes } from "./routes/integrations.js";
@@ -68,13 +69,19 @@ export async function buildApp(opts: BuildAppOptions = {}): Promise<FastifyInsta
   // §5.3 events
   await app.register(fastifyWebsocket);
   app.get("/ws", { websocket: true }, (socket) => {
-    rt.hub.add(socket as unknown as HubSocket);
+    const hubSocket = socket as unknown as HubSocket;
+    rt.hub.add(hubSocket);
+    // A live WS client is telemetry demand: keep the poller sampling while it is
+    // connected, and release it on close so idle-stop can wind nvidia-smi down.
+    rt.telemetry.retain();
+    hubSocket.on("close", () => rt.telemetry.release());
   });
 
   registerCoreRoutes(app, rt);
   registerPlanningRoutes(app, rt);
   registerEnvironmentRoutes(app, rt);
   registerInsightsRoutes(app, rt);
+  registerTelemetryRoutes(app, rt);
   registerAgentRoutes(app, rt);
   registerPlatformRoutes(app, rt);
   registerIntegrationRoutes(app, rt);

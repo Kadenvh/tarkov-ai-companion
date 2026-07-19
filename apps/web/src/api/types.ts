@@ -280,11 +280,47 @@ export interface PerfMapRow {
   frametime_p50?: number | null;
   frametime_p95?: number | null;
   frametime_p99?: number | null;
+  /** optional raw frametime samples (ms) — enables the distribution histogram */
+  frametimes?: number[];
   regressed?: boolean;
   regression?: { regressed: boolean; reasons: string[] };
 }
 
 export type PerfResponse = PerfMapRow[] | { maps?: PerfMapRow[]; rows?: PerfMapRow[] };
+
+// ---------- telemetry (live observability — GET /api/telemetry/*, WS telemetry.sample) ----------
+
+export interface TelemetrySystem {
+  cpuPct: number;
+  memUsedMiB: number;
+  memTotalMiB: number;
+}
+
+/** Optional — omitted when no discrete GPU / no telemetry provider. */
+export interface TelemetryGpu {
+  utilPct: number;
+  memUsedMiB: number;
+  memTotalMiB: number;
+  coreClockMhz: number;
+  tempC: number;
+  powerW: number;
+}
+
+/** One point of live system/GPU telemetry. `ts` is epoch-ms (normalized). */
+export interface TelemetrySample {
+  ts: number;
+  system: TelemetrySystem;
+  gpu?: TelemetryGpu;
+}
+
+export interface TelemetryHistory {
+  samples: TelemetrySample[];
+  intervalMs: number;
+}
+
+/** Tolerant — normalized via readTelemetrySample() / readTelemetryHistory(). */
+export type TelemetryCurrentResponse = Record<string, unknown>;
+export type TelemetryHistoryResponse = Record<string, unknown>;
 
 export interface AmmoEntry {
   id: string;

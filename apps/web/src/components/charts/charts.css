@@ -1,0 +1,302 @@
+/* Chart toolkit styling — token-driven, one system.
+   Hue = job: teal (secondary) for system/GPU/perf, tan (primary) for
+   progression/economy. Grid recessive; axis/label/value text in ink tokens,
+   never the series color. Numbers tabular. */
+
+.chart-fig {
+  margin: 0;
+}
+.chart-cap {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xs);
+}
+.chart-title {
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  letter-spacing: 0.02em;
+}
+.chart-unit {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+.chart-toggle {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  background: transparent;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  padding: 1px 7px;
+  cursor: pointer;
+}
+.chart-toggle:hover {
+  color: var(--color-secondary-400);
+  border-color: color-mix(in srgb, var(--color-secondary-500) 40%, transparent);
+}
+.chart-toggle[aria-pressed="true"] {
+  color: var(--color-secondary-400);
+  border-color: color-mix(in srgb, var(--color-secondary-500) 40%, transparent);
+}
+.chart-table {
+  margin-top: var(--space-xs);
+}
+
+.chart-wrap {
+  position: relative;
+  width: 100%;
+}
+.chart {
+  display: block;
+  width: 100%;
+  overflow: visible;
+}
+.chart-empty {
+  border: 1px dashed var(--border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+/* ---- series hue tokens (magnitude = one hue, light->dark) ---- */
+.chart.hue-secondary,
+.ts-row.hue-secondary,
+.tip-swatch.hue-secondary {
+  --series: var(--color-secondary-400);
+  --series-strong: var(--color-secondary-300);
+  --series-fill: color-mix(in srgb, var(--color-secondary-500) 12%, transparent);
+}
+.chart.hue-primary,
+.ts-row.hue-primary,
+.tip-swatch.hue-primary {
+  --series: var(--color-primary-400);
+  --series-strong: var(--color-primary-300);
+  --series-fill: color-mix(in srgb, var(--color-primary-500) 12%, transparent);
+}
+
+/* ---- marks ---- */
+.chart .line {
+  fill: none;
+  stroke: var(--series, var(--color-secondary-400));
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.chart .area {
+  fill: var(--series-fill, color-mix(in srgb, var(--color-secondary-500) 12%, transparent));
+  stroke: none;
+}
+.chart .bar {
+  fill: var(--series, var(--color-secondary-400));
+}
+.chart .bar.tone-good {
+  fill: var(--color-success-500);
+}
+.chart .bar.tone-warn {
+  fill: var(--color-warning-500);
+}
+.chart .bar.tone-bad {
+  fill: var(--color-error-500);
+}
+.chart .endpoint {
+  fill: var(--series-strong, var(--color-secondary-300));
+  stroke: var(--color-surface-950);
+  stroke-width: 1.5;
+}
+.chart .crosshair-dot {
+  fill: var(--series-strong, var(--color-secondary-300));
+}
+.chart .bar-value {
+  fill: var(--color-text-secondary);
+  font-size: var(--text-xs);
+}
+
+/* ---- grid + axes (recessive; ink text) ---- */
+.chart .grid {
+  stroke: var(--color-surface-700);
+  stroke-width: 1;
+  opacity: 0.35;
+}
+.chart .axis-x,
+.chart .axis-y {
+  fill: var(--color-text-muted);
+  font-size: var(--text-xs);
+  font-family: var(--font-mono);
+}
+.chart .ts-rowlabel {
+  fill: var(--color-text-secondary);
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* ---- crosshair ---- */
+.chart .crosshair {
+  stroke: var(--color-text-muted);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* ---- annotation markers (status hues, always labelled) ---- */
+.ts-marker .marker-line {
+  stroke-width: 1.5;
+  stroke-dasharray: 4 3;
+  opacity: 0.85;
+}
+.ts-marker .marker-label {
+  font-size: var(--text-xs);
+  font-family: var(--font-mono);
+  dominant-baseline: hanging;
+}
+.ts-marker.tone-kappa .marker-line {
+  stroke: var(--color-kappa-500);
+}
+.ts-marker.tone-kappa .marker-label {
+  fill: var(--color-kappa-400);
+}
+.ts-marker.tone-good .marker-line {
+  stroke: var(--color-success-500);
+}
+.ts-marker.tone-good .marker-label {
+  fill: var(--color-success-400);
+}
+.ts-marker.tone-warn .marker-line {
+  stroke: var(--color-warning-500);
+}
+.ts-marker.tone-warn .marker-label {
+  fill: var(--color-warning-400);
+}
+
+/* ---- tooltip (HTML overlay) ---- */
+.chart-tip {
+  position: absolute;
+  top: 0;
+  transform: translateX(8px);
+  pointer-events: none;
+  background: var(--color-surface-900);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-elevated);
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--text-xs);
+  z-index: 5;
+  min-width: 96px;
+}
+.chart-tip.flip {
+  transform: translateX(-100%) translateX(-8px);
+}
+.chart-tip .tip-label {
+  color: var(--color-text-muted);
+  margin-bottom: 3px;
+}
+.chart-tip .tip-val {
+  color: var(--color-text);
+  font-weight: var(--font-weight-semibold);
+}
+.chart-tip .tip-sub {
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+.chart-tip .tip-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+.chart-tip .tip-name {
+  color: var(--color-text-secondary);
+}
+.chart-tip .tip-row .tip-val {
+  margin-left: auto;
+}
+.tip-swatch {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--series, var(--color-secondary-400));
+  flex: none;
+}
+
+/* ---- StatTile ---- */
+.stat-tile {
+  background: var(--color-surface-900);
+  border: 1px solid var(--border-default);
+  border-left: 3px solid var(--color-secondary-500);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-md);
+}
+.stat-tile.hue-primary {
+  border-left-color: var(--color-primary-500);
+}
+.stat-tile .st-label {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.stat-tile .st-value {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  margin-top: 2px;
+}
+.stat-tile .st-num {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.1;
+  color: var(--color-text);
+}
+.stat-tile .st-unit {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+.stat-tile .st-delta {
+  font-size: var(--text-xs);
+  margin-top: 3px;
+  color: var(--color-text-muted);
+}
+.stat-tile .st-delta.good {
+  color: var(--color-success-400);
+}
+.stat-tile .st-delta.bad {
+  color: var(--color-error-400);
+}
+.stat-tile .st-sub {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin-top: 3px;
+}
+
+/* tabular-nums helper for chart numerics */
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* endpoint marker distortion is unavoidable under the sparkline's
+   preserveAspectRatio=none; keep it subtle */
+.sparkline.hue-secondary .line {
+  stroke: var(--color-secondary-500);
+}
+.sparkline.hue-secondary .area {
+  fill: color-mix(in srgb, var(--color-secondary-500) 12%, transparent);
+}
+.sparkline .endpoint {
+  fill: var(--color-primary-400);
+}
+.sparkline.hue-secondary .endpoint {
+  fill: var(--color-secondary-400);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chart *,
+  .chart-tip {
+    transition: none !important;
+  }
+}

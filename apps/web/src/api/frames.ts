@@ -45,6 +45,8 @@ export interface FrameHandlers {
   onNotice?(payload: NoticePayload): void;
   /** §5.7 source.status — a remote source's status row changed. */
   onSourceStatus?(payload: Record<string, unknown>): void;
+  /** telemetry.sample — one live system/GPU telemetry point (observability surface). */
+  onTelemetry?(payload: Record<string, unknown>): void;
   onUnknown?(frame: WsFrame): void;
 }
 
@@ -93,6 +95,9 @@ export function routeFrame(frame: WsFrame, handlers: FrameHandlers): boolean {
       return true;
     case "source.status":
       handlers.onSourceStatus?.(payload);
+      return true;
+    case "telemetry.sample":
+      handlers.onTelemetry?.(payload);
       return true;
     default:
       handlers.onUnknown?.(frame);

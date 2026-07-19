@@ -27,12 +27,16 @@ import type {
   SourceStatusRow,
   StateResponse,
   StoryResponse,
+  TelemetryHistoryResponse,
+  TelemetrySample,
 } from "./api/types";
 import {
   normalizePlanResponse,
   normalizeStoryResponse,
   readPlayerState,
   readSourceStatusRow,
+  readTelemetryHistory,
+  readTelemetrySample,
   type NormalizedPlayerState,
 } from "./lib/normalize";
 import type { DecisionsMade, StageProgress } from "./lib/story";
@@ -95,6 +99,10 @@ export interface AppStore {
   raidBanner: RaidBanner | null;
   /** Live per-source status pushed over WS (§5.7); merged over the fetched rows by the Sources view. */
   liveSourceStatus: Record<string, SourceStatusRow>;
+  /** Rolling client buffer of live telemetry (seeded from /history, appended from WS telemetry.sample). */
+  telemetry: TelemetrySample[];
+  /** true once the initial telemetry history fetch has resolved (so views can distinguish "loading" from "unsupported"). */
+  telemetryLoaded: boolean;
 
   horizon: number;
   setHorizon(h: number): void;
@@ -129,6 +137,9 @@ export function useApp(): AppStore {
 }
 
 let toastSeq = 1;
+
+/** Rolling telemetry buffer cap (~15 min at 1s cadence) — bounds memory + render cost. */
+const TELEMETRY_CAP = 900;
 
 export function AppProvider({ children }: { children: ReactNode }): ReactNode {
   const [toasts, setToasts] = useState<Toast[]>([]);
@@ -173,6 +184,8 @@ export function AppProvider({ children }: { children: ReactNode }): ReactNode {
   const [positions, setPositions] = useState<PositionPayload[]>([]);
   const [raidBanner, setRaidBanner] = useState<RaidBanner | null>(null);
   const [liveSourceStatus, setLiveSourceStatus] = useState<Record<string, SourceStatusRow>>({});
+  const [telemetry, setTelemetry] = useState<TelemetrySample[]>([]);
+  const [telemetryLoaded, setTelemetryLoaded] = useState(false);
   const [onboardingOpen, setOnboardingOpen] = useState(false);
 
   const [horizon, setHorizonState] = useState<number>(() => loadLocal("tac-horizon", 5));
@@ -246,6 +259,18 @@ export function AppProvider({ children }: { children: ReactNode }): ReactNode {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // seed the telemetry buffer from history (degrades to empty when the endpoint is absent)
+  useEffect(() => {
+    void api
+      .get<TelemetryHistoryResponse>("/api/telemetry/history", { minutes: 10 })
+      .then((res) => {
+        const { samples } = readTelemetryHistory(res);
+        if (samples.length > 0) setTelemetry(samples.slice(-TELEMETRY_CAP));
+      })
+      .catch(() => undefined)
+      .finally(() => setTelemetryLoaded(true));
+  }, [api]);
+
   // refetch plan when horizon changes (after initial load)
   const firstHorizon = useRef(true);
   useEffect(() => {
@@ -303,6 +328,16 @@ export function AppProvider({ children }: { children: ReactNode }): ReactNode {
     onSourceStatus: (payload) => {
       const row = readSourceStatusRow(payload);
       if (row) setLiveSourceStatus((prev) => ({ ...prev, [row.id]: row }));
+    },
+    onTelemetry: (payload) => {
+      const sample = readTelemetrySample(payload);
+      if (!sample) return;
+      setTelemetry((prev) => {
+        // guard against out-of-order / duplicate timestamps
+        if (prev.length > 0 && sample.ts <= prev[prev.length - 1]!.ts) return prev;
+        const next = prev.length >= TELEMETRY_CAP ? prev.slice(prev.length - TELEMETRY_CAP + 1) : prev;
+        return [...next, sample];
+      });
     },
   });
 
@@ -383,6 +418,8 @@ export function AppProvider({ children }: { children: ReactNode }): ReactNode {
     positions,
     raidBanner,
     liveSourceStatus,
+    telemetry,
+    telemetryLoaded,
     horizon,
     setHorizon,
     toasts,

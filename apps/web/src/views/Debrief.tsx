@@ -18,7 +18,7 @@ import {
 import { fmtHour, fmtMinutes, fmtNumber, fmtPct, fmtRubles } from "../lib/format";
 import { mapDisplayName } from "../lib/maps";
 import { Badge, Empty } from "../components/common";
-import { Sparkline } from "../components/Sparkline";
+import { BarChart, TimeSeries, type BarDatum, type TimeMarker } from "../components/charts";
 import { HighlightTimeline } from "../components/HighlightTimeline";
 import type {
   AttributionResponse,
@@ -142,32 +142,20 @@ export function DebriefView(): ReactNode {
         {raids && raids.byMap.length > 0 ? (
           <div className="card">
             <h3 style={{ marginTop: 0 }}>Survival by map</h3>
-            <div className="table-scroll">
-              <table className="data">
-                <thead>
-                  <tr>
-                    <th>Map</th>
-                    <th className="num">Raids</th>
-                    <th className="num">Survived</th>
-                    <th className="num">Rate</th>
-                    <th />
-                  </tr>
-                </thead>
-                <tbody>
-                  {raids.byMap.map((row) => (
-                    <tr key={row.map}>
-                      <td>{mapDisplayName(row.map)}</td>
-                      <td className="num">{row.n}</td>
-                      <td className="num">{row.survived}</td>
-                      <td className="num">{fmtPct(row.survivalRate)}</td>
-                      <td>
-                        <LowN low={row.lowConfidence} />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <BarChart
+              hue="primary"
+              unit="%"
+              height={190}
+              format={(v) => String(Math.round(v))}
+              data={raids.byMap.map(
+                (row): BarDatum => ({
+                  label: mapDisplayName(row.map),
+                  value: (row.survivalRate ?? 0) * 100,
+                  sub: `${row.survived}/${row.n} survived${row.lowConfidence ? " · low n" : ""}`,
+                  ...(row.lowConfidence ? { tone: "warn" as const } : {}),
+                }),
+              )}
+            />
           </div>
         ) : null}
 
@@ -269,7 +257,21 @@ export function DebriefView(): ReactNode {
               </>
             ) : null}
           </div>
-          <div className="table-scroll">
+          <BarChart
+            title="Survival rate by session"
+            hue="primary"
+            unit="%"
+            height={170}
+            format={(v) => String(Math.round(v))}
+            data={rhythm.sessions.slice(-14).map(
+              (s): BarDatum => ({
+                label: new Date(s.startTs).toLocaleDateString("en-US", { month: "numeric", day: "numeric" }),
+                value: (s.survivalRate ?? 0) * 100,
+                sub: `${s.raidCount} raids · ${fmtMinutes(s.lengthMin)}`,
+              }),
+            )}
+          />
+          <div className="table-scroll" style={{ marginTop: 12 }}>
             <table className="data">
               <thead>
                 <tr>
@@ -301,9 +303,20 @@ export function DebriefView(): ReactNode {
           <h3 style={{ marginTop: 0 }}>
             Flea income ({economy.income.bucket}) <LowN low={economy.income.lowConfidence} />
           </h3>
-          <Sparkline
-            title="cumulative flea income"
-            points={economy.income.points.map((p) => ({ label: p.period, value: p.cumulative }))}
+          <TimeSeries
+            title="Cumulative flea income"
+            times={economy.income.points.map((_, i) => i)}
+            xFormat={(t) => economy.income?.points[Math.round(t)]?.period ?? ""}
+            metrics={[
+              {
+                key: "income",
+                label: "Cumulative",
+                unit: "₽",
+                hue: "primary",
+                values: economy.income.points.map((p) => p.cumulative),
+                format: (v) => fmtRubles(v),
+              },
+            ]}
           />
           <div className="kv" style={{ marginTop: 10 }}>
             <span className="k">Total observed</span>
@@ -327,9 +340,31 @@ export function DebriefView(): ReactNode {
             Net worth &amp; goal ETA <LowN low={networth.lowConfidence} />
           </h3>
           {networth.series.length > 0 ? (
-            <Sparkline
-              title="net-worth estimate"
-              points={networth.series.map((p) => ({ label: p.day, value: p.estimatedNetWorth }))}
+            <TimeSeries
+              title="Net-worth estimate"
+              times={networth.series.map((p) => Date.parse(p.day))}
+              xFormat={(t) => new Date(t).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+              markers={
+                networth.goal && !networth.goal.reached && networth.goal.etaDays != null
+                  ? [
+                      {
+                        t: Date.now() + networth.goal.etaDays * 86_400_000,
+                        label: `goal ~${fmtNumber(networth.goal.etaDays)}d`,
+                        tone: "kappa",
+                      } as TimeMarker,
+                    ]
+                  : []
+              }
+              metrics={[
+                {
+                  key: "nw",
+                  label: "Net worth",
+                  unit: "₽",
+                  hue: "primary",
+                  values: networth.series.map((p) => p.estimatedNetWorth),
+                  format: (v) => fmtRubles(v),
+                },
+              ]}
             />
           ) : null}
           <div className="kv" style={{ marginTop: 10 }}>

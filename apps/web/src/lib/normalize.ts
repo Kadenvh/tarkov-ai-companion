@@ -34,6 +34,7 @@ import type {
   SurvivalByDurationRow,
   SurvivalByHourRow,
   SurvivalByMapRow,
+  TelemetrySample,
 } from "../api/types";
 
 type Rec = Record<string, unknown>;
@@ -344,6 +345,11 @@ export function readPerfRows(raw: unknown): PerfMapRow[] {
       const v = num(r[key]);
       if (v !== undefined) entry[key] = v;
     }
+    const frametimes = arr(pick(r, "frametimes", "frametimeSamples"));
+    if (frametimes) {
+      const samples = frametimes.filter((x): x is number => typeof x === "number" && Number.isFinite(x));
+      if (samples.length > 0) entry.frametimes = samples;
+    }
     const regression = rec(r["regression"]);
     if (regression && typeof regression["regressed"] === "boolean") {
       entry.regression = {
@@ -357,6 +363,71 @@ export function readPerfRows(raw: unknown): PerfMapRow[] {
     out.push(entry);
   }
   return out;
+}
+
+// ---------- telemetry (GET /api/telemetry/*, WS telemetry.sample) ----------
+
+/** Coerce a timestamp that may arrive as epoch-ms, epoch-sec, or ISO string. */
+function readTs(v: unknown): number {
+  const n = num(v);
+  if (n !== undefined) {
+    // heuristic: values below ~10^12 that still look like seconds get scaled up
+    return n < 1e12 && n > 1e9 ? n * 1000 : n;
+  }
+  const s = str(v);
+  if (s !== undefined) {
+    const parsed = Date.parse(s);
+    if (Number.isFinite(parsed)) return parsed;
+  }
+  return Date.now();
+}
+
+/** One telemetry sample. Null when the system block is unusable. GPU is optional. */
+export function readTelemetrySample(raw: unknown): TelemetrySample | null {
+  const r = rec(raw);
+  if (!r) return null;
+  const sys = rec(pick(r, "system", "sys")) ?? r;
+  const cpuPct = num(pick(sys, "cpuPct", "cpu", "cpuUsage"));
+  if (cpuPct === undefined) return null;
+  const sample: TelemetrySample = {
+    ts: readTs(pick(r, "ts", "time", "timestamp")),
+    system: {
+      cpuPct,
+      memUsedMiB: num(pick(sys, "memUsedMiB", "memUsed")) ?? 0,
+      memTotalMiB: num(pick(sys, "memTotalMiB", "memTotal")) ?? 0,
+    },
+  };
+  const g = rec(pick(r, "gpu"));
+  const utilPct = num(pick(g ?? {}, "utilPct", "util", "gpuUtil"));
+  if (g && utilPct !== undefined) {
+    sample.gpu = {
+      utilPct,
+      memUsedMiB: num(pick(g, "memUsedMiB", "memUsed")) ?? 0,
+      memTotalMiB: num(pick(g, "memTotalMiB", "memTotal")) ?? 0,
+      coreClockMhz: num(pick(g, "coreClockMhz", "coreClock", "clockMhz")) ?? 0,
+      tempC: num(pick(g, "tempC", "temp", "temperature")) ?? 0,
+      powerW: num(pick(g, "powerW", "power")) ?? 0,
+    };
+  }
+  return sample;
+}
+
+export interface NormalizedTelemetryHistory {
+  samples: TelemetrySample[];
+  intervalMs: number;
+}
+
+/** Accepts `{ samples, intervalMs }` or a bare array of samples. */
+export function readTelemetryHistory(raw: unknown): NormalizedTelemetryHistory {
+  const root = rec(raw);
+  const list = arr(raw) ?? arr(root?.["samples"]) ?? [];
+  const samples: TelemetrySample[] = [];
+  for (const row of list) {
+    const s = readTelemetrySample(row);
+    if (s) samples.push(s);
+  }
+  samples.sort((a, b) => a.ts - b.ts);
+  return { samples, intervalMs: num(root?.["intervalMs"]) ?? 1000 };
 }
 
 // ---------- /api/insights/raids ----------
