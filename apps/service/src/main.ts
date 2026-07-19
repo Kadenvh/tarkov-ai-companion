@@ -1,5 +1,5 @@
 import { buildApp } from "./app.js";
-import { defaultDataDir, loadConfig, servicePort, watchDisabled } from "./config.js";
+import { defaultDataDir, loadConfig, resolveNetwork, servicePort, watchDisabled, LOCAL_HOSTS } from "./config.js";
 import { DEFAULT_HORIZON } from "./plan.js";
 
 /**
@@ -36,8 +36,16 @@ async function main(): Promise<void> {
   );
 
   const port = servicePort();
-  await app.listen({ port, host: "127.0.0.1" });
-  console.log(`[http]        listening on http://127.0.0.1:${port} (REST + /ws)`);
+  const net = resolveNetwork(config);
+  await app.listen({ port, host: net.bindHost });
+  if (net.lanEnabled) {
+    const lanHosts = [...net.allowedHosts].filter((h) => h && !LOCAL_HOSTS.includes(h));
+    console.log(`[http]        listening on http://${net.bindHost}:${port} (REST + /ws) — LAN-EXPOSED`);
+    console.log(`[http]        reachable from this LAN at: ${lanHosts.map((h) => `http://${h}:${port}`).join(", ") || "(no LAN IP detected)"}`);
+    console.log(`[http]        trusted-home-LAN model: no auth, Host allowlist only. Never expose this port to the internet.`);
+  } else {
+    console.log(`[http]        listening on http://127.0.0.1:${port} (REST + /ws) — local-only`);
+  }
 
   let closing = false;
   const shutdown = (signal: string): void => {
