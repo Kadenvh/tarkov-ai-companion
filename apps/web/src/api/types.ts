@@ -85,7 +85,11 @@ export interface PlannedRaidTask {
   reasons: string[];
 }
 
-/** planner ExclusivityWarning / story-decision warning, attached per raid. */
+/**
+ * planner ExclusivityWarning / story-decision / xp-gate-stall finding. Tolerant:
+ * different `kind`s populate different optional fields; the view renders from
+ * whatever is present (`message`/`consequence` first).
+ */
 export interface ForesightWarning {
   kind: string;
   completing?: { id: string; name: string };
@@ -94,6 +98,12 @@ export interface ForesightWarning {
   /** free-form consequence text (story decisions) */
   consequence?: string;
   message?: string;
+  /** xp-gate stall (kind: "xp-gate") — projected vs required level short-fall. */
+  task?: { id: string; name: string };
+  requiredLevel?: number;
+  projectedLevel?: number;
+  levelsShort?: number;
+  raidsShort?: number | null;
 }
 
 export interface PlannedRaid {

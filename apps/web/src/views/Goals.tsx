@@ -203,7 +203,7 @@ export function GoalsView(): ReactNode {
       {topForesight.length > 0 ? (
         <div className="foresight-banner">
           <div className="sectionlabel">
-            <span className="eyebrow">⚠ Foresight · irreversible decisions ahead</span>
+            <span className="eyebrow">⚠ Foresight · irreversible decisions &amp; XP-gate stalls ahead</span>
             <span className="rule" />
           </div>
           {topForesight.map((warning, i) => {
