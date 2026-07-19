@@ -992,6 +992,31 @@ table.data code {
   font-size: var(--text-base);
 }
 
+/* ---------- scav cooldown (This Raid) ---------- */
+
+.scav-card.cleared {
+  border-color: var(--color-success-500);
+}
+.scav-card .scav-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+.scav-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+.scav-intel {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+}
+
 /* ---------- story tracker ---------- */
 
 .ending-card {
