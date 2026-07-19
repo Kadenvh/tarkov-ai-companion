@@ -33,6 +33,7 @@ import type {
   AttributionResponse,
   AuditResult,
   EnvironmentSettingsResponse,
+  HardwareResponse,
   NvidiaReportResponse,
   PerfResponse,
   SettingDiff,
@@ -546,6 +547,51 @@ function SensitivityPanel({ audit }: { audit: AuditResult | null }): ReactNode {
   );
 }
 
+/**
+ * Hardware-aware perf advice — the two hardware-dependent EFT settings (Only-
+ * use-physical-cores + Automatic-RAM-cleaner) answered from DETECTED specs, not
+ * asked. These don't fit the meta-divergence audit (the right value depends on
+ * the machine), so they get their own concrete on/off + rationale here.
+ */
+function HardwarePanel({ hardware }: { hardware: HardwareResponse | null }): ReactNode {
+  return (
+    <div className="card">
+      <h3 style={{ marginTop: 0 }}>Performance settings for your rig</h3>
+      {!hardware ? (
+        <Empty>Detecting your hardware…</Empty>
+      ) : (
+        <>
+          <p className="sub" style={{ marginTop: 0 }}>
+            Detected:{" "}
+            <strong>
+              {hardware.hardware.physicalCores ?? "?"}
+              {hardware.hardware.physicalCores ? " physical" : " physical (est.)"} /{" "}
+              {hardware.hardware.logicalCores} logical cores
+            </strong>{" "}
+            · <strong>{hardware.hardware.totalRamGB} GB RAM</strong>. These two settings depend on
+            your machine, so they're advised here rather than in the meta audit.
+          </p>
+          <ul className="objective-list">
+            {hardware.advice.map((a) => (
+              <li key={a.key}>
+                <span className="tick">{a.recommend === "on" ? "◉" : "○"}</span>
+                <span>
+                  <strong>{a.label}</strong>:{" "}
+                  <span className={`badge ${a.recommend === "on" ? "live" : "anymap"}`}>
+                    {a.recommend.toUpperCase()}
+                  </span>{" "}
+                  {a.confidence === "medium" ? <Badge kind="warn">worth A/B testing</Badge> : null}
+                  <div className="note">{a.why}</div>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+    </div>
+  );
+}
+
 function SettingsTab({
   audit,
   profiles,
@@ -556,6 +602,7 @@ function SettingsTab({
   settingsLoaded,
   applyProfile,
   applyKeys,
+  hardware,
   nvidia,
   caliber,
   ammo,
@@ -571,6 +618,7 @@ function SettingsTab({
   settingsLoaded: boolean;
   applyProfile: () => void;
   applyKeys: (keys?: string[]) => void;
+  hardware: HardwareResponse | null;
   nvidia: NvidiaReportResponse | null;
   caliber: string;
   ammo: AmmoEntry[];
@@ -588,6 +636,7 @@ function SettingsTab({
         applyKeys={applyKeys}
       />
       <SensitivityPanel audit={audit} />
+      <HardwarePanel hardware={hardware} />
 
       <div className="card">
         <h3 style={{ marginTop: 0 }}>EFT settings vs curated profiles</h3>
@@ -835,9 +884,14 @@ export function EnvironmentView(): ReactNode {
   const [nvidia, setNvidia] = useState<NvidiaReportResponse | null>(null);
   const [perf, setPerf] = useState<ReturnType<typeof readPerfRows>>([]);
   const [attribution, setAttribution] = useState<ReturnType<typeof readAttribution> | null>(null);
+  const [hardware, setHardware] = useState<HardwareResponse | null>(null);
 
   useEffect(() => {
     void loadSettings();
+    void api
+      .get<HardwareResponse>("/api/environment/hardware")
+      .then(setHardware)
+      .catch(() => undefined);
     void api
       .get<NvidiaReportResponse>("/api/environment/nvidia")
       .then(setNvidia)
@@ -918,6 +972,7 @@ export function EnvironmentView(): ReactNode {
           settingsLoaded={settingsLoaded}
           applyProfile={() => void applyChanges(activeProfile)}
           applyKeys={(keys) => void applyChanges("meta", keys)}
+          hardware={hardware}
           nvidia={nvidia}
           caliber={caliber}
           ammo={ammo}

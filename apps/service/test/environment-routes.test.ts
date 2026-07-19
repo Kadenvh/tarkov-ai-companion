@@ -78,6 +78,17 @@ describe("environment routes (CONTRACTS §5.4)", () => {
     expect(Array.isArray(body.recommendations)).toBe(true);
   });
 
+  it("GET /api/environment/hardware returns detected specs + on/off perf advice", async () => {
+    const app = await testApp();
+    const body = (await app.inject({ method: "GET", url: "/api/environment/hardware" })).json();
+    expect(body.hardware.logicalCores).toBeGreaterThanOrEqual(1);
+    expect(body.hardware.totalRamGB).toBeGreaterThan(0);
+    // Exactly the two hardware-dependent settings, each a concrete on/off.
+    const keys = body.advice.map((a: { key: string }) => a.key).sort();
+    expect(keys).toEqual(["AutomaticRamCleaner", "OnlyUsePhysicalCores"]);
+    for (const a of body.advice) expect(["on", "off"]).toContain(a.recommend);
+  });
+
   it("POST /api/environment/perf/import ingests a PresentMon CSV; GET /api/environment/perf reads it back", async () => {
     const app = await testApp();
     const res = await app.inject({

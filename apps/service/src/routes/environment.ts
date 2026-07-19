@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
+import { detectHardware } from "../hardware.js";
 import {
   PROFILES,
   getProfile,
@@ -15,6 +16,7 @@ import {
   detectRegression,
   buildAmmoTable,
   ammoByCaliber,
+  perfAdvice,
   GameRunningError,
   type AmmoEntry,
   type RecommendationProfile,
@@ -93,6 +95,16 @@ export function registerEnvironmentRoutes(app: FastifyInstance, rt: ServiceRunti
       // arrays / undefined fields when files are missing.
       audit: auditConfig(settings),
     };
+  });
+
+  // Hardware-aware performance advice (detect, don't ask): concrete on/off for
+  // the two hardware-dependent EFT settings — Only-use-physical-cores + the
+  // Automatic-RAM-cleaner — derived from detected CPU cores + RAM. Cached for
+  // the process lifetime (hardware doesn't change mid-session).
+  let hardwareCache: Awaited<ReturnType<typeof detectHardware>> | null = null;
+  app.get("/api/environment/hardware", async () => {
+    if (!hardwareCache) hardwareCache = await detectHardware();
+    return { hardware: hardwareCache, advice: perfAdvice(hardwareCache) };
   });
 
   app.post("/api/environment/settings/apply", async (req, reply) => {
